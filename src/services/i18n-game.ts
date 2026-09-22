@@ -47,5 +47,5 @@ export function translateBerry(t: TFunction, id: string): string {
 
 export function translateRecipe(t: TFunction, id: string): string {
   if (!id) return id;
-  return t(`game.recipe.`, { defaultValue: id });
+  return t(`game.recipe.${id}`, { defaultValue: id });
 }
