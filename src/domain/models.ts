@@ -59,7 +59,7 @@ export interface PokemonSpecies {
 }
 
 export interface Recipe {
-  name: string; 
+  name: string;
   displayName: string;
   type: 'curry' | 'salad' | 'dessert';
   ingredients: IngredientSet[];
@@ -95,6 +95,7 @@ export interface OwnedPokemon {
     100: string | null;
   };
   ingredientChoices: {
+    1?: string | null;
     30: string | null;
     60: string | null;
   };

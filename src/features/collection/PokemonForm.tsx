@@ -4,7 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useParams } from 'react-router-dom';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
-import type { OwnedPokemon } from '../../domain/models';
+import type { OwnedPokemon, StaticDataSchema } from '../../domain/models';
+import _gamedata from '../../data/static/gamedata.json';
+import { getNatureDisplayName } from '../../services/i18n-game';
+
+const gamedata = _gamedata as unknown as StaticDataSchema;
 
 const pokemonSchema = z.object({
   speciesId: z.string().min(1, "Especie es requerida"),
@@ -20,7 +24,7 @@ export default function PokemonForm() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
-  
+
   const { register, handleSubmit, formState: { errors } } = useForm<PokemonFormData>({
     resolver: zodResolver(pokemonSchema),
     defaultValues: {
@@ -42,7 +46,11 @@ export default function PokemonForm() {
       ribbonLevel: 0,
       natureId: data.natureId,
       subskills: { 10: null, 25: null, 50: null, 75: null, 100: null },
-      ingredientChoices: { 30: null, 60: null },
+      ingredientChoices: {
+        1: gamedata.species.find(s => s.name === data.speciesId)?.ingredient0?.[0]?.ingredient.name || null,
+        30: null,
+        60: null
+      },
       skillLevel: 1,
       shiny: data.shiny,
       notes: '',
@@ -69,10 +77,15 @@ export default function PokemonForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">{t('pokemon_form.species')}</label>
-          <input {...register('speciesId')} className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="PIKACHU" />
+          <select {...register('speciesId')} className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500">
+            <option value="">{t('pokemon_form.select_species')}</option>
+            {gamedata.species.map(s => (
+              <option key={s.name} value={s.name}>{s.displayName}</option>
+            ))}
+          </select>
           {errors.speciesId && <p className="text-red-500 text-sm mt-1">{errors.speciesId.message}</p>}
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">{t('pokemon_form.nickname')}</label>
           <input {...register('nickname')} className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500" />
@@ -85,7 +98,13 @@ export default function PokemonForm() {
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">{t('pokemon_form.nature')}</label>
-          <input {...register('natureId')} className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Brave" />
+          <select {...register('natureId')} className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500">
+            <option value="">{t('pokemon_form.select_nature')}</option>
+            {gamedata.natures.map(n => (
+              <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>
+            ))}
+          </select>
+          {errors.natureId && <p className="text-red-500 text-sm mt-1">{errors.natureId.message}</p>}
         </div>
 
         <div className="flex items-center gap-2">

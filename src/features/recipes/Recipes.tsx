@@ -8,15 +8,15 @@ export default function Recipes() {
   const [filter, setFilter] = useState<'ALL' | 'CURRY' | 'SALAD' | 'DESSERT'>('ALL');
 
   const recipes: Recipe[] = (gamedata.recipes as unknown as Recipe[]) || [];
-  
+
   const filteredRecipes = recipes.filter(r => filter === 'ALL' || r.type.toUpperCase() === filter);
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">{t('recipes.title')}</h2>
-      
+
       <div className="flex gap-2 mb-6">
-        <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'ALL' ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>Todos</button>
+        <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'ALL' ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>{t('recipes.all')}</button>
         <button onClick={() => setFilter('CURRY')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'CURRY' ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>{t('recipes.curry')}</button>
         <button onClick={() => setFilter('SALAD')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'SALAD' ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>{t('recipes.salad')}</button>
         <button onClick={() => setFilter('DESSERT')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'DESSERT' ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>{t('recipes.dessert')}</button>
@@ -31,7 +31,7 @@ export default function Recipes() {
             </div>
             <div className="text-right">
               <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
-                Valor: {recipe.value}
+                {t('recipes.value')}: {recipe.value}
               </span>
             </div>
           </div>

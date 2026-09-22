@@ -1,6 +1,6 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Book, LayoutDashboard, List } from 'lucide-react';
+import { Book, LayoutDashboard, List, Settings as SettingsIcon } from 'lucide-react';
 
 export default function Layout() {
   const { t } = useTranslation();
@@ -28,6 +28,12 @@ export default function Layout() {
             <Link to="/recetas" className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg text-slate-700 font-medium">
               <Book size={20} />
               {t('nav.recipes')}
+            </Link>
+          </li>
+          <li>
+            <Link to="/configuracion" className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg text-slate-700 font-medium">
+              <SettingsIcon size={20} />
+              {t('nav.settings')}
             </Link>
           </li>
         </ul>

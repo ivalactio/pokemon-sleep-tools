@@ -4,15 +4,18 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
 import { ArrowLeft, Trash2, Calculator, AlertCircle } from 'lucide-react';
 import gamedata from '../../data/static/gamedata.json';
+import { useTranslation } from 'react-i18next';
+import { translateSubskill, translateMainSkill, translateIngredient, translateBerry, getNatureDisplayName } from '../../services/i18n-game';
 import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
 import type { ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
 
 const engine = new SleepApiEngine(gamedata as unknown as StaticDataSchema);
 
 export default function PokemonDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const pokemon = useLiveQuery(() => id ? collectionRepository.getById(id) : undefined, [id]);
 
   const [config, setConfig] = useState<SimulationConfig>({
@@ -20,7 +23,7 @@ export default function PokemonDetail() {
     bedtime: '22:00',
     wakeup: '06:00'
   });
-  
+
   const [estimate, setEstimate] = useState<ProductionEstimate | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,55 +55,164 @@ export default function PokemonDetail() {
       <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-2 text-slate-500 hover:text-slate-800 font-medium">
         <ArrowLeft size={20} /> Volver
       </button>
-      
+
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative">
         <button onClick={handleDelete} className="absolute top-6 right-6 text-red-500 hover:bg-red-50 p-2 rounded-lg">
           <Trash2 size={20} />
         </button>
-        
-        <h2 className="text-3xl font-bold mb-2">{pokemon.nickname || pokemon.speciesId}</h2>
-        <p className="text-slate-500 text-lg mb-6">Nivel {pokemon.level} • {pokemon.natureId}</p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="flex justify-between items-start mb-6">
           <div>
-            <h3 className="font-bold text-slate-800 mb-2">Detalles Básicos</h3>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li><span className="font-medium">Especie:</span> {pokemon.speciesId}</li>
-              <li><span className="font-medium">Nivel de Habilidad:</span> {pokemon.skillLevel}</li>
-              <li><span className="font-medium">Shiny:</span> {pokemon.shiny ? 'Sí' : 'No'}</li>
-            </ul>
+            <h2 className="text-3xl font-bold mb-1">
+              <input type="text" value={pokemon.nickname || ''} placeholder={pokemon.speciesId} onChange={e => collectionRepository.update({ ...pokemon, nickname: e.target.value })} className="bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-500 focus:outline-none" />
+            </h2>
+            <div className="flex items-center gap-2 mt-2">
+              <select value={pokemon.speciesId} onChange={e => {
+                const newSpecies = gamedata.species.find(s => s.name === e.target.value);
+                const ing0 = newSpecies?.ingredient0?.[0]?.ingredient.name || null;
+                collectionRepository.update({
+                  ...pokemon,
+                  speciesId: e.target.value,
+                  ingredientChoices: { 1: ing0, 30: null, 60: null }
+                });
+              }} className="p-1 border border-slate-300 rounded text-sm bg-slate-50">
+                {gamedata.species.map(s => <option key={s.name} value={s.name}>{s.displayName}</option>)}
+              </select>
+              <span className="text-slate-400">•</span>
+              <span className="text-sm font-medium text-slate-600">Nv.</span>
+              <input type="number" min="1" max="100" value={pokemon.level} onChange={e => collectionRepository.update({ ...pokemon, level: parseInt(e.target.value) || 1 })} className="w-16 p-1 border border-slate-300 rounded text-sm bg-slate-50" />
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-slate-800 mb-2">Ingredientes & SubSkills</h3>
-            <p className="text-sm text-slate-500 italic">Próximamente: renderizado detallado basado en datos estáticos.</p>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer">
+            <input type="checkbox" checked={pokemon.shiny} onChange={e => collectionRepository.update({ ...pokemon, shiny: e.target.checked })} className="rounded text-indigo-600" />
+            {t('pokemon_detail.shiny')}
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="space-y-4">
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <h3 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.base_stats')}</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-slate-600">{t('pokemon_detail.nature')}</span>
+                  <select value={pokemon.natureId} onChange={e => collectionRepository.update({ ...pokemon, natureId: e.target.value })} className="p-1.5 border border-slate-300 rounded text-sm bg-white min-w-[120px] max-w-[200px] truncate">
+                    <option value="">{t('pokemon_detail.none')}</option>
+                    {gamedata.natures.map(n => <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
+                  </select>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-slate-600">{t('pokemon_detail.ribbon_level')}</span>
+                  <select value={pokemon.ribbonLevel || 0} onChange={e => collectionRepository.update({ ...pokemon, ribbonLevel: parseInt(e.target.value) as 0|1|2|3|4 })} className="p-1.5 border border-slate-300 rounded text-sm bg-white min-w-[120px]">
+                    {[0, 1, 2, 3, 4].map(r => <option key={r} value={r}>{t('pokemon_detail.level_short')} {r}</option>)}
+                  </select>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-slate-600">{t('pokemon_detail.sneaky_snacking')}</span>
+                  <input type="checkbox" checked={pokemon.sneakySnacking} onChange={e => collectionRepository.update({ ...pokemon, sneakySnacking: e.target.checked })} className="rounded text-indigo-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h3 className="font-bold text-blue-900 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.main_skill')}</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-blue-800">{t('pokemon_detail.skill')}</span>
+                  <span className="text-sm font-medium bg-blue-100 text-blue-900 px-2 py-1 rounded">
+                    {translateMainSkill(t, gamedata.species.find(s => s.name === pokemon.speciesId)?.skill?.name || '') || t('pokemon_detail.unknown')}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-blue-800">{t('pokemon_detail.skill_level')}</span>
+                  <select value={pokemon.skillLevel} onChange={e => collectionRepository.update({ ...pokemon, skillLevel: parseInt(e.target.value) || 1 })} className="p-1.5 border border-blue-300 rounded text-sm bg-white min-w-[120px]">
+                    {[1, 2, 3, 4, 5, 6, 7].map(l => <option key={l} value={l}>{t('pokemon_detail.level_short')} {l}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+              <h3 className="font-bold text-amber-900 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.ingredients')}</h3>
+              <div className="space-y-3">
+                {[1, 30, 60].map(lvl => {
+                  const species = gamedata.species.find(s => s.name === pokemon.speciesId);
+                  const options = species ? (lvl === 1 ? species.ingredient0 : lvl === 30 ? species.ingredient30 : species.ingredient60) : [];
+                  return (
+                    <div key={lvl} className="flex justify-between items-center">
+                      <span className={`text-sm ${pokemon.level >= lvl ? 'text-amber-900 font-medium' : 'text-amber-700/60'}`}>{t('pokemon_detail.level_short')} {lvl}</span>
+                      <select
+                        value={pokemon.ingredientChoices[lvl as 1|30|60] || ''}
+                        onChange={e => collectionRepository.update({ ...pokemon, ingredientChoices: { ...pokemon.ingredientChoices, [lvl]: e.target.value || null } })}
+                        className={`p-1.5 border border-amber-300 rounded text-sm bg-white min-w-[120px] ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
+                      >
+                        <option value="">{t('pokemon_detail.select')}</option>
+                        {options?.map(opt => (
+                          <option key={opt.ingredient.name} value={opt.ingredient.name}>{translateIngredient(t, opt.ingredient.name)} (x{opt.amount})</option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 h-full">
+              <h3 className="font-bold text-purple-900 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.subskills')}</h3>
+              <div className="space-y-3">
+                {[10, 25, 50, 75, 100].map(lvl => (
+                  <div key={lvl} className="flex justify-between items-center">
+                    <span className={`text-sm w-12 ${pokemon.level >= lvl ? 'text-purple-900 font-medium' : 'text-purple-700/60'}`}>{t('pokemon_detail.level_short')} {lvl}</span>
+                    <select
+                      value={pokemon.subskills[lvl as 10|25|50|75|100] || ''}
+                      onChange={e => collectionRepository.update({ ...pokemon, subskills: { ...pokemon.subskills, [lvl]: e.target.value || null } })}
+                      className={`flex-1 p-1.5 border border-purple-300 rounded text-sm bg-white ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
+                    >
+                      <option value="">{t('pokemon_detail.empty')}</option>
+                      {gamedata.subSkills
+                        .filter(sk => {
+                          const isSelectedElsewhere = Object.entries(pokemon.subskills).some(([otherLvl, subskillName]) =>
+                            Number(otherLvl) !== lvl && subskillName === sk.name
+                          );
+                          return !isSelectedElsewhere;
+                        })
+                        .map(sk => (
+                          <option key={sk.name} value={sk.name}>{translateSubskill(t, sk.name)}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-        
+
         <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Calculator size={20} className="text-indigo-600" /> 
-            Cálculo de Producción (SleepAPI)
+            <Calculator size={20} className="text-indigo-600" />
+            {t('pokemon_detail.calc_production')}
           </h3>
-          
+
           <div className="flex flex-wrap gap-4 mb-4 items-end">
             <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-              Campamento
+              {t('pokemon_detail.camp')}
               <input type="checkbox" checked={config.camp} onChange={e => setConfig({...config, camp: e.target.checked})} className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-              Hora de Dormir
+              {t('pokemon_detail.bedtime')}
               <input type="time" value={config.bedtime} onChange={e => setConfig({...config, bedtime: e.target.value})} className="border border-slate-300 rounded px-2 py-1" />
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-              Hora de Despertar
+              {t('pokemon_detail.wakeup')}
               <input type="time" value={config.wakeup} onChange={e => setConfig({...config, wakeup: e.target.value})} className="border border-slate-300 rounded px-2 py-1" />
             </label>
-            <button 
-              onClick={handleCalculate} 
+            <button
+              onClick={handleCalculate}
               disabled={loading}
               className="ml-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg disabled:opacity-50"
             >
-              {loading ? 'Calculando...' : 'Calcular producción'}
+              {loading ? t('pokemon_detail.calculating') : t('pokemon_detail.calculate')}
             </button>
           </div>
 
@@ -113,38 +225,38 @@ export default function PokemonDetail() {
           {estimate && (
             <div className="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm mt-4">
               <div className="flex justify-between items-center mb-4">
-                <h4 className="font-bold text-slate-800">Resultado ESTIMADO</h4>
-                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">Periodo: {estimate.period}</span>
+                <h4 className="font-bold text-slate-800">{t('pokemon_detail.estimated_result')}</h4>
+                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">{t('pokemon_detail.period')}: {estimate.period}</span>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
-                  <div className="text-xs font-bold text-orange-800 uppercase mb-1">Bayas</div>
+                  <div className="text-xs font-bold text-orange-800 uppercase mb-1">{t('pokemon_detail.berries')}</div>
                   {estimate.berries.map((b, i) => (
                     <div key={i} className="flex justify-between font-medium text-orange-900">
-                      <span>{b.name}</span>
+                      <span>{translateBerry(t, b.name)}</span>
                       <span>{b.amount.toFixed(1)}</span>
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="bg-amber-50 p-3 rounded-lg border border-amber-100">
-                  <div className="text-xs font-bold text-amber-800 uppercase mb-1">Ingredientes</div>
+                  <div className="text-xs font-bold text-amber-800 uppercase mb-1">{t('pokemon_detail.ingredients')}</div>
                   {estimate.ingredients.map((ing, i) => (
                     <div key={i} className="flex justify-between font-medium text-amber-900">
-                      <span>{ing.name}</span>
+                      <span>{translateIngredient(t, ing.name)}</span>
                       <span>{ing.amount.toFixed(1)}</span>
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                  <div className="text-xs font-bold text-blue-800 uppercase mb-1">Habilidad</div>
-                  <div className="font-medium text-blue-900 text-xl">{estimate.skillProcs.toFixed(2)} <span className="text-sm">procs</span></div>
+                  <div className="text-xs font-bold text-blue-800 uppercase mb-1">{t('pokemon_detail.skill')}</div>
+                  <div className="font-medium text-blue-900 text-xl">{estimate.skillProcs.toFixed(2)} <span className="text-sm">{t('pokemon_detail.procs')}</span></div>
                 </div>
               </div>
               <div className="mt-3 text-xs text-slate-400 text-right">
-                Calculado a las {new Date(estimate.calculatedAt).toLocaleTimeString()}
+                {t('pokemon_detail.calculated_at')} {new Date(estimate.calculatedAt).toLocaleTimeString()}
               </div>
             </div>
           )}

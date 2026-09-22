@@ -5,6 +5,7 @@ import Collection from './features/collection/Collection';
 import PokemonForm from './features/collection/PokemonForm';
 import PokemonDetail from './features/collection/PokemonDetail';
 import Recipes from './features/recipes/Recipes';
+import Settings from './features/settings/Settings';
 import './i18n/config';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="pokemon/:id" element={<PokemonDetail />} />
           <Route path="pokemon/:id/editar" element={<PokemonForm />} />
           <Route path="recetas" element={<Recipes />} />
+          <Route path="configuracion" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

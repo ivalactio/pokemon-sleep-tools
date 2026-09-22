@@ -27,7 +27,7 @@ export class DexieCollectionRepository implements CollectionRepository {
     // Basic import, overwriting duplicates or just adding them
     await db.ownedPokemon.bulkPut(pokemonList);
   }
-  
+
   async clearAll(): Promise<void> {
     await db.ownedPokemon.clear();
   }

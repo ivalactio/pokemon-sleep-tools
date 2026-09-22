@@ -34,7 +34,7 @@ export class SleepApiEngine implements CalculationEngine {
 
       const data = await response.json();
       const estimate = this.mapToProductionEstimate(data, config);
-      
+
       this.cache.set(cacheKey, estimate);
       return estimate;
     } catch (error) {
@@ -68,46 +68,67 @@ export class SleepApiEngine implements CalculationEngine {
   }
 
   private buildCalculateTeamRequest(pokemon: OwnedPokemon, config: SimulationConfig) {
-    const species = this.gameData.species.find(s => s.name === pokemon.speciesId);
+    const canonicalSpeciesId = pokemon.speciesId.toUpperCase();
+    const species = this.gameData.species.find(s => s.name === canonicalSpeciesId);
     if (!species) {
-      throw new Error(`Species ${pokemon.speciesId} not found in game data`);
+      throw new Error(`Especie '${pokemon.speciesId}' no encontrada en los datos del juego.`);
+    }
+
+    if (!pokemon.natureId) {
+      throw new Error('La naturaleza es obligatoria para calcular la producción.');
+    }
+
+    // Normalize natureId to match title case in gamedata.json (e.g. 'brave' -> 'Brave')
+    const canonicalNatureId = pokemon.natureId.charAt(0).toUpperCase() + pokemon.natureId.slice(1).toLowerCase();
+    const natureExists = this.gameData.natures.some(n => n.name === canonicalNatureId);
+    if (!natureExists) {
+      throw new Error(`La naturaleza '${pokemon.natureId}' no es válida.`);
     }
 
     const ingredients: { level: number; amount: number; name: string }[] = [];
-    if (species.ingredient0 && species.ingredient0[0]) {
-      ingredients.push({
-        level: 1,
-        amount: species.ingredient0[0].amount,
-        name: species.ingredient0[0].ingredient.name
-      });
+
+    if (!pokemon.ingredientChoices[1]) {
+      throw new Error(`Ingrediente de nivel 1 es requerido.`);
+    }
+    const choice1 = species.ingredient0.find(i => i.ingredient.name === pokemon.ingredientChoices[1]);
+    if (choice1) {
+      ingredients.push({ level: 1, amount: choice1.amount, name: choice1.ingredient.name });
+    } else {
+      throw new Error(`Ingrediente de nivel 1 '${pokemon.ingredientChoices[1]}' no es válido para la especie.`);
     }
 
-    if (pokemon.level >= 30 && pokemon.ingredientChoices[30]) {
+    if (pokemon.level >= 30) {
+      if (!pokemon.ingredientChoices[30]) {
+        throw new Error(`Ingrediente de nivel 30 es requerido para Pokémon de nivel >= 30.`);
+      }
       const choice = species.ingredient30.find(i => i.ingredient.name === pokemon.ingredientChoices[30]);
       if (choice) {
-        ingredients.push({
-          level: 30,
-          amount: choice.amount,
-          name: choice.ingredient.name
-        });
+        ingredients.push({ level: 30, amount: choice.amount, name: choice.ingredient.name });
       }
     }
 
-    if (pokemon.level >= 60 && pokemon.ingredientChoices[60]) {
+    if (pokemon.level >= 60) {
+      if (!pokemon.ingredientChoices[60]) {
+        throw new Error(`Ingrediente de nivel 60 es requerido para Pokémon de nivel >= 60.`);
+      }
       const choice = species.ingredient60.find(i => i.ingredient.name === pokemon.ingredientChoices[60]);
       if (choice) {
-        ingredients.push({
-          level: 60,
-          amount: choice.amount,
-          name: choice.ingredient.name
-        });
+        ingredients.push({ level: 60, amount: choice.amount, name: choice.ingredient.name });
       }
     }
 
     const subskills: { level: number; subskill: string }[] = [];
+    const seenSubskills = new Set<string>();
     for (const [lvlStr, subskillName] of Object.entries(pokemon.subskills)) {
       const lvl = Number(lvlStr);
       if (subskillName && pokemon.level >= lvl) {
+        if (seenSubskills.has(subskillName)) {
+           throw new Error(`Subskill duplicada: '${subskillName}'. Un Pokémon no puede tener la misma subskill varias veces.`);
+        }
+        if (!this.gameData.subSkills.some(sk => sk.name === subskillName)) {
+           throw new Error(`Subskill '${subskillName}' no es válida.`);
+        }
+        seenSubskills.add(subskillName);
         subskills.push({ level: lvl, subskill: subskillName });
       }
     }
@@ -117,21 +138,16 @@ export class SleepApiEngine implements CalculationEngine {
         camp: config.camp,
         bedtime: config.bedtime,
         wakeup: config.wakeup,
-        island: {
-          name: "Greengrass Isle",
-          shortName: "greengrass",
-          areaBonus: 0,
-          berries: []
-        }
+        island: { name: "Greengrass Isle", shortName: "greengrass", areaBonus: 0, berries: [] }
       },
       members: [
         {
-          pokemon: pokemon.speciesId,
+          pokemon: canonicalSpeciesId,
           level: pokemon.level,
           ribbon: pokemon.ribbonLevel,
-          carrySize: pokemon.carryLimitSeen || 0, // Sending total carry limit if available
+          carrySize: 0, // Ignored by SleepAPI backend
           skillLevel: pokemon.skillLevel,
-          nature: pokemon.natureId,
+          nature: canonicalNatureId,
           subskills: subskills,
           ingredients: ingredients,
           sneakySnacking: false,
@@ -149,7 +165,7 @@ export class SleepApiEngine implements CalculationEngine {
     }
 
     const produceTotal = member.produceTotal || { berries: [], ingredients: [] };
-    
+
     return {
       period: "24 horas",
       berries: produceTotal.berries.map(b => ({

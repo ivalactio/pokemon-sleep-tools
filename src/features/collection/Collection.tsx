@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
+import { getNatureDisplayName } from '../../services/i18n-game';
 
 export default function Collection() {
   const { t } = useTranslation();
@@ -30,7 +31,9 @@ export default function Collection() {
           {pokemonList.map(p => (
             <Link key={p.id} to={`/pokemon/${p.id}`} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-green-300 transition-colors">
               <h3 className="font-bold text-lg">{p.nickname || p.speciesId}</h3>
-              <p className="text-sm text-slate-500">Nivel {p.level} • {p.natureId}</p>
+              <p className="text-sm text-slate-500 truncate">
+                {t('collection.sort_by_level')} {p.level} • {getNatureDisplayName(t, p.natureId || '')}
+              </p>
             </Link>
           ))}
         </div>
