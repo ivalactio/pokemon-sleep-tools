@@ -187,4 +187,58 @@ describe('VisionValidationService', () => {
     expect(draft.errors['ingredient_1']).toBeDefined();
     expect(draft.errors['ribbon']).toBeDefined();
   });
+
+  it('resolves all canonical Spanish ingredients to their internal IDs', () => {
+    const ingrMap = {
+      'Miel': 'Honey',
+      'Siestomate': 'Tomato',
+      'Soja Verdegal': 'Soybean',
+      'Manzana Selecta': 'Apple',
+      'Fiambre Vegetariano': 'Sausage',
+      'Huevo Selecto': 'Egg',
+      'Hierba Picante': 'Herb',
+      'Jengibre': 'Ginger',
+      'Maíz Verdegal': 'Corn',
+      'Patata': 'Potato',
+      'Seta Sabrosa': 'Mushroom',
+      'Cacao Relajante': 'Cacao',
+      'Puerro Grueso': 'Leek',
+      'Aceite Puro': 'Oil',
+      'Leche Mu-mu': 'Milk',
+      'Café Estimulante': 'Coffee',
+      'Aguacate': 'Avocado',
+      'Calabaza Suculenta': 'Pumpkin',
+      'Cola de Slowpoke': 'Tail'
+    };
+
+    for (const [es, en] of Object.entries(ingrMap)) {
+      expect(VisionValidationService.normalizeString(es, 'ingredient')).toBe(en);
+    }
+  });
+
+  it('resolves all canonical Spanish subskills to their internal IDs', () => {
+    const subskillMap = {
+      'Activación S': 'Skill Chance S',
+      'Activación M': 'Skill Chance M',
+      'Inventario S': 'Inventory Up S',
+      'Inventario M': 'Inventory Up M',
+      'Inventario L': 'Inventory Up L',
+      'Más ingredientes S': 'Ingredient Finder S',
+      'Más ingredientes M': 'Ingredient Finder M',
+      'Velocidad ayuda S': 'Helping Speed S',
+      'Velocidad ayuda M': 'Helping Speed M',
+      'Nivel habilidad S': 'Skill Level Up S',
+      'Nivel habilidad M': 'Skill Level Up M',
+      'Bonus ayuda': 'Helping Bonus',
+      'Bonus EXP al dormir': 'Sleep EXP Bonus',
+      'Bonus EXP de estudio': 'Research EXP Bonus',
+      'Bonus fragmentos sueño': 'Dream Shard Bonus',
+      'Bonus recupera energía': 'Energy Recovery Bonus',
+      'Busca bayas S': 'Berry Finding S'
+    };
+
+    for (const [es, en] of Object.entries(subskillMap)) {
+      expect(VisionValidationService.normalizeString(es, 'subskill')).toBe(en);
+    }
+  });
 });

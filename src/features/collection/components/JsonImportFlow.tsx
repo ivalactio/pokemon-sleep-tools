@@ -1,9 +1,62 @@
 import { useState } from 'react';
 import { CheckCircle, AlertTriangle, XCircle, ChevronRight, X, Upload, CheckSquare, Square } from 'lucide-react';
 import type { PokemonDraft } from '../../../domain/vision/models';
-import type { OwnedPokemon } from '../../../domain/models';
+import type { OwnedPokemon, StaticDataSchema } from '../../../domain/models';
 import VisionReview from './VisionReview';
 import { JsonImportValidationService } from '../../../services/vision/JsonImportValidationService';
+
+import _gamedata from '../../../data/static/gamedata.json';
+
+const gamedata = _gamedata as unknown as StaticDataSchema;
+
+function canMaterializePokemon(draft: PokemonDraft): boolean {
+  if (Object.keys(draft.errors).length > 0) {
+    return false;
+  }
+  const p = draft.pokemon;
+  if (!p.speciesId || typeof p.level !== 'number' || p.level < 1 || p.level > 100 || !p.natureId) {
+    return false;
+  }
+  return true;
+}
+
+function materializePokemon(draft: PokemonDraft): OwnedPokemon {
+  const p = draft.pokemon;
+  const now = Date.now();
+  const speciesData = (gamedata.species as any[]).find((s: any) => s.name === p.speciesId);
+  const defaultIng1 = speciesData?.ingredient0?.[0]?.ingredient?.name ?? null;
+
+  return {
+    id: p.id || crypto.randomUUID(),
+    speciesId: p.speciesId!,
+    nickname: p.nickname || '',
+    level: p.level!,
+    ribbonLevel: (p.ribbonLevel ?? 0) as 0 | 1 | 2 | 3 | 4,
+    natureId: p.natureId!,
+    subskills: {
+      10: p.subskills?.[10] ?? null,
+      25: p.subskills?.[25] ?? null,
+      50: p.subskills?.[50] ?? null,
+      75: p.subskills?.[75] ?? null,
+      100: p.subskills?.[100] ?? null,
+    },
+    ingredientChoices: {
+      1: p.ingredientChoices?.[1] ?? defaultIng1,
+      30: p.ingredientChoices?.[30] ?? null,
+      60: p.ingredientChoices?.[60] ?? null,
+    },
+    skillLevel: p.skillLevel ?? 1,
+    shiny: Boolean(p.shiny),
+    notes: p.notes || '',
+    sneakySnacking: p.sneakySnacking ?? false,
+    helpingFrequencySeen: p.helpingFrequencySeen ?? null,
+    carryLimitSeen: p.carryLimitSeen ?? null,
+    source: p.source || 'json_import',
+    createdAt: p.createdAt || now,
+    updatedAt: p.updatedAt || now,
+    gameDataVersion: p.gameDataVersion || '1.0.0',
+  };
+}
 
 interface JsonImportFlowProps {
   onSave: (pokemon: OwnedPokemon) => Promise<void>;
@@ -66,30 +119,44 @@ export default function JsonImportFlow({ onSave, onClose }: JsonImportFlowProps)
       d.importId && selectedIds.has(d.importId) && !savedIds.has(d.importId)
     );
 
-    let hasErrors = false;
+    if (toSave.length === 0) return;
+
+    const unmaterializable: string[] = [];
     const newSaved = new Set(savedIds);
+    let savedCount = 0;
 
     for (const draft of toSave) {
-      const p = draft.pokemon as Partial<OwnedPokemon>;
-      // Chequear si faltan campos indispensables
-      if (!p.speciesId || !p.natureId || !p.level || !p.ingredientChoices?.[30] || !p.ingredientChoices?.[60]) {
-        alert(`Faltan campos obligatorios en el Pokémon ${p.speciesId || 'Desconocido'}. Por favor, revísalo antes de guardar.`);
-        hasErrors = true;
-        continue; // skip saving this one
+      if (!canMaterializePokemon(draft)) {
+        const name = draft.pokemon.speciesId || draft.sourceFile || 'Pokémon';
+        const missing: string[] = [];
+        if (Object.keys(draft.errors).length > 0) {
+          missing.push(Object.values(draft.errors).join(', '));
+        } else {
+          if (!draft.pokemon.speciesId) missing.push('especie');
+          if (typeof draft.pokemon.level !== 'number') missing.push('nivel');
+          if (!draft.pokemon.natureId) missing.push('naturaleza');
+        }
+        unmaterializable.push(`${name} (${missing.join('; ')})`);
+        continue;
       }
-      
+
       try {
-        await onSave(p as OwnedPokemon);
+        const owned = materializePokemon(draft);
+        await onSave(owned);
         newSaved.add(draft.importId!);
+        savedCount++;
       } catch (e) {
         console.error('Error guardando', e);
-        hasErrors = true;
+        unmaterializable.push(`${draft.pokemon.speciesId || 'Pokémon'}: Error al persistir`);
       }
     }
 
     setSavedIds(newSaved);
-    if (!hasErrors && newSaved.size > 0) {
-      alert('¡Guardado exitoso!');
+
+    if (unmaterializable.length > 0) {
+      alert(`Se guardaron ${savedCount} Pokémon.\n\nLos siguientes ${unmaterializable.length} Pokémon seleccionados no se pudieron guardar por datos incompletos o errores:\n• ${unmaterializable.join('\n• ')}\n\nPuedes pulsar 'Revisar' o 'Corregir' para completarlos.`);
+    } else if (savedCount > 0) {
+      alert(`¡Se guardaron correctamente ${savedCount} Pokémon!`);
       if (newSaved.size === drafts.length) {
         onClose();
       }
@@ -101,6 +168,7 @@ export default function JsonImportFlow({ onSave, onClose }: JsonImportFlowProps)
     
     const errorCount = Object.keys(draft.errors).length;
     if (errorCount > 0) return <XCircle className="text-red-500 w-5 h-5" />;
+    if (!canMaterializePokemon(draft)) return <AlertTriangle className="text-amber-500 w-5 h-5" />;
     if (draft.warnings.length > 0) return <AlertTriangle className="text-amber-500 w-5 h-5" />;
     return <CheckCircle className="text-slate-300 w-5 h-5" />; // Pending, but valid
   };
@@ -110,6 +178,13 @@ export default function JsonImportFlow({ onSave, onClose }: JsonImportFlowProps)
     
     const errorCount = Object.keys(draft.errors).length;
     if (errorCount > 0) return `${errorCount} errores`;
+    if (!canMaterializePokemon(draft)) {
+      const missing: string[] = [];
+      if (!draft.pokemon.speciesId) missing.push('especie');
+      if (typeof draft.pokemon.level !== 'number') missing.push('nivel');
+      if (!draft.pokemon.natureId) missing.push('naturaleza');
+      return `Incompleto (falta ${missing.join(', ')})`;
+    }
     if (draft.warnings.length > 0) return `${draft.warnings.length} advertencias`;
     return 'Pendiente (Válido)';
   };
@@ -265,7 +340,7 @@ export default function JsonImportFlow({ onSave, onClose }: JsonImportFlowProps)
                   onClick={() => setActiveDraft(draft)}
                   className="flex items-center text-indigo-600 dark:text-indigo-400 font-medium hover:underline px-3 py-1"
                 >
-                  <span className="text-sm mr-1">{hasErrors ? 'Corregir' : 'Revisar'}</span>
+                  <span className="text-sm mr-1">{hasErrors || !canMaterializePokemon(draft) ? 'Corregir' : 'Revisar'}</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )}

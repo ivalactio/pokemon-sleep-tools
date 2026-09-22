@@ -41,14 +41,14 @@ describe('Game Data Localization', () => {
 
   it('translates subskills correctly', async () => {
     const t = i18next.t.bind(i18next);
-    expect(translateSubskill(t, 'Berry Finding S')).toBe('Buscabayas S');
+    expect(translateSubskill(t, 'Berry Finding S')).toBe('Busca bayas S');
     await i18next.changeLanguage('en');
     expect(translateSubskill(t, 'Berry Finding S')).toBe('Berry Finding S');
   });
 
   it('translates ingredients correctly', async () => {
     const t = i18next.t.bind(i18next);
-    expect(translateIngredient(t, 'Honey')).toBe('Miel Dulce');
+    expect(translateIngredient(t, 'Honey')).toBe('Miel');
     await i18next.changeLanguage('en');
     expect(translateIngredient(t, 'Honey')).toBe('Honey');
   });

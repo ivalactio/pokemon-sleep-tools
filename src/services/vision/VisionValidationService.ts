@@ -51,16 +51,47 @@ for (const locale of locales) {
 }
 
 // 3. Explicit Aliases
-// (Here we can add explicit manual aliases if Gemini consistently hallucinates a specific spelling)
-addMapping('ingredient', 'Honey', ['Miel']); // example explicit alias
-addMapping('ingredient', 'Ginger', ['Jengibre']);
+// Old ingredient translations and partial names
+addMapping('ingredient', 'Honey', ['Miel Dulce']);
+addMapping('ingredient', 'Tomato', ['Tomate Ronquido', 'Tomate']);
+addMapping('ingredient', 'Soybean', ['Soja Saludable', 'Soja']);
+addMapping('ingredient', 'Egg', ['Huevo Sabroso', 'Huevo']);
+addMapping('ingredient', 'Ginger', ['Jengibre Entusiasta']);
+addMapping('ingredient', 'Corn', ['Maíz Greengrass', 'Maíz']);
+addMapping('ingredient', 'Potato', ['Patata Suave']);
+addMapping('ingredient', 'Coffee', ['Cafe Estimulante']);
+addMapping('ingredient', 'Pumpkin', ['Calabaza']);
+addMapping('ingredient', 'Tail', ['Cola Slowpoke']);
+addMapping('ingredient', 'Milk', ['Leche']);
+addMapping('ingredient', 'Cacao', ['Cacao']);
+addMapping('ingredient', 'Herb', ['Hierba']);
+addMapping('ingredient', 'Mushroom', ['Seta']);
+addMapping('ingredient', 'Sausage', ['Salchicha']);
+addMapping('ingredient', 'Leek', ['Puerro']);
+addMapping('ingredient', 'Apple', ['Manzana']);
+addMapping('ingredient', 'Oil', ['Aceite']);
+
+// Subskill old translations and common english shorthands
+addMapping('subskill', 'Skill Trigger S', ['Skill Trigger S']);
+addMapping('subskill', 'Skill Trigger M', ['Skill Trigger M']);
+addMapping('subskill', 'Helping Bonus', ['Helping Bonus']);
+addMapping('subskill', 'Sleep EXP Bonus', ['Sleep EXP Bonus']);
+addMapping('subskill', 'Research EXP Bonus', ['Research EXP Bonus']);
+addMapping('subskill', 'Dream Shard Bonus', ['Dream Shard Bonus']);
+addMapping('subskill', 'Energy Recovery Bonus', ['Energy Recovery Bonus']);
+addMapping('subskill', 'Berry Finding S', ['Berry Finding S']);
+addMapping('subskill', 'Inventory Up S', ['Inventory S']);
+addMapping('subskill', 'Inventory Up M', ['Inventory M']);
+addMapping('subskill', 'Inventory Up L', ['Inventory L']);
+addMapping('subskill', 'Ingredient Finder S', ['Ingredient Finder S', 'Hallazgo de Ingredientes S']);
+addMapping('subskill', 'Ingredient Finder M', ['Ingredient Finder M', 'Hallazgo de Ingredientes M']);
+addMapping('subskill', 'Helping Speed S', ['Helping Speed S', 'Rapidez de Ayuda S']);
+addMapping('subskill', 'Helping Speed M', ['Helping Speed M', 'Rapidez de Ayuda M']);
+addMapping('subskill', 'Skill Level Up S', ['Skill Level Up S', 'Nivel de Habilidad Principal S']);
+addMapping('subskill', 'Skill Level Up M', ['Skill Level Up M', 'Nivel de Habilidad Principal M']);
+addMapping('subskill', 'Skill Level Up L', ['Skill Level Up L']);
+
 addMapping('mainSkill', 'Charge Energy S', ['Charge Energy']);
-addMapping('subskill', 'Ingredient Finder S', ['Más ingredientes S']);
-addMapping('subskill', 'Ingredient Finder M', ['Más ingredientes M']);
-addMapping('subskill', 'Ingredient Finder L', ['Más ingredientes L']);
-addMapping('subskill', 'Sleep EXP Bonus', ['Bonus EXP al dormir']);
-addMapping('subskill', 'Helping Speed M', ['Velocidad ayuda M']);
-addMapping('subskill', 'Helping Speed S', ['Velocidad ayuda S']);
 
 export class VisionValidationService {
   
