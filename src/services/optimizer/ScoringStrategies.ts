@@ -138,7 +138,10 @@ export class RecipeScoringStrategy implements ScoringStrategy {
     const coveragePercent = Math.min(minCoverage * 100, 999); // Cap para visualización
     const estimatedServings = minCoverage; // Aproximación v1
     
-    // Score heurístico: raciones_estimadas * valor_receta
+    // NOTA ARQUITECTÓNICA v1:
+    // El 'score' principal devuelto aquí se utiliza EXCLUSIVAMENTE para ordenar los equipos de mejor a peor en el optimizador.
+    // La métrica 'estimatedServings * recipe.value' ES UNA HEURÍSTICA DE ORDENACIÓN y NO representa una producción
+    // real garantizada ni un valor económico comparable 1:1 con las bayas o los ingredientes directos.
     const score = estimatedServings * recipe.value;
 
     const recipeDetails: RecipeScore = {
