@@ -19,4 +19,14 @@ export default defineConfig({
       }
     })
   ],
+  server: {
+    proxy: {
+      // En desarrollo, reenvía /api/* al backend Node local (puerto 3001)
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      }
+    }
+  }
 })
+

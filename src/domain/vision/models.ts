@@ -37,4 +37,5 @@ export interface PokemonDraft {
   pokemon: Partial<OwnedPokemon>;
   errors: Record<string, string>;
   warnings: string[];
+  rawExtraction: PokemonExtractionResult;
 }

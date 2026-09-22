@@ -6,6 +6,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
-    globals: true
+    globals: true,
+    environmentMatchGlobs: [
+      // Tests que importan módulos backend (Node.js) corren en entorno node
+      ['src/services/vision/geminiExtractor.test.ts', 'node'],
+    ],
   }
 })
+

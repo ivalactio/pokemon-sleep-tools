@@ -40,7 +40,35 @@
   },
   "settings": {
     "title": "Settings",
-    "language": "Language"
+    "language": "Language",
+    "gemini": {
+      "title": "Gemini Configuration (BYOK)",
+      "provider_label": "Vision Mode",
+      "provider_mock": "Mock (Simulated, no network)",
+      "provider_gemini": "Gemini (Real)",
+      "api_key_label": "Gemini API Key",
+      "api_key_placeholder": "Paste your key (e.g., AIzaSy...)",
+      "show_key": "Show key",
+      "hide_key": "Hide key",
+      "test_connection": "Test Connection",
+      "delete_key": "Delete Key",
+      "status_testing": "Testing...",
+      "status_success": "Connection successful.",
+      "status_error": "Connection error.",
+      "no_key_warning": "Server key will be used if available.",
+      "byok_warning": "The key is kept in memory during this session only. It will disappear when you reload the page."
+    }
+  },
+  "errors": {
+    "MISSING_API_KEY": "No API key available. Configure one in Settings or on the server.",
+    "UNAUTHORIZED": "The provided Gemini API key is invalid or was rejected.",
+    "RATE_LIMIT": "Gemini rate limit or quota exceeded.",
+    "GEMINI_ERROR": "Temporary Gemini error or image rejected.",
+    "BACKEND_DOWN": "Could not connect to the backend server.",
+    "UNKNOWN": "An unexpected error occurred while processing the image.",
+    "IMAGE_TOO_LARGE": "Image exceeds 5 MB limit.",
+    "UNSUPPORTED_MIME": "Unsupported image format.",
+    "TIMEOUT": "Analysis took too long (timeout)."
   },
   "pokemon_detail": {
     "basic_details": "Basic Details",

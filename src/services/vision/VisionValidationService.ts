@@ -196,7 +196,8 @@ export class VisionValidationService {
     return {
       pokemon,
       errors,
-      warnings
+      warnings,
+      rawExtraction: extraction
     };
   }
 }
