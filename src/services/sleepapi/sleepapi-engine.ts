@@ -44,7 +44,7 @@ export class SleepApiEngine implements CalculationEngine {
     }
   }
 
-  simulateTeam(): Promise<unknown> {
+  simulateTeam(_team: OwnedPokemon[], _config: SimulationConfig): Promise<ProductionEstimate[]> {
     throw new Error('simulateTeam not implemented');
   }
 

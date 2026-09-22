@@ -13,6 +13,7 @@ import type { StaticDataSchema } from '../../domain/models';
 import type { OptimizerConfig, TeamResult, OptimizerObjective } from '../../domain/optimizer/core';
 import { Play, Square, AlertCircle, ChevronRight, Calculator } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { TeamDetailModal } from './components/TeamDetailModal';
 
 const engine = new LocalCalculationEngine(gamedata as unknown as StaticDataSchema);
 const optimizer = new OptimizerService(gamedata as unknown as StaticDataSchema, engine);
@@ -36,6 +37,7 @@ export default function OptimizerPage() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [progress, setProgress] = useState<OptimizerProgress | null>(null);
   const [results, setResults] = useState<TeamResult[] | null>(null);
+  const [selectedResult, setSelectedResult] = useState<TeamResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -390,7 +392,7 @@ export default function OptimizerPage() {
               const totalIngredients = res.evaluation.memberEstimates.reduce((acc, m) => acc + m.estimate.ingredients.reduce((sum, ing) => sum + ing.amount, 0), 0);
               
               return (
-              <div key={i} className="bg-bg-surface border border-border-main rounded-xl p-5 shadow-sm space-y-4">
+                <div key={i} className="bg-bg-surface border border-border-main rounded-xl p-5 shadow-sm space-y-4 cursor-pointer hover:border-indigo-400 transition-colors" onClick={() => setSelectedResult(res)}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border-main pb-3 gap-2">
                   <div>
                     <h3 className="text-lg font-bold">#{i + 1} - Puntuación: {Math.round(res.score.score).toLocaleString()}</h3>
@@ -429,6 +431,8 @@ export default function OptimizerPage() {
           )}
         </div>
       )}
+
+      <TeamDetailModal result={selectedResult} onClose={() => setSelectedResult(null)} />
     </div>
   );
 }

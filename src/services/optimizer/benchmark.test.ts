@@ -56,7 +56,7 @@ class FastEngine {
       ingredients: [], skillProcs: 1, configUsed: config, calculatedAt: Date.now()
     };
   }
-  async simulateTeam(team, config) { return Promise.all(team.map(p => this.estimateProduction(p, config))); }
+  async simulateTeam(team: any[], config: any) { return Promise.all(team.map((p: any) => this.estimateProduction(p, config))); }
   async validateTeam() { return true; }
 }
 

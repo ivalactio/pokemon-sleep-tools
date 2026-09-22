@@ -149,7 +149,7 @@ export class LocalCalculationEngine implements CalculationEngine {
     const helpsPerSlot = ingredientHelps / unlockedIngSlots.length;
 
     for (const slot of unlockedIngSlots) {
-      const existing = ingredientsProducing.find(i => i.name === slot.name);
+      const existing = ingredientsProducing.find((i: any) => i.name === slot.name);
       if (existing) {
         existing.amount += slot.amount * helpsPerSlot;
       } else {
@@ -173,7 +173,7 @@ export class LocalCalculationEngine implements CalculationEngine {
     return {
       period: "24 horas (Aproximación local)",
       berries: [{ name: berryName, amount: totalBerries }],
-      ingredients: ingredientsProducing.map(i => ({ name: i.name, amount: i.amount })),
+      ingredients: ingredientsProducing.map((i: any) => ({ name: i.name, amount: i.amount })),
       skillProcs: skillProcs,
       configUsed: config,
       calculatedAt: Date.now()
@@ -192,25 +192,25 @@ export class LocalCalculationEngine implements CalculationEngine {
     return active;
   }
 
-  private getUnlockedIngredientSlots(pokemon: OwnedPokemon, species: StaticSpecies): { name: string, amount: number }[] {
+  private getUnlockedIngredientSlots(pokemon: OwnedPokemon, species: any): { name: string, amount: number }[] {
     const slots: { name: string, amount: number }[] = [];
     
     // Nivel 1 (siempre desbloqueado)
     const choice1 = pokemon.ingredientChoices[1];
-    const match1 = species.ingredient0.find(i => i.ingredient.name === choice1) || species.ingredient0[0];
+    const match1 = species.ingredient0.find((i: any) => i.ingredient.name === choice1) || species.ingredient0[0];
     slots.push({ name: match1.ingredient.name, amount: match1.amount });
 
     // Nivel 30
     if (pokemon.level >= 30) {
       const choice30 = pokemon.ingredientChoices[30];
-      const match30 = species.ingredient30.find(i => i.ingredient.name === choice30) || species.ingredient30[0];
+      const match30 = species.ingredient30.find((i: any) => i.ingredient.name === choice30) || species.ingredient30[0];
       slots.push({ name: match30.ingredient.name, amount: match30.amount });
     }
 
     // Nivel 60
     if (pokemon.level >= 60) {
       const choice60 = pokemon.ingredientChoices[60];
-      const match60 = species.ingredient60.find(i => i.ingredient.name === choice60) || species.ingredient60[0];
+      const match60 = species.ingredient60.find((i: any) => i.ingredient.name === choice60) || species.ingredient60[0];
       slots.push({ name: match60.ingredient.name, amount: match60.amount });
     }
 
