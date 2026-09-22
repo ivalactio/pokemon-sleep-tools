@@ -8,8 +8,11 @@ import Recipes from './features/recipes/Recipes';
 import Settings from './features/settings/Settings';
 import { VisionConfigProvider } from './domain/vision/VisionConfigContext';
 import './i18n/config';
+import { useTheme } from './hooks/useTheme';
 
 function App() {
+  useTheme(); // Initialize theme on load
+
   return (
     <VisionConfigProvider>
       <BrowserRouter>

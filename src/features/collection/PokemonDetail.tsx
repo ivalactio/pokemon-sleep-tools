@@ -28,7 +28,7 @@ export default function PokemonDetail() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!pokemon) return <div className="p-8 text-center text-slate-500">Cargando o no encontrado...</div>;
+  if (!pokemon) return <div className="p-8 text-center text-text-muted">Cargando o no encontrado...</div>;
 
   const handleDelete = async () => {
     if (window.confirm("¿Seguro que quieres eliminar este Pokémon?")) {
@@ -52,18 +52,18 @@ export default function PokemonDetail() {
 
   return (
     <div>
-      <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-2 text-slate-500 hover:text-slate-800 font-medium">
+      <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-2 text-text-muted hover:text-text-main font-medium">
         <ArrowLeft size={20} /> Volver
       </button>
 
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative">
+      <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm relative">
         <button onClick={handleDelete} className="absolute top-6 right-6 text-red-500 hover:bg-red-50 p-2 rounded-lg">
           <Trash2 size={20} />
         </button>
         <div className="flex justify-between items-start mb-6">
           <div>
             <h2 className="text-3xl font-bold mb-1">
-              <input type="text" value={pokemon.nickname || ''} placeholder={pokemon.speciesId} onChange={e => collectionRepository.update({ ...pokemon, nickname: e.target.value })} className="bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-500 focus:outline-none" />
+              <input type="text" value={pokemon.nickname || ''} placeholder={pokemon.speciesId} onChange={e => collectionRepository.update({ ...pokemon, nickname: e.target.value })} className="bg-transparent border-b border-dashed border-border-main focus:border-indigo-500 focus:outline-none" />
             </h2>
             <div className="flex items-center gap-2 mt-2">
               <select value={pokemon.speciesId} onChange={e => {
@@ -74,15 +74,15 @@ export default function PokemonDetail() {
                   speciesId: e.target.value,
                   ingredientChoices: { 1: ing0, 30: null, 60: null }
                 });
-              }} className="p-1 border border-slate-300 rounded text-sm bg-slate-50">
+              }} className="p-1 border border-border-main rounded text-sm bg-bg-app">
                 {gamedata.species.map(s => <option key={s.name} value={s.name}>{s.displayName}</option>)}
               </select>
               <span className="text-slate-400">•</span>
-              <span className="text-sm font-medium text-slate-600">Nv.</span>
-              <input type="number" min="1" max="100" value={pokemon.level} onChange={e => collectionRepository.update({ ...pokemon, level: parseInt(e.target.value) || 1 })} className="w-16 p-1 border border-slate-300 rounded text-sm bg-slate-50" />
+              <span className="text-sm font-medium text-text-muted">Nv.</span>
+              <input type="number" min="1" max="100" value={pokemon.level} onChange={e => collectionRepository.update({ ...pokemon, level: parseInt(e.target.value) || 1 })} className="w-16 p-1 border border-border-main rounded text-sm bg-bg-app" />
             </div>
           </div>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm font-medium text-text-main bg-bg-app px-3 py-1.5 rounded-lg border border-border-main cursor-pointer">
             <input type="checkbox" checked={pokemon.shiny} onChange={e => collectionRepository.update({ ...pokemon, shiny: e.target.checked })} className="rounded text-indigo-600" />
             {t('pokemon_detail.shiny')}
           </label>
@@ -90,24 +90,24 @@ export default function PokemonDetail() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="space-y-4">
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-              <h3 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.base_stats')}</h3>
+            <div className="bg-bg-app p-4 rounded-lg border border-border-main">
+              <h3 className="font-bold text-text-main mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.base_stats')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600">{t('pokemon_detail.nature')}</span>
-                  <select value={pokemon.natureId} onChange={e => collectionRepository.update({ ...pokemon, natureId: e.target.value })} className="p-1.5 border border-slate-300 rounded text-sm bg-white min-w-[120px] max-w-[200px] truncate">
+                  <span className="text-sm text-text-muted">{t('pokemon_detail.nature')}</span>
+                  <select value={pokemon.natureId} onChange={e => collectionRepository.update({ ...pokemon, natureId: e.target.value })} className="p-1.5 border border-border-main rounded text-sm bg-bg-surface min-w-[120px] max-w-[200px] truncate">
                     <option value="">{t('pokemon_detail.none')}</option>
                     {gamedata.natures.map(n => <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
                   </select>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600">{t('pokemon_detail.ribbon_level')}</span>
-                  <select value={pokemon.ribbonLevel || 0} onChange={e => collectionRepository.update({ ...pokemon, ribbonLevel: parseInt(e.target.value) as 0|1|2|3|4 })} className="p-1.5 border border-slate-300 rounded text-sm bg-white min-w-[120px]">
+                  <span className="text-sm text-text-muted">{t('pokemon_detail.ribbon_level')}</span>
+                  <select value={pokemon.ribbonLevel || 0} onChange={e => collectionRepository.update({ ...pokemon, ribbonLevel: parseInt(e.target.value) as 0|1|2|3|4 })} className="p-1.5 border border-border-main rounded text-sm bg-bg-surface min-w-[120px]">
                     {[0, 1, 2, 3, 4].map(r => <option key={r} value={r}>{t('pokemon_detail.level_short')} {r}</option>)}
                   </select>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600">{t('pokemon_detail.sneaky_snacking')}</span>
+                  <span className="text-sm text-text-muted">{t('pokemon_detail.sneaky_snacking')}</span>
                   <input type="checkbox" checked={pokemon.sneakySnacking} onChange={e => collectionRepository.update({ ...pokemon, sneakySnacking: e.target.checked })} className="rounded text-indigo-600" />
                 </div>
               </div>
@@ -124,7 +124,7 @@ export default function PokemonDetail() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-blue-800">{t('pokemon_detail.skill_level')}</span>
-                  <select value={pokemon.skillLevel} onChange={e => collectionRepository.update({ ...pokemon, skillLevel: parseInt(e.target.value) || 1 })} className="p-1.5 border border-blue-300 rounded text-sm bg-white min-w-[120px]">
+                  <select value={pokemon.skillLevel} onChange={e => collectionRepository.update({ ...pokemon, skillLevel: parseInt(e.target.value) || 1 })} className="p-1.5 border border-blue-300 rounded text-sm bg-bg-surface min-w-[120px]">
                     {[1, 2, 3, 4, 5, 6, 7].map(l => <option key={l} value={l}>{t('pokemon_detail.level_short')} {l}</option>)}
                   </select>
                 </div>
@@ -143,7 +143,7 @@ export default function PokemonDetail() {
                       <select
                         value={pokemon.ingredientChoices[lvl as 1|30|60] || ''}
                         onChange={e => collectionRepository.update({ ...pokemon, ingredientChoices: { ...pokemon.ingredientChoices, [lvl]: e.target.value || null } })}
-                        className={`p-1.5 border border-amber-300 rounded text-sm bg-white min-w-[120px] ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
+                        className={`p-1.5 border border-amber-300 rounded text-sm bg-bg-surface min-w-[120px] ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
                       >
                         <option value="">{t('pokemon_detail.select')}</option>
                         {options?.map(opt => (
@@ -167,7 +167,7 @@ export default function PokemonDetail() {
                     <select
                       value={pokemon.subskills[lvl as 10|25|50|75|100] || ''}
                       onChange={e => collectionRepository.update({ ...pokemon, subskills: { ...pokemon.subskills, [lvl]: e.target.value || null } })}
-                      className={`flex-1 p-1.5 border border-purple-300 rounded text-sm bg-white ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
+                      className={`flex-1 p-1.5 border border-purple-300 rounded text-sm bg-bg-surface ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
                     >
                       <option value="">{t('pokemon_detail.empty')}</option>
                       {gamedata.subSkills
@@ -188,24 +188,24 @@ export default function PokemonDetail() {
           </div>
         </div>
 
-        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <div className="bg-bg-app p-6 rounded-xl border border-border-main">
+          <h3 className="font-bold text-text-main mb-4 flex items-center gap-2">
             <Calculator size={20} className="text-indigo-600" />
             {t('pokemon_detail.calc_production')}
           </h3>
 
           <div className="flex flex-wrap gap-4 mb-4 items-end">
-            <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+            <label className="flex flex-col gap-1 text-sm font-medium text-text-main">
               {t('pokemon_detail.camp')}
-              <input type="checkbox" checked={config.camp} onChange={e => setConfig({...config, camp: e.target.checked})} className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+              <input type="checkbox" checked={config.camp} onChange={e => setConfig({...config, camp: e.target.checked})} className="w-5 h-5 rounded border-border-main text-indigo-600 focus:ring-indigo-500" />
             </label>
-            <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+            <label className="flex flex-col gap-1 text-sm font-medium text-text-main">
               {t('pokemon_detail.bedtime')}
-              <input type="time" value={config.bedtime} onChange={e => setConfig({...config, bedtime: e.target.value})} className="border border-slate-300 rounded px-2 py-1" />
+              <input type="time" value={config.bedtime} onChange={e => setConfig({...config, bedtime: e.target.value})} className="border border-border-main rounded px-2 py-1" />
             </label>
-            <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+            <label className="flex flex-col gap-1 text-sm font-medium text-text-main">
               {t('pokemon_detail.wakeup')}
-              <input type="time" value={config.wakeup} onChange={e => setConfig({...config, wakeup: e.target.value})} className="border border-slate-300 rounded px-2 py-1" />
+              <input type="time" value={config.wakeup} onChange={e => setConfig({...config, wakeup: e.target.value})} className="border border-border-main rounded px-2 py-1" />
             </label>
             <button
               onClick={handleCalculate}
@@ -223,10 +223,10 @@ export default function PokemonDetail() {
           )}
 
           {estimate && (
-            <div className="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm mt-4">
+            <div className="bg-bg-surface p-4 rounded-lg border border-indigo-100 shadow-sm mt-4">
               <div className="flex justify-between items-center mb-4">
-                <h4 className="font-bold text-slate-800">{t('pokemon_detail.estimated_result')}</h4>
-                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">{t('pokemon_detail.period')}: {estimate.period}</span>
+                <h4 className="font-bold text-text-main">{t('pokemon_detail.estimated_result')}</h4>
+                <span className="text-xs text-text-muted bg-slate-100 px-2 py-1 rounded">{t('pokemon_detail.period')}: {estimate.period}</span>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

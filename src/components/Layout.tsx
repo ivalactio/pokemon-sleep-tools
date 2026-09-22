@@ -6,32 +6,32 @@ export default function Layout() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 text-slate-900">
-      <nav className="w-full md:w-64 bg-white border-b md:border-r border-slate-200 p-4">
+    <div className="min-h-screen flex flex-col md:flex-row bg-bg-app text-text-main">
+      <nav className="w-full md:w-64 bg-bg-surface border-b md:border-r border-border-main p-4">
         <h1 className="text-xl font-bold text-green-600 mb-8 flex items-center gap-2">
           {t('app.title')}
         </h1>
         <ul className="space-y-2">
           <li>
-            <Link to="/" className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg text-slate-700 font-medium">
+            <Link to="/" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
               <LayoutDashboard size={20} />
               {t('nav.dashboard')}
             </Link>
           </li>
           <li>
-            <Link to="/coleccion" className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg text-slate-700 font-medium">
+            <Link to="/coleccion" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
               <List size={20} />
               {t('nav.collection')}
             </Link>
           </li>
           <li>
-            <Link to="/recetas" className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg text-slate-700 font-medium">
+            <Link to="/recetas" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
               <Book size={20} />
               {t('nav.recipes')}
             </Link>
           </li>
           <li>
-            <Link to="/configuracion" className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg text-slate-700 font-medium">
+            <Link to="/configuracion" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
               <SettingsIcon size={20} />
               {t('nav.settings')}
             </Link>

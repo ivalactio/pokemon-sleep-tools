@@ -38,4 +38,6 @@ export interface PokemonDraft {
   errors: Record<string, string>;
   warnings: string[];
   rawExtraction: PokemonExtractionResult;
+  sourceFile?: string;
+  importId?: string; // To track identity in lists
 }

@@ -84,13 +84,13 @@ export default function VisionCapture({ provider, providerLabel = 'Proveedor', o
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center space-x-2 bg-white border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
+              className="flex items-center space-x-2 bg-bg-surface border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
             >
               <ImageIcon className="w-5 h-5 text-slate-600" />
               <span>Subir Imagen</span>
             </button>
             {/* The capture attribute opens the camera on mobile devices */}
-            <label className="flex items-center space-x-2 bg-white border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+            <label className="flex items-center space-x-2 bg-bg-surface border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
               <Camera className="w-5 h-5 text-slate-600" />
               <span>Cámara</span>
               <input

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Plus, Image as ImageIcon, Sparkles, FlaskConical } from 'lucide-react';
@@ -14,6 +14,9 @@ import type { PokemonDraft } from '../../domain/vision/models';
 import type { OwnedPokemon } from '../../domain/models';
 import { useVisionConfig, type ProviderKey } from '../../domain/vision/VisionConfigContext';
 
+import { JsonImportValidationService } from '../../services/vision/JsonImportValidationService';
+import JsonImportFlow from './components/JsonImportFlow';
+
 const PROVIDER_LABELS: Record<ProviderKey, string> = {
   mock: 'Mock (test)',
   gemini: 'Gemini',
@@ -26,6 +29,7 @@ export default function Collection() {
   
   const [isCapturing, setIsCapturing] = useState(false);
   const [draft, setDraft] = useState<PokemonDraft | null>(null);
+  const [jsonImportDrafts, setJsonImportDrafts] = useState<PokemonDraft[] | null>(null);
   const [captureError, setCaptureError] = useState<string | null>(null);
 
   const handleProviderChange = (key: ProviderKey) => {
@@ -37,6 +41,20 @@ export default function Collection() {
     await collectionRepository.add(pokemon);
     setDraft(null);
     setIsCapturing(false);
+  };
+
+  const handleJsonImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JsonImportValidationService.parseJson(text);
+      const drafts = parsed.map(p => JsonImportValidationService.processExternalPokemon(p));
+      setJsonImportDrafts(drafts);
+    } catch (error) {
+      alert(`Error importando JSON: ${error}`);
+    }
+    e.target.value = '';
   };
 
   const getProviderInstance = (): VisionProvider => {
@@ -58,14 +76,29 @@ export default function Collection() {
     );
   }
 
+  if (jsonImportDrafts) {
+    return (
+      <JsonImportFlow 
+        initialDrafts={jsonImportDrafts}
+        onSave={async (pokemon) => { await collectionRepository.add(pokemon); }}
+        onClose={() => setJsonImportDrafts(null)}
+      />
+    );
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">{t('collection.title')}</h2>
         <div className="flex gap-2">
+          <label className={`cursor-pointer px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover`}>
+            <ImageIcon size={20} />
+            Importar JSON
+            <input type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
+          </label>
           <button 
             onClick={() => setIsCapturing(!isCapturing)} 
-            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${isCapturing ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${isCapturing ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover'}`}
           >
             <ImageIcon size={20} />
             Importar captura
@@ -78,10 +111,10 @@ export default function Collection() {
       </div>
 
       {isCapturing && (
-        <div className="mb-6 bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+        <div className="mb-6 bg-bg-surface border border-border-main rounded-xl p-5 shadow-sm space-y-4">
           {/* Selector de proveedor */}
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-slate-600">Analizar con:</span>
+            <span className="text-sm font-medium text-text-muted">Analizar con:</span>
             {(Object.keys(PROVIDER_LABELS) as ProviderKey[]).map((key) => (
               <button
                 key={key}
@@ -89,7 +122,7 @@ export default function Collection() {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors border ${
                   provider === key
                     ? 'bg-blue-600 text-white border-blue-700'
-                    : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
+                    : 'bg-bg-surface text-text-main border-border-main hover:bg-bg-surface-hover'
                 }`}
               >
                 {key === 'gemini' ? <Sparkles size={14} /> : <FlaskConical size={14} />}
@@ -97,12 +130,12 @@ export default function Collection() {
               </button>
             ))}
             {provider === 'gemini' && !geminiApiKey && (
-              <span className="text-xs text-slate-500 bg-blue-50 px-2 py-1 rounded border border-blue-100">
+              <span className="text-xs text-slate-500 dark:text-slate-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded border border-blue-100 dark:border-blue-800">
                 Usando servidor
               </span>
             )}
             {provider === 'gemini' && geminiApiKey && (
-              <span className="text-xs text-slate-500 bg-green-50 px-2 py-1 rounded border border-green-200 text-green-700">
+              <span className="text-xs text-slate-500 dark:text-slate-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300">
                 Usando clave BYOK
               </span>
             )}
@@ -119,7 +152,7 @@ export default function Collection() {
           />
 
           {captureError && (
-            <div className="text-red-700 bg-red-50 p-3 rounded-lg border border-red-200 text-sm">
+            <div className="text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 p-3 rounded-lg border border-red-200 dark:border-red-800 text-sm">
               <strong>Error:</strong> {captureError}
             </div>
           )}
@@ -127,18 +160,18 @@ export default function Collection() {
       )}
 
       {!pokemonList || pokemonList.length === 0 ? (
-        <div className="text-center p-12 bg-white border border-slate-200 rounded-xl border-dashed">
-          <p className="text-slate-500 mb-4">{t('collection.empty')}</p>
-          <Link to="/coleccion/nuevo" className="text-green-600 font-medium hover:underline">
+        <div className="text-center p-12 bg-bg-surface border border-border-main rounded-xl border-dashed">
+          <p className="text-text-muted mb-4">{t('collection.empty')}</p>
+          <Link to="/coleccion/nuevo" className="text-green-600 dark:text-green-400 font-medium hover:underline">
             {t('collection.add_first')}
           </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pokemonList.map(p => (
-            <Link key={p.id} to={`/pokemon/${p.id}`} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-green-300 transition-colors">
-              <h3 className="font-bold text-lg">{p.nickname || p.speciesId}</h3>
-              <p className="text-sm text-slate-500 truncate">
+            <Link key={p.id} to={`/pokemon/${p.id}`} className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-sm hover:border-green-300 dark:hover:border-green-500 transition-colors">
+              <h3 className="font-bold text-lg text-text-main">{p.nickname || p.speciesId}</h3>
+              <p className="text-sm text-text-muted truncate">
                 {t('collection.sort_by_level')} {p.level} • {getNatureDisplayName(t, p.natureId || '')}
               </p>
             </Link>

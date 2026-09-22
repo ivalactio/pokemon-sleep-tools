@@ -15,50 +15,55 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const pokemonList = useLiveQuery(() => collectionRepository.getAll()) || [];
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  
+  const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [importMessage, setImportMessage] = useState<string | null>(null);
 
   const handleExport = () => {
-    const data = {
-      schemaVersion: 1,
-      gameDataVersion: '1.0.0',
-      pokemon: pokemonList
-    };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `pokesleep-backup-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const data = {
+        schemaVersion: 1,
+        gameDataVersion: '1.0.0',
+        pokemon: pokemonList
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pokesleep-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      alert('Error exportando datos');
+    }
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setError(null);
-    setSuccess(null);
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setImportStatus('idle');
+    setImportMessage(null);
 
     try {
       const text = await file.text();
       const rawData = JSON.parse(text);
       const parsed = exportSchema.safeParse(rawData);
-
+      
       if (!parsed.success) {
         throw new Error(t('dashboard.import_error_format'));
       }
-
+      
       if (window.confirm(t('dashboard.import_confirm').replace('{count}', parsed.data.pokemon.length.toString()))) {
         await collectionRepository.import(parsed.data.pokemon);
-        setSuccess(t('dashboard.import_success'));
+        setImportStatus('success');
+        setImportMessage(t('dashboard.import_success'));
       }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(t('dashboard.import_error_read'));
-      }
+    } catch (err: any) {
+      console.error(err);
+      setImportStatus('error');
+      setImportMessage(err.message || t('dashboard.import_error_read'));
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -69,28 +74,28 @@ export default function Dashboard() {
       <h2 className="text-2xl font-bold">{t('dashboard.title')}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-800 mb-4">{t('dashboard.collection_summary')}</h3>
+        <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm">
+          <h3 className="font-bold text-text-main mb-4">{t('dashboard.collection_summary')}</h3>
           <div className="flex items-center gap-4">
-            <div className="bg-indigo-100 text-indigo-700 p-4 rounded-lg w-24 text-center">
-              <div className="text-3xl font-black">{pokemonList.length}</div>
+            <div className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 p-4 rounded-lg w-24 text-center">
+              <span className="block text-3xl font-black">{pokemonList.length}</span>
+              <span className="text-xs font-medium uppercase tracking-wider">{t('dashboard.total_pokemon')}</span>
             </div>
-            <div className="text-slate-600 font-medium">{t('dashboard.total_pokemon')}</div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-800 mb-4">{t('dashboard.backup')}</h3>
+        <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm">
+          <h3 className="font-bold text-text-main mb-4">{t('dashboard.backup')}</h3>
 
           <div className="flex flex-col gap-3">
             <button
               onClick={handleExport}
-              className="flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 p-3 rounded-lg font-medium transition-colors border border-indigo-200"
+              className="flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 p-3 rounded-lg font-medium transition-colors border border-indigo-200 dark:border-indigo-800"
             >
               <Download size={20} />
               {t('dashboard.export')}
             </button>
-
+            
             <div>
               <input
                 type="file"
@@ -101,25 +106,26 @@ export default function Dashboard() {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 p-3 rounded-lg font-medium transition-colors border border-slate-300"
+                className="w-full flex items-center justify-center gap-2 bg-bg-surface hover:bg-bg-surface-hover text-text-main p-3 rounded-lg font-medium transition-colors border border-border-main"
               >
                 <Upload size={20} />
                 {t('dashboard.import')}
               </button>
             </div>
-          </div>
 
-          {error && (
-            <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-start gap-2">
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <p>{error}</p>
-            </div>
-          )}
-          {success && (
-            <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">
-              <p>{success}</p>
-            </div>
-          )}
+            {importStatus === 'error' && (
+              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm flex items-start gap-2">
+                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                {importMessage}
+              </div>
+            )}
+            
+            {importStatus === 'success' && (
+              <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg text-sm">
+                {importMessage}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

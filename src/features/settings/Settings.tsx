@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useVisionConfig } from '../../domain/vision/VisionConfigContext';
 import { GeminiVisionProvider } from '../../services/vision/GeminiVisionProvider';
 import { Eye, EyeOff, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
   const { provider, setProvider, geminiApiKey, setGeminiApiKey } = useVisionConfig();
+  const { theme, setTheme } = useTheme();
 
   const [inputKey, setInputKey] = useState(geminiApiKey || '');
   const [showKey, setShowKey] = useState(false);
@@ -56,31 +58,43 @@ export default function Settings() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8">
-      <h1 className="text-3xl font-bold text-slate-800">{t('nav.settings')}</h1>
+      <h1 className="text-3xl font-bold text-text-main">{t('nav.settings')}</h1>
 
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <label className="font-bold text-slate-700">{t('settings.language')}</label>
+          <label className="font-bold text-text-main">{t('settings.language')}</label>
           <select
             value={i18n.language}
             onChange={handleLanguageChange}
-            className="p-2 border border-slate-300 rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500"
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface"
           >
             <option value="es">Español</option>
             <option value="en">English</option>
           </select>
         </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-text-main">Tema</label>
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface"
+          >
+            <option value="light">Claro</option>
+            <option value="dark">Oscuro</option>
+          </select>
+        </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
-        <h2 className="text-xl font-bold text-slate-800 border-b pb-2">{t('settings.gemini.title')}</h2>
+      <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm space-y-6">
+        <h2 className="text-xl font-bold text-text-main border-b pb-2">{t('settings.gemini.title')}</h2>
         
         <div className="flex flex-col gap-2">
-          <label className="font-bold text-slate-700">{t('settings.gemini.provider_label')}</label>
+          <label className="font-bold text-text-main">{t('settings.gemini.provider_label')}</label>
           <select
             value={provider}
             onChange={handleProviderChange}
-            className="p-2 border border-slate-300 rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500"
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="mock">{t('settings.gemini.provider_mock')}</option>
             <option value="gemini">{t('settings.gemini.provider_gemini')}</option>
@@ -90,7 +104,7 @@ export default function Settings() {
         {provider === 'gemini' && (
           <div className="space-y-4 pt-4">
             <div className="flex flex-col gap-2">
-              <label className="font-bold text-slate-700">{t('settings.gemini.api_key_label')}</label>
+              <label className="font-bold text-text-main">{t('settings.gemini.api_key_label')}</label>
               
               <div className="flex items-center gap-2 max-w-lg">
                 <div className="relative flex-1">
@@ -99,12 +113,12 @@ export default function Settings() {
                     value={inputKey}
                     onChange={handleKeyChange}
                     placeholder={t('settings.gemini.api_key_placeholder')}
-                    className="w-full p-2 pr-10 border border-slate-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full p-2 pr-10 border border-border-main rounded focus:ring-indigo-500 focus:border-indigo-500"
                   />
                   <button
                     type="button"
                     onClick={() => setShowKey(!showKey)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-text-muted"
                     title={showKey ? t('settings.gemini.hide_key') : t('settings.gemini.show_key')}
                   >
                     {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -132,7 +146,7 @@ export default function Settings() {
                 )}
               </div>
               
-              <p className="text-sm text-slate-500">{t('settings.gemini.no_key_warning')}</p>
+              <p className="text-sm text-text-muted">{t('settings.gemini.no_key_warning')}</p>
               {inputKey && (
                 <p className="text-xs text-amber-600 font-medium">{t('settings.gemini.byok_warning')}</p>
               )}

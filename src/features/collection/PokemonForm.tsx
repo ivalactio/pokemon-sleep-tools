@@ -72,7 +72,7 @@ export default function PokemonForm() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-xl mx-auto">
+    <div className="bg-bg-surface p-6 rounded-xl border border-slate-200 shadow-sm max-w-xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">{id ? t('pokemon_form.title_edit') : t('pokemon_form.title_add')}</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>

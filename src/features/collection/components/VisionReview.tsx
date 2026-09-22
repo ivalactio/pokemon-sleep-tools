@@ -76,11 +76,11 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden flex flex-col max-h-[90vh]">
-      <div className="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
+    <div className="bg-bg-surface rounded-xl border border-border-main shadow-lg overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="p-4 bg-bg-app border-b border-border-main flex justify-between items-center sticky top-0 z-10">
         <h2 className="text-xl font-bold">Revisar Captura</h2>
         <div className="flex gap-2">
-          <button onClick={onCancel} className="px-3 py-1.5 text-slate-600 hover:bg-slate-200 rounded-lg flex items-center gap-1">
+          <button onClick={onCancel} className="px-3 py-1.5 text-text-muted hover:bg-slate-200 rounded-lg flex items-center gap-1">
             <X size={16} /> Cancelar
           </button>
           <button 
@@ -110,11 +110,11 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
             <h3 className="font-bold text-lg border-b pb-2">Datos Básicos</h3>
             
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Especie *</label>
+              <label className="block text-sm font-medium text-text-main mb-1">Especie *</label>
               <select 
                 value={formData.speciesId || ''} 
                 onChange={e => handleChange('speciesId', e.target.value)}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.species ? 'border-red-500 bg-red-50' : 'border-slate-300'}`}
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.species ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
               >
                 <option value="">Seleccionar especie...</option>
                 {gamedata.species.map(s => <option key={s.name} value={s.name}>{s.displayName}</option>)}
@@ -123,59 +123,59 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Apodo</label>
+              <label className="block text-sm font-medium text-text-main mb-1">Apodo</label>
               <input 
                 type="text" 
                 value={formData.nickname || ''} 
                 onChange={e => handleChange('nickname', e.target.value)}
-                className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                className="w-full p-2 border border-border-main rounded-lg focus:ring-2 focus:ring-green-500"
               />
               {renderConfidence(draft.rawExtraction.nickname, 'Apodo')}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Nivel *</label>
+                <label className="block text-sm font-medium text-text-main mb-1">Nivel *</label>
                 <input 
                   type="number" 
                   min="1" max="100"
                   value={formData.level || ''} 
                   onChange={e => handleChange('level', parseInt(e.target.value) || 0)}
-                  className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.level ? 'border-red-500 bg-red-50' : 'border-slate-300'}`}
+                  className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.level ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
                 />
                 {renderConfidence(draft.rawExtraction.level, 'Nivel', 'level')}
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Nivel Main Skill</label>
+                <label className="block text-sm font-medium text-text-main mb-1">Nivel Main Skill</label>
                 <input 
                   type="number" 
                   min="1" max="7"
                   value={formData.skillLevel || ''} 
                   onChange={e => handleChange('skillLevel', parseInt(e.target.value) || 1)}
-                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full p-2 border border-border-main rounded-lg focus:ring-2 focus:ring-green-500"
                 />
                 {renderConfidence(draft.rawExtraction.skillLevel, 'Nivel Skill')}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Main Skill (Auto)</label>
+              <label className="block text-sm font-medium text-text-main mb-1">Main Skill (Auto)</label>
               <input 
                 type="text" 
                 disabled
                 value={formData.speciesId ? (gamedata.species.find(s => s.name === formData.speciesId)?.skill.name || '') : ''} 
-                className="w-full p-2 border border-slate-300 rounded-lg bg-slate-100 text-slate-500"
+                className="w-full p-2 border border-border-main rounded-lg bg-slate-100 text-text-muted"
               />
               {renderConfidence(draft.rawExtraction.mainSkill, 'Main Skill')}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Cinta (Ribbon)</label>
+              <label className="block text-sm font-medium text-text-main mb-1">Cinta (Ribbon)</label>
               <select 
                 value={formData.ribbonLevel || 0} 
                 onChange={e => handleChange('ribbonLevel', parseInt(e.target.value) || 0)}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.ribbon ? 'border-red-500 bg-red-50' : 'border-slate-300'}`}
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.ribbon ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
               >
                 <option value={0}>Ninguna (0)</option>
                 <option value={1}>Nv 1 (+ Inventario)</option>
@@ -187,11 +187,11 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Naturaleza *</label>
+              <label className="block text-sm font-medium text-text-main mb-1">Naturaleza *</label>
               <select 
                 value={formData.natureId || ''} 
                 onChange={e => handleChange('natureId', e.target.value)}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.nature ? 'border-red-500 bg-red-50' : 'border-slate-300'}`}
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.nature ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
               >
                 <option value="">Seleccionar naturaleza...</option>
                 {gamedata.natures.map(n => <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
@@ -221,11 +221,11 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                 const lvl = level as 1 | 30 | 60;
                 return (
                   <div key={level} className="mb-3">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Nivel {level}</label>
+                    <label className="block text-sm font-medium text-text-main mb-1">Nivel {level}</label>
                     <select
                       value={formData.ingredientChoices?.[lvl] || ''}
                       onChange={e => handleIngredientChange(lvl, e.target.value)}
-                      className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`ingredient_${level}`] ? 'border-red-500 bg-red-50' : 'border-slate-300'}`}
+                      className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`ingredient_${level}`] ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
                     >
                       <option value="">Seleccionar ingrediente...</option>
                       {gamedata.ingredients.map(ing => (
@@ -244,11 +244,11 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                 const lvl = level as 10 | 25 | 50 | 75 | 100;
                 return (
                   <div key={level} className="mb-3">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Nivel {level}</label>
+                    <label className="block text-sm font-medium text-text-main mb-1">Nivel {level}</label>
                     <select
                       value={formData.subskills?.[lvl] || ''}
                       onChange={e => handleSubskillChange(lvl, e.target.value)}
-                      className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`subskill_${level}`] ? 'border-red-500 bg-red-50' : 'border-slate-300'}`}
+                      className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`subskill_${level}`] ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
                     >
                       <option value="">Seleccionar subhabilidad...</option>
                       {gamedata.subSkills.map(sk => (

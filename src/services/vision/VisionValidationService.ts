@@ -53,7 +53,14 @@ for (const locale of locales) {
 // 3. Explicit Aliases
 // (Here we can add explicit manual aliases if Gemini consistently hallucinates a specific spelling)
 addMapping('ingredient', 'Honey', ['Miel']); // example explicit alias
+addMapping('ingredient', 'Ginger', ['Jengibre']);
 addMapping('mainSkill', 'Charge Energy S', ['Charge Energy']);
+addMapping('subskill', 'Ingredient Finder S', ['Más ingredientes S']);
+addMapping('subskill', 'Ingredient Finder M', ['Más ingredientes M']);
+addMapping('subskill', 'Ingredient Finder L', ['Más ingredientes L']);
+addMapping('subskill', 'Sleep EXP Bonus', ['Bonus EXP al dormir']);
+addMapping('subskill', 'Helping Speed M', ['Velocidad ayuda M']);
+addMapping('subskill', 'Helping Speed S', ['Velocidad ayuda S']);
 
 export class VisionValidationService {
   

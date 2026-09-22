@@ -1,11 +1,38 @@
 @import "tailwindcss";
 
+@theme {
+  --color-bg-app: var(--bg-app);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-hover: var(--bg-surface-hover);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-main: var(--border-main);
+}
+
 :root {
   --primary: #4ade80; /* Pokemon Sleep green tint */
+  
+  --bg-app: var(--color-slate-50);
+  --bg-surface: var(--color-white);
+  --bg-surface-hover: var(--color-slate-50);
+  --text-main: var(--color-slate-900);
+  --text-muted: var(--color-slate-500);
+  --border-main: var(--color-slate-200);
+}
+
+:root[data-theme="dark"] {
+  --bg-app: #0b1120;
+  --bg-surface: #172033; /* azul marino ligeramente más claro */
+  --bg-surface-hover: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-main: #334155;
+  
+  color-scheme: dark;
 }
 
 body {
   font-family: system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--bg-app);
+  color: var(--text-main);
 }
