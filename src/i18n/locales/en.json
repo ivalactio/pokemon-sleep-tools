@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "PokéSleep Optimizer"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "collection": "Collection",
+    "recipes": "Recipes",
+    "add_pokemon": "Add Pokémon"
+  },
+  "collection": {
+    "title": "My Collection",
+    "search": "Search by nickname or species...",
+    "empty": "No Pokémon in your collection.",
+    "add_first": "Add your first Pokémon!",
+    "specialty": "Specialty",
+    "sort_by_level": "Level"
+  },
+  "pokemon_form": {
+    "title_add": "Add Pokémon",
+    "title_edit": "Edit Pokémon",
+    "species": "Species",
+    "nickname": "Nickname",
+    "level": "Level",
+    "nature": "Nature",
+    "shiny": "Shiny",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "recipes": {
+    "title": "Recipe Catalog",
+    "curry": "Curries",
+    "salad": "Salads",
+    "dessert": "Desserts"
+  }
+}

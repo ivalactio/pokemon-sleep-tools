@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "PokéSleep Optimizer"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "collection": "Colección",
+    "recipes": "Recetas",
+    "add_pokemon": "Añadir Pokémon"
+  },
+  "collection": {
+    "title": "Mi Colección",
+    "search": "Buscar por apodo o especie...",
+    "empty": "No tienes Pokémon en tu colección.",
+    "add_first": "¡Añade tu primer Pokémon!",
+    "specialty": "Especialidad",
+    "sort_by_level": "Nivel"
+  },
+  "pokemon_form": {
+    "title_add": "Añadir Pokémon",
+    "title_edit": "Editar Pokémon",
+    "species": "Especie",
+    "nickname": "Apodo",
+    "level": "Nivel",
+    "nature": "Naturaleza",
+    "shiny": "Variocolor (Shiny)",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "recipes": {
+    "title": "Catálogo de Recetas",
+    "curry": "Curris",
+    "salad": "Ensaladas",
+    "dessert": "Postres"
+  }
+}
