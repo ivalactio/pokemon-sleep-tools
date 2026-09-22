@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Plus, Image as ImageIcon, Sparkles, FlaskConical } from 'lucide-react';
+import { Plus, Image as ImageIcon, Sparkles, FlaskConical, Search, Download } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
 import { getNatureDisplayName } from '../../services/i18n-game';
@@ -28,6 +28,27 @@ export default function Collection() {
   
   const [isCapturing, setIsCapturing] = useState(false);
   const [draft, setDraft] = useState<PokemonDraft | null>(null);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'level' | 'name'>('level');
+
+  const filteredList = (pokemonList || []).filter(p => {
+    if (search && !p.nickname?.toLowerCase().includes(search.toLowerCase()) && !p.speciesId.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  }).sort((a, b) => {
+    if (sortBy === 'level') return b.level - a.level;
+    if (sortBy === 'name') return (a.nickname || a.speciesId).localeCompare(b.nickname || b.speciesId);
+    return b.level - a.level;
+  });
+
+  const handleExport = () => {
+    const data = JSON.stringify(pokemonList, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pokesleep_backup.json';
+    a.click();
+  };
   const [isImportingJson, setIsImportingJson] = useState(false);
   const [captureError, setCaptureError] = useState<string | null>(null);
 
@@ -72,9 +93,20 @@ export default function Collection() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h2 className="text-2xl font-bold">{t('collection.title')}</h2>
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2 items-center">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
+            <input type="text" placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-3 py-2 bg-bg-surface border border-border-main rounded-lg text-sm w-full sm:w-32" />
+          </div>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="bg-bg-surface border border-border-main rounded-lg px-3 py-2 text-sm">
+            <option value="level">Nv</option>
+            <option value="name">Nombre</option>
+          </select>
+          <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-surface hover:bg-slate-100" title="Exportar Backup JSON">
+            <Download size={18} className="text-text-muted"/>
+          </button>
           <button 
             onClick={() => setIsImportingJson(true)}
             className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover`}
@@ -145,7 +177,7 @@ export default function Collection() {
         </div>
       )}
 
-      {!pokemonList || pokemonList.length === 0 ? (
+      {!filteredList || filteredList.length === 0 ? (
         <div className="text-center p-12 bg-bg-surface border border-border-main rounded-xl border-dashed">
           <p className="text-text-muted mb-4">{t('collection.empty')}</p>
           <Link to="/coleccion/nuevo" className="text-green-600 dark:text-green-400 font-medium hover:underline">
@@ -154,7 +186,7 @@ export default function Collection() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {pokemonList.map(p => (
+          {filteredList.map(p => (
             <Link key={p.id} to={`/pokemon/${p.id}`} className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-sm hover:border-green-300 dark:hover:border-green-500 transition-colors">
               <h3 className="font-bold text-lg text-text-main">{p.nickname || p.speciesId}</h3>
               <p className="text-sm text-text-muted truncate">
