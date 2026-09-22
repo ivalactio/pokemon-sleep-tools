@@ -6,6 +6,7 @@ import PokemonForm from './features/collection/PokemonForm';
 import PokemonDetail from './features/collection/PokemonDetail';
 import Recipes from './features/recipes/Recipes';
 import Settings from './features/settings/Settings';
+import OptimizerPage from './features/optimizer/OptimizerPage';
 import { VisionConfigProvider } from './domain/vision/VisionConfigContext';
 import './i18n/config';
 import { useTheme } from './hooks/useTheme';
@@ -24,6 +25,7 @@ function App() {
             <Route path="pokemon/:id" element={<PokemonDetail />} />
             <Route path="pokemon/:id/editar" element={<PokemonForm />} />
             <Route path="recetas" element={<Recipes />} />
+            <Route path="optimizador" element={<OptimizerPage />} />
             <Route path="configuracion" element={<Settings />} />
           </Route>
         </Routes>

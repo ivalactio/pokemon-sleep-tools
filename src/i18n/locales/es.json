@@ -7,7 +7,8 @@
     "collection": "Colección",
     "recipes": "Recetas",
     "add_pokemon": "Añadir Pokémon",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "optimizer": "Optimizador"
   },
   "collection": {
     "title": "Mi Colección",

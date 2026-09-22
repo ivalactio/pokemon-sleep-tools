@@ -1,7 +1,6 @@
 import { OptimizerService } from './OptimizerService';
 import type { OwnedPokemon, ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
 import type { OptimizerConfig } from '../../domain/optimizer/core';
-import { getIsland } from '../../domain/optimizer/islands';
 
 // Minimal mock game data
 const mockGameData: StaticDataSchema = {

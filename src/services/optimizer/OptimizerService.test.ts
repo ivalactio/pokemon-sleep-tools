@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest';
+import { expect, test } from 'vitest';
 import { OptimizerService } from './OptimizerService';
 import type { OptimizerConfig } from '../../domain/optimizer/core';
 import type { CalculationEngine } from '../../domain/services/interfaces';

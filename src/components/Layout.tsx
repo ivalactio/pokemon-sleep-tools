@@ -1,9 +1,17 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Book, LayoutDashboard, List, Settings as SettingsIcon } from 'lucide-react';
+import { Book, LayoutDashboard, List, Settings as SettingsIcon, Zap } from 'lucide-react';
 
 export default function Layout() {
   const { t } = useTranslation();
+  const location = useLocation();
+  
+  const linkClass = (path: string) => {
+    const isActive = location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
+    return `flex items-center gap-3 p-2 rounded-lg font-medium transition-colors ${
+      isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'text-text-main hover:bg-bg-surface-hover'
+    }`;
+  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-bg-app text-text-main">
@@ -13,25 +21,31 @@ export default function Layout() {
         </h1>
         <ul className="space-y-2">
           <li>
-            <Link to="/" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
+            <Link to="/" className={linkClass('/')}>
               <LayoutDashboard size={20} />
               {t('nav.dashboard')}
             </Link>
           </li>
           <li>
-            <Link to="/coleccion" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
+            <Link to="/coleccion" className={linkClass('/coleccion')}>
               <List size={20} />
               {t('nav.collection')}
             </Link>
           </li>
           <li>
-            <Link to="/recetas" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
+            <Link to="/recetas" className={linkClass('/recetas')}>
               <Book size={20} />
               {t('nav.recipes')}
             </Link>
           </li>
           <li>
-            <Link to="/configuracion" className="flex items-center gap-3 p-2 hover:bg-bg-surface-hover rounded-lg text-text-main font-medium">
+            <Link to="/optimizador" className={linkClass('/optimizador')}>
+              <Zap size={20} />
+              {t('nav.optimizer')}
+            </Link>
+          </li>
+          <li>
+            <Link to="/configuracion" className={linkClass('/configuracion')}>
               <SettingsIcon size={20} />
               {t('nav.settings')}
             </Link>
