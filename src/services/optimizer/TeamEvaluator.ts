@@ -15,22 +15,20 @@ export class TeamEvaluator {
   }
 
   async evaluate(team: Team, config: SimulationConfig): Promise<TeamEvaluationContext> {
-    // Para aprovechar la caché eficientemente (y evitar esperas secuenciales excesivas),
-    // resolvemos la producción de todos los miembros en paralelo.
-    // El engine (ej. SleepApiEngine) manejará la caché interna.
-    const memberEstimates = await Promise.all(
-      team.members.map(async pokemon => {
-        const estimate = await this.engine.estimateProduction(pokemon, config);
-        return { pokemon, estimate };
-      })
-    );
+    // Calculamos el equipo completo para incluir sinergias (Helping Bonus, Energía, etc)
+    const estimates = await this.engine.simulateTeam(team.members, config);
+    
+    const memberEstimates = team.members.map((pokemon, index) => ({
+      pokemon,
+      estimate: estimates[index]
+    }));
 
     const metadata = this.calculateMetadata(team);
 
     return {
       team,
       memberEstimates,
-      teamEstimate: null, // Placeholder para simulación de equipo completa (v2/Neroli's Lab)
+      teamEstimate: null, // Placeholder para score consolidado en v2
       metadata
     };
   }

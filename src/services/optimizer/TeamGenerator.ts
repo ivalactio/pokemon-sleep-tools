@@ -1,13 +1,25 @@
 import type { OwnedPokemon } from '../../domain/models';
-import type { TeamConstraints, Team } from '../../domain/optimizer/core';
+import type { TeamConstraints, Team, TeamCompositionRule } from '../../domain/optimizer/core';
+
+export class LegendaryCompositionRule implements TeamCompositionRule {
+  isValid(team: OwnedPokemon[]): boolean {
+    const speciesCount = new Map<string, number>();
+    for (const member of team) {
+      const count = speciesCount.get(member.speciesId) || 0;
+      speciesCount.set(member.speciesId, count + 1);
+      
+      const legendaries = ['RAIKOU', 'ENTEI', 'SUICUNE'];
+      if (legendaries.includes(member.speciesId) && count + 1 > 1) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
 
 export class TeamGenerator {
-  /**
-   * Genera equipos de 5 miembros de forma perezosa.
-   * - candidates: lista filtrada por CandidateFilter (ya no incluye exluidos ni debajo de minLevel).
-   * - required: lista de OwnedPokemon obligatorios.
-   * - constraints: contiene uniqueSpecies (si true, no se permiten 2 de la misma especie en el mismo equipo).
-   */
+  private rules: TeamCompositionRule[] = [new LegendaryCompositionRule()];
+
   *generateTeams(
     candidates: OwnedPokemon[],
     required: OwnedPokemon[],
@@ -15,13 +27,13 @@ export class TeamGenerator {
   ): Generator<Team> {
     const slotsLibres = 5 - required.length;
     
-    // El pool de libres son los candidatos que no están en required.
-    // requiredPokemonIds se asume que ha sido validado para no contener excluidos ni repetidos.
     const pool = candidates.filter(c => !required.includes(c));
 
     if (slotsLibres <= 0) {
-      // Validamos uniqueSpecies sobre required, aunque validationConfig debería prevenir esto.
       if (constraints.uniqueSpecies && this.hasDuplicateSpecies(required)) {
+        return;
+      }
+      if (!this.passesRules(required)) {
         return;
       }
       yield { members: [...required] };
@@ -31,13 +43,8 @@ export class TeamGenerator {
     yield* this.generateCombinations(pool, slotsLibres, [...required], constraints, 0);
   }
 
-  /**
-   * Cuenta los equipos de forma exacta ejecutando un dry-run sin instanciar/modificar arrays
-   * en cada yield, lo cual es ultra-rápido.
-   */
   countTeams(candidates: OwnedPokemon[], required: OwnedPokemon[], constraints: TeamConstraints): number {
     let count = 0;
-    // Iterar pero descartando el resultado
     for (const _ of this.generateTeams(candidates, required, constraints)) {
       count++;
     }
@@ -52,7 +59,9 @@ export class TeamGenerator {
     startIndex: number
   ): Generator<Team> {
     if (k === 0) {
-      yield { members: [...currentCombo] };
+      if (this.passesRules(currentCombo)) {
+        yield { members: [...currentCombo] };
+      }
       return;
     }
 
@@ -61,12 +70,18 @@ export class TeamGenerator {
 
       if (constraints.uniqueSpecies) {
         if (currentCombo.some(p => p.speciesId === candidate.speciesId)) {
-          continue; // Prune branch: especie ya existente en el equipo
+          continue; // Prune branch
         }
       }
 
       currentCombo.push(candidate);
-      yield* this.generateCombinations(pool, k - 1, currentCombo, constraints, i + 1);
+      
+      // We can also prune early for some rules, but for now we validate at k=0.
+      // However, legendary uniqueness can be pruned early.
+      if (this.passesRules(currentCombo)) {
+        yield* this.generateCombinations(pool, k - 1, currentCombo, constraints, i + 1);
+      }
+      
       currentCombo.pop();
     }
   }
@@ -78,5 +93,9 @@ export class TeamGenerator {
       species.add(p.speciesId);
     }
     return false;
+  }
+
+  private passesRules(team: OwnedPokemon[]): boolean {
+    return this.rules.every(r => r.isValid(team));
   }
 }

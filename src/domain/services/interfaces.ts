@@ -3,7 +3,7 @@ import type { PokemonExtractionResult } from '../vision/models';
 
 export interface CalculationEngine {
   estimateProduction(pokemon: OwnedPokemon, config: SimulationConfig): Promise<ProductionEstimate>;
-  simulateTeam(team: OwnedPokemon[], config: SimulationConfig): Promise<unknown>;
+  simulateTeam(team: OwnedPokemon[], config: SimulationConfig): Promise<ProductionEstimate[]>;
   validateTeam(team: OwnedPokemon[]): Promise<boolean>;
 }
 

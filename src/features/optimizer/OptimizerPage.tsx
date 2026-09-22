@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { translateRecipe } from '../../services/i18n-game';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
-import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
+import { LocalCalculationEngine } from '../../services/optimizer/calculator/LocalCalculationEngine';
 import { OptimizerService } from '../../services/optimizer/OptimizerService';
 import type { OptimizerProgress } from '../../services/optimizer/OptimizerService';
 import { getIsland, ISLANDS } from '../../domain/optimizer/islands';
@@ -14,7 +14,7 @@ import type { OptimizerConfig, TeamResult, OptimizerObjective } from '../../doma
 import { Play, Square, AlertCircle, ChevronRight, Calculator } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const engine = new SleepApiEngine(gamedata as unknown as StaticDataSchema);
+const engine = new LocalCalculationEngine(gamedata as unknown as StaticDataSchema);
 const optimizer = new OptimizerService(gamedata as unknown as StaticDataSchema, engine);
 
 export default function OptimizerPage() {

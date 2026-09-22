@@ -68,3 +68,8 @@ export interface TeamEvaluationContext {
   teamEstimate: ProductionEstimate | null; // v1: No hay estimación agregada de sinergia real
   metadata: TeamMetadata;
 }
+
+
+export interface TeamCompositionRule {
+  isValid(team: OwnedPokemon[]): boolean;
+}

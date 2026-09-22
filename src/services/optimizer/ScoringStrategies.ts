@@ -32,9 +32,13 @@ export class BerryScoringStrategy implements ScoringStrategy {
         const berryData = this.gameData.berries.find(b => b.name === berryProd.name);
         if (berryData) {
           const isFavored = favoredBerries.includes(berryProd.name);
-          // Valor base total de esta producción (sin multiplicador de isla todavía, el optimizador no asume nivel de snorlax)
+          // Valor base total de esta producción
           const baseValue = berryProd.amount * berryData.value;
-          const finalValue = isFavored ? baseValue * 2 : baseValue;
+          let finalValue = isFavored ? baseValue * 2 : baseValue;
+          
+          // Aplicar bonus de área
+          const areaBonusMult = 1 + (config.areaBonus ?? 0) / 100;
+          finalValue = finalValue * areaBonusMult;
           
           totalValue += finalValue;
           if (isFavored) {

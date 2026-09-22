@@ -82,7 +82,7 @@ class MockEngine implements CalculationEngine {
       calculatedAt: Date.now()
     };
   }
-  async simulateTeam(): Promise<unknown> { return null; }
+  async simulateTeam(team, config) { return Promise.all(team.map(p => this.estimateProduction(p, config))); }
   async validateTeam(): Promise<boolean> { return true; }
 }
 
