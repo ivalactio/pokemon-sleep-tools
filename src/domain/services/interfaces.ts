@@ -1,4 +1,5 @@
 import type { OwnedPokemon, ProductionEstimate, SimulationConfig } from '../models';
+import type { PokemonExtractionResult } from '../vision/models';
 
 export interface CalculationEngine {
   estimateProduction(pokemon: OwnedPokemon, config: SimulationConfig): Promise<ProductionEstimate>;
@@ -7,5 +8,5 @@ export interface CalculationEngine {
 }
 
 export interface VisionProvider {
-  analyzeScreenshot(imageBlob: Blob): Promise<Partial<OwnedPokemon>>;
+  extractPokemonFromImage(image: Blob | File): Promise<PokemonExtractionResult>;
 }
