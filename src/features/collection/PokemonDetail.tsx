@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { translateSubskill, translateMainSkill, translateIngredient, translateBerry, getNatureDisplayName } from '../../services/i18n-game';
 import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
 import type { ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
+import { ISLANDS } from '../../domain/optimizer/islands';
 
 const engine = new SleepApiEngine(gamedata as unknown as StaticDataSchema);
 
@@ -21,7 +22,9 @@ export default function PokemonDetail() {
   const [config, setConfig] = useState<SimulationConfig>({
     camp: false,
     bedtime: '22:00',
-    wakeup: '06:00'
+    wakeup: '06:00',
+    island: 'greengrass',
+    areaBonus: 0
   });
 
   const [estimate, setEstimate] = useState<ProductionEstimate | null>(null);
@@ -206,6 +209,16 @@ export default function PokemonDetail() {
             <label className="flex flex-col gap-1 text-sm font-medium text-text-main">
               {t('pokemon_detail.wakeup')}
               <input type="time" value={config.wakeup} onChange={e => setConfig({...config, wakeup: e.target.value})} className="border border-border-main rounded px-2 py-1" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm font-medium text-text-main">
+              {t('pokemon_detail.island')}
+              <select value={config.island} onChange={e => setConfig({...config, island: e.target.value as any})} className="border border-border-main rounded px-2 py-1 bg-bg-surface">
+                {ISLANDS.map(island => <option key={island.id} value={island.id}>{island.name}</option>)}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-sm font-medium text-text-main">
+              {t('pokemon_detail.area_bonus')}
+              <input type="number" min="0" max="100" value={config.areaBonus} onChange={e => setConfig({...config, areaBonus: parseInt(e.target.value) || 0})} className="border border-border-main rounded px-2 py-1 w-20" />
             </label>
             <button
               onClick={handleCalculate}

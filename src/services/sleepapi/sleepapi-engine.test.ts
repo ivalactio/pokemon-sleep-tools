@@ -90,7 +90,9 @@ const mockPokemon: OwnedPokemon = {
 const mockConfig: SimulationConfig = {
   camp: false,
   bedtime: '22:00',
-  wakeup: '06:00'
+  wakeup: '06:00',
+  island: 'greengrass',
+  areaBonus: 0
 };
 
 beforeEach(() => {
@@ -126,6 +128,10 @@ test('estimates production and uses cache', async () => {
   const callPayload = JSON.parse((mockFetch.mock.calls[0][1] as RequestInit).body as string);
 
   expect(callPayload.settings.camp).toBe(false);
+  expect(callPayload.settings.island).toBeDefined();
+  expect(callPayload.settings.island.shortName).toBe('greengrass');
+  expect(callPayload.settings.island.areaBonus).toBe(0);
+  expect(callPayload.settings.island.berries).toEqual([]);
   expect(callPayload.members[0].pokemon).toBe('BULBASAUR');
   expect(callPayload.members[0].level).toBe(30);
 
@@ -140,6 +146,40 @@ test('estimates production and uses cache', async () => {
     { level: 10, subskill: 'Helping Bonus' },
     { level: 25, subskill: 'Helping Speed M' }
   ]);
+});
+
+test('uses favoriteBerries if provided for greengrass', async () => {
+  const engine = new SleepApiEngine(mockGameData);
+  const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+    members: [{ produceTotal: { berries: [], ingredients: [] }, skillProcs: 0 }]
+  })));
+
+  const customConfig: SimulationConfig = {
+    ...mockConfig,
+    island: 'greengrass',
+    favoriteBerries: ['LEPPA', 'ORAN', 'PECHA']
+  };
+
+  await engine.estimateProduction(mockPokemon, customConfig);
+  const callPayload = JSON.parse((mockFetch.mock.calls[0][1] as RequestInit).body as string);
+  expect(callPayload.settings.island.berries).toEqual(['LEPPA', 'ORAN', 'PECHA']);
+});
+
+test('uses defaultFavoriteBerries if not provided', async () => {
+  const engine = new SleepApiEngine(mockGameData);
+  const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+    members: [{ produceTotal: { berries: [], ingredients: [] }, skillProcs: 0 }]
+  })));
+
+  const customConfig: SimulationConfig = {
+    ...mockConfig,
+    island: 'cyan'
+  };
+
+  await engine.estimateProduction(mockPokemon, customConfig);
+  const callPayload = JSON.parse((mockFetch.mock.calls[0][1] as RequestInit).body as string);
+  expect(callPayload.settings.island.shortName).toBe('cyan');
+  expect(callPayload.settings.island.berries).toEqual(['ORAN', 'PECHA', 'PAMTRE']);
 });
 
 test('validates missing nature', async () => {

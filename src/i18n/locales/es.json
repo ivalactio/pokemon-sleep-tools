@@ -87,6 +87,8 @@
     "camp": "Campamento",
     "bedtime": "Hora de Dormir",
     "wakeup": "Hora de Despertar",
+    "island": "Isla",
+    "area_bonus": "Bonus de área (%)",
     "calculate": "Calcular producción",
     "calculating": "Calculando...",
     "estimated_result": "Resultado ESTIMADO",

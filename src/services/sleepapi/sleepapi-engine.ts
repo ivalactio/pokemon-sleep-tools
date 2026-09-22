@@ -1,5 +1,6 @@
 import type { CalculationEngine } from '../../domain/services/interfaces';
 import type { OwnedPokemon, ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
+import { getIsland } from '../../domain/optimizer/islands';
 
 export class SleepApiEngine implements CalculationEngine {
   private cache = new Map<string, ProductionEstimate>();
@@ -133,12 +134,20 @@ export class SleepApiEngine implements CalculationEngine {
       }
     }
 
+    const islandCfg = getIsland(config.island);
+    const resolvedBerries = config.favoriteBerries ?? islandCfg.defaultFavoriteBerries;
+
     return {
       settings: {
         camp: config.camp,
         bedtime: config.bedtime,
         wakeup: config.wakeup,
-        island: { name: "Greengrass Isle", shortName: "greengrass", areaBonus: 0, berries: [] }
+        island: { 
+          name: islandCfg.name, 
+          shortName: islandCfg.shortName, 
+          areaBonus: config.areaBonus ?? 0, 
+          berries: resolvedBerries 
+        }
       },
       members: [
         {

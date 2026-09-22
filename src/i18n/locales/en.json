@@ -87,6 +87,8 @@
     "camp": "Camp Ticket",
     "bedtime": "Bedtime",
     "wakeup": "Wakeup Time",
+    "island": "Island",
+    "area_bonus": "Area Bonus (%)",
     "calculate": "Calculate production",
     "calculating": "Calculating...",
     "estimated_result": "ESTIMATED Result",

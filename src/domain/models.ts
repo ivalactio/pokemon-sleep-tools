@@ -117,10 +117,15 @@ export interface ExportSchema {
   pokemon: OwnedPokemon[];
 }
 
+import type { IslandId } from './optimizer/islands';
+
 export interface SimulationConfig {
   camp: boolean;
   bedtime: string; // "HH:MM"
   wakeup: string; // "HH:MM"
+  island: IslandId;
+  areaBonus: number;
+  favoriteBerries?: string[];
 }
 
 export interface ProductionEstimate {
