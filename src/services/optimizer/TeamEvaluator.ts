@@ -3,10 +3,16 @@ import type { SimulationConfig, StaticDataSchema } from '../../domain/models';
 import type { Team, TeamEvaluationContext, TeamMetadata } from '../../domain/optimizer/core';
 
 export class TeamEvaluator {
+  private engine: CalculationEngine;
+  private gameData: StaticDataSchema;
+
   constructor(
-    private engine: CalculationEngine,
-    private gameData: StaticDataSchema
-  ) {}
+    engine: CalculationEngine,
+    gameData: StaticDataSchema
+  ) {
+    this.engine = engine;
+    this.gameData = gameData;
+  }
 
   async evaluate(team: Team, config: SimulationConfig): Promise<TeamEvaluationContext> {
     // Para aprovechar la caché eficientemente (y evitar esperas secuenciales excesivas),

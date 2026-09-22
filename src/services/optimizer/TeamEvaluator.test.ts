@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest';
+import { expect, test } from 'vitest';
 import { TeamEvaluator } from './TeamEvaluator';
 import type { CalculationEngine } from '../../domain/services/interfaces';
 import type { OwnedPokemon, ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
