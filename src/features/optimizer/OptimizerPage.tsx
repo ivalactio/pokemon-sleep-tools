@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { translateRecipe } from '../../services/i18n-game';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
 import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
@@ -215,23 +216,6 @@ export default function OptimizerPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Tipo de Platos de la Semana</label>
-              <select 
-                value={recipeType}
-                onChange={e => {
-                  setRecipeType(e.target.value as 'curry' | 'salad' | 'dessert');
-                  setTargetRecipeId('');
-                }}
-                className="w-full p-2 border border-border-main rounded bg-bg-app"
-                disabled={isOptimizing}
-              >
-                <option value="curry">Guisos y Curris</option>
-                <option value="salad">Ensaladas</option>
-                <option value="dessert">Postres</option>
-              </select>
-            </div>
-
-            <div>
               <label className="block text-sm font-medium mb-1">Objetivo de Optimización</label>
               <select 
                 value={objective}
@@ -246,19 +230,38 @@ export default function OptimizerPage() {
             </div>
 
             {objective === 'recipe' && (
-              <div>
-                <label className="block text-sm font-medium mb-1 text-text-muted">Priorizar Receta Específica (Opcional)</label>
-                <select 
-                  value={targetRecipeId}
-                  onChange={e => setTargetRecipeId(e.target.value)}
-                  className="w-full p-2 border border-border-main rounded bg-bg-app text-sm"
-                  disabled={isOptimizing}
-                >
-                  <option value="">Optimizar para TODA la categoría ({recipesForType.length} recetas)</option>
-                  {recipesForType.map(r => (
-                    <option key={r.name} value={r.name}>{r.displayName}</option>
-                  ))}
-                </select>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tipo de Platos de la Semana</label>
+                  <select 
+                    value={recipeType}
+                    onChange={e => {
+                      setRecipeType(e.target.value as 'curry' | 'salad' | 'dessert');
+                      setTargetRecipeId('');
+                    }}
+                    className="w-full p-2 border border-border-main rounded bg-bg-app"
+                    disabled={isOptimizing}
+                  >
+                    <option value="curry">Guisos y Curris</option>
+                    <option value="salad">Ensaladas</option>
+                    <option value="dessert">Postres</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-text-muted">Priorizar Receta Específica (Opcional)</label>
+                  <select 
+                    value={targetRecipeId}
+                    onChange={e => setTargetRecipeId(e.target.value)}
+                    className="w-full p-2 border border-border-main rounded bg-bg-app text-sm"
+                    disabled={isOptimizing}
+                  >
+                    <option value="">Optimizar para TODA la categoría ({recipesForType.length} recetas)</option>
+                    {recipesForType.map(r => (
+                      <option key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
 

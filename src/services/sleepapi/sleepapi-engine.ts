@@ -95,7 +95,9 @@ export class SleepApiEngine implements CalculationEngine {
     if (choice1) {
       ingredients.push({ level: 1, amount: choice1.amount, name: choice1.ingredient.name });
     } else {
-      throw new Error(`Ingrediente de nivel 1 '${pokemon.ingredientChoices[1]}' no es válido para la especie.`);
+      const defaultIng = species.ingredient0[0];
+      console.warn(`Ingrediente de nivel 1 '${pokemon.ingredientChoices[1]}' no es válido para ${species.name}. Usando ${defaultIng.ingredient.name}.`);
+      ingredients.push({ level: 1, amount: defaultIng.amount, name: defaultIng.ingredient.name });
     }
 
     if (pokemon.level >= 30) {
@@ -105,6 +107,10 @@ export class SleepApiEngine implements CalculationEngine {
       const choice = species.ingredient30.find(i => i.ingredient.name === pokemon.ingredientChoices[30]);
       if (choice) {
         ingredients.push({ level: 30, amount: choice.amount, name: choice.ingredient.name });
+      } else {
+        const defaultIng = species.ingredient30[0];
+        console.warn(`Ingrediente de nivel 30 '${pokemon.ingredientChoices[30]}' no es válido para ${species.name}. Usando ${defaultIng.ingredient.name}.`);
+        ingredients.push({ level: 30, amount: defaultIng.amount, name: defaultIng.ingredient.name });
       }
     }
 
@@ -115,6 +121,10 @@ export class SleepApiEngine implements CalculationEngine {
       const choice = species.ingredient60.find(i => i.ingredient.name === pokemon.ingredientChoices[60]);
       if (choice) {
         ingredients.push({ level: 60, amount: choice.amount, name: choice.ingredient.name });
+      } else {
+        const defaultIng = species.ingredient60[0];
+        console.warn(`Ingrediente de nivel 60 '${pokemon.ingredientChoices[60]}' no es válido para ${species.name}. Usando ${defaultIng.ingredient.name}.`);
+        ingredients.push({ level: 60, amount: defaultIng.amount, name: defaultIng.ingredient.name });
       }
     }
 

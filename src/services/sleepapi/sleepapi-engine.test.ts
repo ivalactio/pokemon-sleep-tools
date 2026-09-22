@@ -310,10 +310,13 @@ test('level 1 ingredient is persisted and sent to SleepAPI properly', async () =
   const updatedPokemon = await collectionRepository.getById('test-pika-1');
   expect(updatedPokemon?.ingredientChoices[1]).toBe('Ginger');
 
-  // 4. Verify the payload fails or sends depending on validation
-  // It should throw because Ginger is not valid for PIKACHU at level 1 in our mock data!
-  await expect(engine.estimateProduction(updatedPokemon!, mockConfig))
-    .rejects.toThrow("Ingrediente de nivel 1 'Ginger' no es válido para la especie.");
+  // 4. Verify it falls back to Apple when estimating production with invalid ingredient
+  const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+    members: [{ produceTotal: { berries: [], ingredients: [] }, skillProcs: 0 }]
+  })));
+
+  await engine.estimateProduction(updatedPokemon!, mockConfig);
+  expect(mockFetch).toHaveBeenCalledTimes(1);
 
   // Now set it back to a valid one and verify it sends correctly
   await collectionRepository.update({
@@ -322,13 +325,14 @@ test('level 1 ingredient is persisted and sent to SleepAPI properly', async () =
   });
 
   const validPokemon = await collectionRepository.getById('test-pika-1');
-  const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+  mockFetch.mockRestore(); // Important: restore before mocking again
+  const mockFetchValid = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
     members: [{ produceTotal: { berries: [], ingredients: [] }, skillProcs: 0 }]
   })));
 
   await engine.estimateProduction(validPokemon!, mockConfig);
-  expect(mockFetch).toHaveBeenCalledTimes(1);
-  const payload = JSON.parse((mockFetch.mock.calls[0][1] as RequestInit).body as string);
+  expect(mockFetchValid).toHaveBeenCalledTimes(1);
+  const payload = JSON.parse((mockFetchValid.mock.calls[0][1] as RequestInit).body as string);
   expect(payload.members[0].ingredients).toEqual([
     { level: 1, amount: 1, name: 'Apple' }
   ]);

@@ -113,7 +113,12 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
               <label className="block text-sm font-medium text-text-main mb-1">Especie *</label>
               <select 
                 value={formData.speciesId || ''} 
-                onChange={e => handleChange('speciesId', e.target.value)}
+                onChange={e => {
+                  handleChange('speciesId', e.target.value);
+                  const newSpecies = gamedata.species.find(s => s.name === e.target.value);
+                  const ing0 = newSpecies?.ingredient0?.[0]?.ingredient.name || null;
+                  setFormData(prev => ({ ...prev, ingredientChoices: { 1: ing0, 30: null, 60: null } as any }));
+                }}
                 className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.species ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
               >
                 <option value="">Seleccionar especie...</option>
@@ -219,6 +224,9 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
               <h3 className="font-bold text-lg border-b pb-2 mb-4">Ingredientes</h3>
               {[1, 30, 60].map((level) => {
                 const lvl = level as 1 | 30 | 60;
+                const speciesData = gamedata.species.find(s => s.name === formData.speciesId);
+                const options = speciesData ? speciesData[`ingredient${lvl}` as 'ingredient0' | 'ingredient30' | 'ingredient60'] || [] : [];
+                
                 return (
                   <div key={level} className="mb-3">
                     <label className="block text-sm font-medium text-text-main mb-1">Nivel {level}</label>
@@ -228,8 +236,10 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                       className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`ingredient_${level}`] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
                     >
                       <option value="">Seleccionar ingrediente...</option>
-                      {gamedata.ingredients.map(ing => (
-                        <option key={ing.name} value={ing.name}>{translateIngredient(t, ing.name)}</option>
+                      {options.map(opt => (
+                        <option key={opt.ingredient.name} value={opt.ingredient.name}>
+                          {translateIngredient(t, opt.ingredient.name)} (x{opt.amount})
+                        </option>
                       ))}
                     </select>
                     {renderConfidence(draft.rawExtraction.ingredients[lvl], `Ingrediente Nv ${level}`, `ingredient_${level}`)}
