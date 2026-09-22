@@ -1,8 +1,8 @@
-import type { OwnedPokemon } from '../models';
+import type { OwnedPokemon, ProductionEstimate, SimulationConfig } from '../models';
 
 export interface CalculationEngine {
-  estimateProduction(pokemon: OwnedPokemon, durationHours: number): Promise<unknown>;
-  simulateTeam(team: OwnedPokemon[], durationHours: number): Promise<unknown>;
+  estimateProduction(pokemon: OwnedPokemon, config: SimulationConfig): Promise<ProductionEstimate>;
+  simulateTeam(team: OwnedPokemon[], config: SimulationConfig): Promise<unknown>;
   validateTeam(team: OwnedPokemon[]): Promise<boolean>;
 }
 

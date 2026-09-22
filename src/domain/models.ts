@@ -115,3 +115,18 @@ export interface ExportSchema {
   gameDataVersion: string;
   pokemon: OwnedPokemon[];
 }
+
+export interface SimulationConfig {
+  camp: boolean;
+  bedtime: string; // "HH:MM"
+  wakeup: string; // "HH:MM"
+}
+
+export interface ProductionEstimate {
+  period: string; // e.g., "24 horas"
+  berries: { name: string; amount: number }[];
+  ingredients: { name: string; amount: number }[];
+  skillProcs: number;
+  configUsed: SimulationConfig;
+  calculatedAt: number;
+}

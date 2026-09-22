@@ -1,0 +1,168 @@
+{
+  "pokemon": {
+    "id": "1234",
+    "speciesId": "BULBASAUR",
+    "nickname": "Bulby",
+    "level": 30,
+    "ribbonLevel": 0,
+    "natureId": "Brave",
+    "subskills": {
+      "10": "Helping Bonus",
+      "25": null,
+      "50": null,
+      "75": null,
+      "100": null
+    },
+    "ingredientChoices": {
+      "30": "Honey",
+      "60": null
+    },
+    "skillLevel": 1,
+    "shiny": false,
+    "notes": "",
+    "sneakySnacking": true,
+    "helpingFrequencySeen": null,
+    "carryLimitSeen": null,
+    "source": "manual",
+    "createdAt": 1790083105411,
+    "updatedAt": 1790083105411,
+    "gameDataVersion": "1.0.0"
+  },
+  "requestSent": {
+    "settings": {
+      "camp": false,
+      "bedtime": "22:00",
+      "wakeup": "06:00",
+      "island": {
+        "name": "Greengrass Isle",
+        "shortName": "greengrass",
+        "areaBonus": 0,
+        "berries": []
+      }
+    },
+    "members": [
+      {
+        "pokemon": "BULBASAUR",
+        "level": 30,
+        "ribbon": 0,
+        "carrySize": 0,
+        "skillLevel": 1,
+        "nature": "Brave",
+        "subskills": [
+          {
+            "level": 10,
+            "subskill": "Helping Bonus"
+          }
+        ],
+        "ingredients": [
+          {
+            "level": 1,
+            "amount": 2,
+            "name": "Honey"
+          },
+          {
+            "level": 30,
+            "amount": 5,
+            "name": "Honey"
+          }
+        ],
+        "sneakySnacking": false,
+        "externalId": "1234"
+      }
+    ]
+  },
+  "estimate": {
+    "period": "24 horas",
+    "berries": [
+      {
+        "name": "DURIN",
+        "amount": 29.065949119373776
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Apple",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Milk",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Soybean",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Honey",
+        "amount": 31.823401172053792
+      },
+      {
+        "name": "Sausage",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Ginger",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Tomato",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Egg",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Oil",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Potato",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Herb",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Corn",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Cacao",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Coffee",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Avocado",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Mushroom",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Leek",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Pumpkin",
+        "amount": 0.2797610353350406
+      },
+      {
+        "name": "Tail",
+        "amount": 0.2797610353350406
+      }
+    ],
+    "skillProcs": 0.8859099804305284,
+    "configUsed": {
+      "camp": false,
+      "bedtime": "22:00",
+      "wakeup": "06:00"
+    },
+    "calculatedAt": 1790083106111
+  }
+}
