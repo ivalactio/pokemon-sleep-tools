@@ -74,6 +74,12 @@ export class JsonImportValidationService {
     // 1. Validate Extraction to generate the Draft (uses existing VisionValidationService)
     const draft = VisionValidationService.validateExtraction(extraction);
 
+    // Si la especie vino explícitamente como null, lo convertimos a warning para no bloquear el flujo
+    if (external.especie === null && draft.errors['species']) {
+      delete draft.errors['species'];
+      draft.warnings.push('Especie no determinada (null). Debes indicarla antes de guardar.');
+    }
+
     // Add UI metadata
     draft.sourceFile = external.archivo_origen || undefined;
     draft.importId = crypto.randomUUID();
@@ -125,7 +131,9 @@ export class JsonImportValidationService {
     
     const matchedSet = targetSetArray?.find((s: any) => s.ingredient.name === internalIngName);
     if (matchedSet) {
-      if (!Number.isInteger(externalIng.cantidad)) {
+      if (externalIng.cantidad === null) {
+        draft.warnings.push(`Cantidad de ingrediente nv ${level} no especificada (null). Se asume ${matchedSet.amount}.`);
+      } else if (!Number.isInteger(externalIng.cantidad)) {
          draft.errors[`ingredient_${level}`] = `Cantidad de ingrediente nv ${level} debe ser entera (${externalIng.cantidad})`;
       } else if (matchedSet.amount !== externalIng.cantidad) {
          draft.errors[`ingredient_${level}`] = `Cantidad incorrecta para ${internalIngName} en nv ${level}. Se esperaba ${matchedSet.amount} pero se recibió ${externalIng.cantidad}`;

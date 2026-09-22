@@ -57,7 +57,7 @@ export default function PokemonDetail() {
       </button>
 
       <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm relative">
-        <button onClick={handleDelete} className="absolute top-6 right-6 text-red-500 hover:bg-red-50 p-2 rounded-lg">
+        <button onClick={handleDelete} className="absolute top-6 right-6 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 dark:bg-red-950/30 p-2 rounded-lg">
           <Trash2 size={20} />
         </button>
         <div className="flex justify-between items-start mb-6">
@@ -113,25 +113,25 @@ export default function PokemonDetail() {
               </div>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <h3 className="font-bold text-blue-900 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.main_skill')}</h3>
+            <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-900/50">
+              <h3 className="font-bold text-blue-900 dark:text-blue-300 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.main_skill')}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-blue-800">{t('pokemon_detail.skill')}</span>
-                  <span className="text-sm font-medium bg-blue-100 text-blue-900 px-2 py-1 rounded">
+                  <span className="text-sm font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-900 dark:text-blue-300 px-2 py-1 rounded">
                     {translateMainSkill(t, gamedata.species.find(s => s.name === pokemon.speciesId)?.skill?.name || '') || t('pokemon_detail.unknown')}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-blue-800">{t('pokemon_detail.skill_level')}</span>
-                  <select value={pokemon.skillLevel} onChange={e => collectionRepository.update({ ...pokemon, skillLevel: parseInt(e.target.value) || 1 })} className="p-1.5 border border-blue-300 rounded text-sm bg-bg-surface min-w-[120px]">
+                  <select value={pokemon.skillLevel} onChange={e => collectionRepository.update({ ...pokemon, skillLevel: parseInt(e.target.value) || 1 })} className="p-1.5 border border-blue-300 dark:border-blue-800 rounded text-sm bg-bg-surface min-w-[120px]">
                     {[1, 2, 3, 4, 5, 6, 7].map(l => <option key={l} value={l}>{t('pokemon_detail.level_short')} {l}</option>)}
                   </select>
                 </div>
               </div>
             </div>
 
-            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+            <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded-lg border border-amber-200 dark:border-amber-900/50">
               <h3 className="font-bold text-amber-900 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.ingredients')}</h3>
               <div className="space-y-3">
                 {[1, 30, 60].map(lvl => {
@@ -143,7 +143,7 @@ export default function PokemonDetail() {
                       <select
                         value={pokemon.ingredientChoices[lvl as 1|30|60] || ''}
                         onChange={e => collectionRepository.update({ ...pokemon, ingredientChoices: { ...pokemon.ingredientChoices, [lvl]: e.target.value || null } })}
-                        className={`p-1.5 border border-amber-300 rounded text-sm bg-bg-surface min-w-[120px] ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
+                        className={`p-1.5 border border-amber-300 dark:border-amber-800 rounded text-sm bg-bg-surface min-w-[120px] ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
                       >
                         <option value="">{t('pokemon_detail.select')}</option>
                         {options?.map(opt => (
@@ -158,7 +158,7 @@ export default function PokemonDetail() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 h-full">
+            <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg border border-purple-200 dark:border-purple-900/50 h-full">
               <h3 className="font-bold text-purple-900 mb-3 text-sm uppercase tracking-wide">{t('pokemon_detail.subskills')}</h3>
               <div className="space-y-3">
                 {[10, 25, 50, 75, 100].map(lvl => (
@@ -167,7 +167,7 @@ export default function PokemonDetail() {
                     <select
                       value={pokemon.subskills[lvl as 10|25|50|75|100] || ''}
                       onChange={e => collectionRepository.update({ ...pokemon, subskills: { ...pokemon.subskills, [lvl]: e.target.value || null } })}
-                      className={`flex-1 p-1.5 border border-purple-300 rounded text-sm bg-bg-surface ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
+                      className={`flex-1 p-1.5 border border-purple-300 dark:border-purple-800 rounded text-sm bg-bg-surface ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
                     >
                       <option value="">{t('pokemon_detail.empty')}</option>
                       {gamedata.subSkills
@@ -217,20 +217,20 @@ export default function PokemonDetail() {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg flex items-center gap-2 text-sm mb-4">
+            <div className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 p-3 rounded-lg flex items-center gap-2 text-sm mb-4">
               <AlertCircle size={16} /> {error}
             </div>
           )}
 
           {estimate && (
-            <div className="bg-bg-surface p-4 rounded-lg border border-indigo-100 shadow-sm mt-4">
+            <div className="bg-bg-surface p-4 rounded-lg border border-indigo-100 dark:border-indigo-900/50 shadow-sm mt-4">
               <div className="flex justify-between items-center mb-4">
                 <h4 className="font-bold text-text-main">{t('pokemon_detail.estimated_result')}</h4>
-                <span className="text-xs text-text-muted bg-slate-100 px-2 py-1 rounded">{t('pokemon_detail.period')}: {estimate.period}</span>
+                <span className="text-xs text-text-muted bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{t('pokemon_detail.period')}: {estimate.period}</span>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                <div className="bg-orange-50 dark:bg-orange-950/30 p-3 rounded-lg border border-orange-100 dark:border-orange-900/50">
                   <div className="text-xs font-bold text-orange-800 uppercase mb-1">{t('pokemon_detail.berries')}</div>
                   {estimate.berries.map((b, i) => (
                     <div key={i} className="flex justify-between font-medium text-orange-900">
@@ -240,7 +240,7 @@ export default function PokemonDetail() {
                   ))}
                 </div>
 
-                <div className="bg-amber-50 p-3 rounded-lg border border-amber-100">
+                <div className="bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg border border-amber-100 dark:border-amber-900/50">
                   <div className="text-xs font-bold text-amber-800 uppercase mb-1">{t('pokemon_detail.ingredients')}</div>
                   {estimate.ingredients.map((ing, i) => (
                     <div key={i} className="flex justify-between font-medium text-amber-900">
@@ -250,9 +250,9 @@ export default function PokemonDetail() {
                   ))}
                 </div>
 
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-100 dark:border-blue-900/50">
                   <div className="text-xs font-bold text-blue-800 uppercase mb-1">{t('pokemon_detail.skill')}</div>
-                  <div className="font-medium text-blue-900 text-xl">{estimate.skillProcs.toFixed(2)} <span className="text-sm">{t('pokemon_detail.procs')}</span></div>
+                  <div className="font-medium text-blue-900 dark:text-blue-300 text-xl">{estimate.skillProcs.toFixed(2)} <span className="text-sm">{t('pokemon_detail.procs')}</span></div>
                 </div>
               </div>
               <div className="mt-3 text-xs text-slate-400 text-right">

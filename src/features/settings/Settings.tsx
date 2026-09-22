@@ -138,7 +138,7 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={deleteKey}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded"
+                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                     title={t('settings.gemini.delete_key')}
                   >
                     <Trash2 size={20} />
@@ -153,7 +153,11 @@ export default function Settings() {
             </div>
 
             {testMessage && (
-              <div className={`p-3 rounded-lg flex items-center gap-2 text-sm border ${testStatus === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+              <div className={`p-3 rounded-lg flex items-center gap-2 text-sm border ${
+                testStatus === 'success' 
+                  ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-900/50 text-green-800 dark:text-green-300' 
+                  : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/50 text-red-800 dark:text-red-300'
+              }`}>
                 {testStatus === 'success' ? <CheckCircle size={18} className="text-green-600" /> : <AlertCircle size={18} className="text-red-600" />}
                 {testMessage}
               </div>

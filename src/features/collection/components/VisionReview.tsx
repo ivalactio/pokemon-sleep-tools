@@ -80,7 +80,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
       <div className="p-4 bg-bg-app border-b border-border-main flex justify-between items-center sticky top-0 z-10">
         <h2 className="text-xl font-bold">Revisar Captura</h2>
         <div className="flex gap-2">
-          <button onClick={onCancel} className="px-3 py-1.5 text-text-muted hover:bg-slate-200 rounded-lg flex items-center gap-1">
+          <button onClick={onCancel} className="px-3 py-1.5 text-text-muted hover:bg-bg-surface-hover rounded-lg flex items-center gap-1">
             <X size={16} /> Cancelar
           </button>
           <button 
@@ -96,7 +96,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
       <div className="p-6 overflow-y-auto flex-1 space-y-6">
         
         {draft.warnings.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-3 rounded-lg text-sm">
+          <div className="bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-900/50 text-yellow-800 dark:text-yellow-400 p-3 rounded-lg text-sm">
             <h4 className="font-bold flex items-center gap-1 mb-1"><AlertTriangle size={16}/> Advertencias</h4>
             <ul className="list-disc pl-5">
               {draft.warnings.map((w, i) => <li key={i}>{w}</li>)}
@@ -114,7 +114,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
               <select 
                 value={formData.speciesId || ''} 
                 onChange={e => handleChange('speciesId', e.target.value)}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.species ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
+                className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.species ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
               >
                 <option value="">Seleccionar especie...</option>
                 {gamedata.species.map(s => <option key={s.name} value={s.name}>{s.displayName}</option>)}
@@ -128,7 +128,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                 type="text" 
                 value={formData.nickname || ''} 
                 onChange={e => handleChange('nickname', e.target.value)}
-                className="w-full p-2 border border-border-main rounded-lg focus:ring-2 focus:ring-green-500"
+                className="w-full p-2 border bg-bg-app text-text-main border-border-main rounded-lg focus:ring-2 focus:ring-green-500"
               />
               {renderConfidence(draft.rawExtraction.nickname, 'Apodo')}
             </div>
@@ -141,7 +141,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                   min="1" max="100"
                   value={formData.level || ''} 
                   onChange={e => handleChange('level', parseInt(e.target.value) || 0)}
-                  className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.level ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
+                  className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.level ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
                 />
                 {renderConfidence(draft.rawExtraction.level, 'Nivel', 'level')}
               </div>
@@ -153,7 +153,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                   min="1" max="7"
                   value={formData.skillLevel || ''} 
                   onChange={e => handleChange('skillLevel', parseInt(e.target.value) || 1)}
-                  className="w-full p-2 border border-border-main rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full p-2 border bg-bg-app text-text-main border-border-main rounded-lg focus:ring-2 focus:ring-green-500"
                 />
                 {renderConfidence(draft.rawExtraction.skillLevel, 'Nivel Skill')}
               </div>
@@ -165,7 +165,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                 type="text" 
                 disabled
                 value={formData.speciesId ? (gamedata.species.find(s => s.name === formData.speciesId)?.skill.name || '') : ''} 
-                className="w-full p-2 border border-border-main rounded-lg bg-slate-100 text-text-muted"
+                className="w-full p-2 border bg-bg-app text-text-main border-border-main rounded-lg bg-slate-100 dark:bg-slate-800 text-text-muted"
               />
               {renderConfidence(draft.rawExtraction.mainSkill, 'Main Skill')}
             </div>
@@ -175,7 +175,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
               <select 
                 value={formData.ribbonLevel || 0} 
                 onChange={e => handleChange('ribbonLevel', parseInt(e.target.value) || 0)}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.ribbon ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
+                className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.ribbon ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
               >
                 <option value={0}>Ninguna (0)</option>
                 <option value={1}>Nv 1 (+ Inventario)</option>
@@ -191,7 +191,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
               <select 
                 value={formData.natureId || ''} 
                 onChange={e => handleChange('natureId', e.target.value)}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.nature ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
+                className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.nature ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
               >
                 <option value="">Seleccionar naturaleza...</option>
                 {gamedata.natures.map(n => <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
@@ -225,7 +225,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                     <select
                       value={formData.ingredientChoices?.[lvl] || ''}
                       onChange={e => handleIngredientChange(lvl, e.target.value)}
-                      className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`ingredient_${level}`] ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
+                      className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`ingredient_${level}`] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
                     >
                       <option value="">Seleccionar ingrediente...</option>
                       {gamedata.ingredients.map(ing => (
@@ -248,7 +248,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                     <select
                       value={formData.subskills?.[lvl] || ''}
                       onChange={e => handleSubskillChange(lvl, e.target.value)}
-                      className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`subskill_${level}`] ? 'border-red-500 bg-red-50' : 'border-border-main'}`}
+                      className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`subskill_${level}`] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
                     >
                       <option value="">Seleccionar subhabilidad...</option>
                       {gamedata.subSkills.map(sk => (

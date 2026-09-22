@@ -14,7 +14,6 @@ import type { PokemonDraft } from '../../domain/vision/models';
 import type { OwnedPokemon } from '../../domain/models';
 import { useVisionConfig, type ProviderKey } from '../../domain/vision/VisionConfigContext';
 
-import { JsonImportValidationService } from '../../services/vision/JsonImportValidationService';
 import JsonImportFlow from './components/JsonImportFlow';
 
 const PROVIDER_LABELS: Record<ProviderKey, string> = {
@@ -29,7 +28,7 @@ export default function Collection() {
   
   const [isCapturing, setIsCapturing] = useState(false);
   const [draft, setDraft] = useState<PokemonDraft | null>(null);
-  const [jsonImportDrafts, setJsonImportDrafts] = useState<PokemonDraft[] | null>(null);
+  const [isImportingJson, setIsImportingJson] = useState(false);
   const [captureError, setCaptureError] = useState<string | null>(null);
 
   const handleProviderChange = (key: ProviderKey) => {
@@ -41,20 +40,6 @@ export default function Collection() {
     await collectionRepository.add(pokemon);
     setDraft(null);
     setIsCapturing(false);
-  };
-
-  const handleJsonImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const parsed = JsonImportValidationService.parseJson(text);
-      const drafts = parsed.map(p => JsonImportValidationService.processExternalPokemon(p));
-      setJsonImportDrafts(drafts);
-    } catch (error) {
-      alert(`Error importando JSON: ${error}`);
-    }
-    e.target.value = '';
   };
 
   const getProviderInstance = (): VisionProvider => {
@@ -76,12 +61,11 @@ export default function Collection() {
     );
   }
 
-  if (jsonImportDrafts) {
+  if (isImportingJson) {
     return (
       <JsonImportFlow 
-        initialDrafts={jsonImportDrafts}
         onSave={async (pokemon) => { await collectionRepository.add(pokemon); }}
-        onClose={() => setJsonImportDrafts(null)}
+        onClose={() => setIsImportingJson(false)}
       />
     );
   }
@@ -91,11 +75,13 @@ export default function Collection() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">{t('collection.title')}</h2>
         <div className="flex gap-2">
-          <label className={`cursor-pointer px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover`}>
+          <button 
+            onClick={() => setIsImportingJson(true)}
+            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover`}
+          >
             <ImageIcon size={20} />
             Importar JSON
-            <input type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
-          </label>
+          </button>
           <button 
             onClick={() => setIsCapturing(!isCapturing)} 
             className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${isCapturing ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover'}`}

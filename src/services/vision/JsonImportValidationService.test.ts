@@ -66,7 +66,7 @@ describe('JsonImportValidationService', () => {
 
   it('should handle null values correctly', () => {
     const jsonStr = JSON.stringify([{
-      "especie": "Bulbasaur",
+      "especie": null,
       "nivel": null,
       "naturaleza": null,
       "subhabilidad_10": null,
@@ -79,7 +79,8 @@ describe('JsonImportValidationService', () => {
     const parsed = JsonImportValidationService.parseJson(jsonStr);
     const draft = JsonImportValidationService.processExternalPokemon(parsed[0]);
 
-    expect(draft.pokemon.speciesId).toBe('BULBASAUR');
+    expect(draft.pokemon.speciesId).toBeUndefined();
+    expect(draft.errors['species']).toBeUndefined(); // null species is a warning now
     expect(draft.pokemon.level).toBeUndefined();
     expect(draft.pokemon.natureId).toBeUndefined();
     expect(draft.pokemon.subskills?.[10]).toBeNull();
