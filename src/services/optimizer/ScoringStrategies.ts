@@ -1,4 +1,4 @@
-import type { TeamEvaluationContext, TeamScore, RecipeScore } from '../../domain/optimizer/core';
+import type { TeamEvaluationContext, TeamScore } from '../../domain/optimizer/core';
 import type { StaticDataSchema } from '../../domain/models';
 import { getIsland } from '../../domain/optimizer/islands';
 
@@ -82,16 +82,29 @@ export class IngredientScoringStrategy implements ScoringStrategy {
 
 export class RecipeScoringStrategy implements ScoringStrategy {
   private gameData: StaticDataSchema;
-  private targetRecipeName: string;
+  private recipeType: 'curry' | 'salad' | 'dessert';
+  private targetRecipeName?: string;
   
-  constructor(gameData: StaticDataSchema, targetRecipeName: string) {
+  constructor(gameData: StaticDataSchema, recipeType: 'curry' | 'salad' | 'dessert', targetRecipeName?: string) {
     this.gameData = gameData;
+    this.recipeType = recipeType;
     this.targetRecipeName = targetRecipeName;
   }
 
   score(context: TeamEvaluationContext): TeamScore {
-    const recipe = this.gameData.recipes.find(r => r.name === this.targetRecipeName);
-    if (!recipe) {
+    let recipesToEvaluate = this.gameData.recipes.filter(r => r.type === this.recipeType);
+    
+    if (this.targetRecipeName) {
+      const specific = recipesToEvaluate.find(r => r.name === this.targetRecipeName);
+      if (specific) {
+        recipesToEvaluate = [specific];
+      } else {
+        // Fallback in case target recipe is not in this type
+        recipesToEvaluate = [];
+      }
+    }
+
+    if (recipesToEvaluate.length === 0) {
       return { objective: 'recipe', score: 0 };
     }
 
@@ -104,58 +117,55 @@ export class RecipeScoringStrategy implements ScoringStrategy {
       }
     }
 
-    let minCoverage = Infinity;
-    const ingredientsMissing: string[] = [];
-    let totalIngredientValue = 0;
+    let bestScore: TeamScore = { objective: 'recipe', score: 0 };
 
-    for (const req of recipe.ingredients) {
-      const produced = totalIngredientsProduced.get(req.ingredient.name) || 0;
+    for (const recipe of recipesToEvaluate) {
+      let minCoverage = Infinity;
+      const ingredientsMissing: string[] = [];
+      let totalIngredientValue = 0;
+
+      for (const req of recipe.ingredients) {
+        const produced = totalIngredientsProduced.get(req.ingredient.name) || 0;
+        
+        const ingData = this.gameData.ingredients.find(i => i.name === req.ingredient.name);
+        if (ingData) {
+          totalIngredientValue += produced * ingData.value;
+        }
+
+        const coverageRatio = produced / req.amount;
+        if (coverageRatio < minCoverage) {
+          minCoverage = coverageRatio;
+        }
+
+        if (produced < req.amount) {
+          ingredientsMissing.push(req.ingredient.name);
+        }
+      }
+
+      if (recipe.ingredients.length === 0) {
+        minCoverage = 0;
+      }
+
+      const coveragePercent = Math.min(minCoverage * 100, 999);
+      const estimatedServings = minCoverage;
       
-      const ingData = this.gameData.ingredients.find(i => i.name === req.ingredient.name);
-      if (ingData) {
-        // Solo sumamos el valor de los ingredientes *relevantes* para la receta que se produjeron
-        // (hasta el límite requerido? No, calculamos el valor de todo lo que sirve para esta receta)
-        // Para v1, sumaremos todo lo producido de este tipo
-        totalIngredientValue += produced * ingData.value;
-      }
+      const scoreValue = estimatedServings * recipe.value;
 
-      const coverageRatio = produced / req.amount;
-      if (coverageRatio < minCoverage) {
-        minCoverage = coverageRatio;
-      }
-
-      if (produced < req.amount) {
-        ingredientsMissing.push(req.ingredient.name);
+      if (scoreValue > bestScore.score || bestScore.score === 0) {
+        bestScore = {
+          objective: 'recipe',
+          score: scoreValue,
+          recipeDetails: {
+            recipeName: recipe.name,
+            coveragePercent,
+            ingredientsMissing,
+            estimatedServings,
+            totalIngredientValue
+          }
+        };
       }
     }
 
-    if (recipe.ingredients.length === 0) {
-      minCoverage = 0;
-    }
-
-    // minCoverage es el factor limitante. Ej: si minCoverage es 2.5, el equipo produce
-    // suficientes ingredientes para cocinar la receta 2.5 veces al día.
-    const coveragePercent = Math.min(minCoverage * 100, 999); // Cap para visualización
-    const estimatedServings = minCoverage; // Aproximación v1
-    
-    // NOTA ARQUITECTÓNICA v1:
-    // El 'score' principal devuelto aquí se utiliza EXCLUSIVAMENTE para ordenar los equipos de mejor a peor en el optimizador.
-    // La métrica 'estimatedServings * recipe.value' ES UNA HEURÍSTICA DE ORDENACIÓN y NO representa una producción
-    // real garantizada ni un valor económico comparable 1:1 con las bayas o los ingredientes directos.
-    const score = estimatedServings * recipe.value;
-
-    const recipeDetails: RecipeScore = {
-      recipeName: recipe.name,
-      coveragePercent,
-      ingredientsMissing,
-      estimatedServings,
-      totalIngredientValue
-    };
-
-    return {
-      objective: 'recipe',
-      score,
-      recipeDetails
-    };
+    return bestScore;
   }
 }

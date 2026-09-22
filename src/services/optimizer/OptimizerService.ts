@@ -141,8 +141,8 @@ export class OptimizerService {
       case 'berries': return new BerryScoringStrategy(this.gameData);
       case 'ingredients': return new IngredientScoringStrategy(this.gameData);
       case 'recipe': 
-        if (!config.targetRecipeId) throw new Error('Se requiere targetRecipeId para el objetivo de receta.');
-        return new RecipeScoringStrategy(this.gameData, config.targetRecipeId);
+        if (!config.recipeType) throw new Error('Se requiere recipeType para el objetivo de receta.');
+        return new RecipeScoringStrategy(this.gameData, config.recipeType, config.targetRecipeId);
       default:
         throw new Error(`Objetivo ${objective} no implementado todavía.`);
     }

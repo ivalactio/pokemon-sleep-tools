@@ -228,5 +228,14 @@
     "import_success": "Import completed successfully.",
     "import_error_format": "Invalid file format or incorrect schema version.",
     "import_error_read": "Error reading JSON file."
+  },
+  "islands": {
+    "greengrass": "Greengrass Isle",
+    "cyan": "Cyan Beach",
+    "taupe": "Taupe Hollow",
+    "snowdrop": "Snowdrop Tundra",
+    "lapis": "Lapis Lakeside",
+    "power_plant": "Old Gold Power Plant",
+    "amber_canyon": "Amber Canyon"
   }
 }

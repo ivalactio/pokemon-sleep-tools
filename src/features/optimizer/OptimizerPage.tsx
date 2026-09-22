@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
 import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
@@ -16,6 +17,7 @@ const engine = new SleepApiEngine(gamedata as unknown as StaticDataSchema);
 const optimizer = new OptimizerService(gamedata as unknown as StaticDataSchema, engine);
 
 export default function OptimizerPage() {
+  const { t } = useTranslation();
   const collection = useLiveQuery(() => collectionRepository.getAll()) || [];
 
   const [island, setIsland] = useState<IslandId>('cyan');
@@ -26,6 +28,7 @@ export default function OptimizerPage() {
   const [excludedPokemonIds, setExcludedPokemonIds] = useState<string[]>([]);
   const [uniqueSpecies, setUniqueSpecies] = useState(false);
   const [objective, setObjective] = useState<OptimizerObjective>('berries');
+  const [recipeType, setRecipeType] = useState<'curry' | 'salad' | 'dessert'>('curry');
   const [targetRecipeId, setTargetRecipeId] = useState<string>('');
   const [topN, setTopN] = useState(10);
 
@@ -69,8 +72,9 @@ export default function OptimizerPage() {
         requiredPokemonIds,
         excludedPokemonIds
       },
+      recipeType,
       objectives: [objective],
-      targetRecipeId: objective === 'recipe' ? targetRecipeId : undefined,
+      targetRecipeId: objective === 'recipe' && targetRecipeId ? targetRecipeId : undefined,
       maxResults: topN
     };
 
@@ -131,7 +135,7 @@ export default function OptimizerPage() {
     });
   };
 
-  const recipes = gamedata.recipes;
+  const recipesForType = gamedata.recipes.filter(r => r.type === recipeType);
 
   return (
     <div className="space-y-6">
@@ -154,7 +158,7 @@ export default function OptimizerPage() {
                 disabled={isOptimizing}
               >
                 {ISLANDS.map(i => (
-                  <option key={i.id} value={i.id}>{i.name}</option>
+                  <option key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>
                 ))}
               </select>
             </div>
@@ -211,6 +215,23 @@ export default function OptimizerPage() {
 
           <div className="space-y-4">
             <div>
+              <label className="block text-sm font-medium mb-1">Tipo de Platos de la Semana</label>
+              <select 
+                value={recipeType}
+                onChange={e => {
+                  setRecipeType(e.target.value as 'curry' | 'salad' | 'dessert');
+                  setTargetRecipeId('');
+                }}
+                className="w-full p-2 border border-border-main rounded bg-bg-app"
+                disabled={isOptimizing}
+              >
+                <option value="curry">Guisos y Curris</option>
+                <option value="salad">Ensaladas</option>
+                <option value="dessert">Postres</option>
+              </select>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium mb-1">Objetivo de Optimización</label>
               <select 
                 value={objective}
@@ -220,22 +241,22 @@ export default function OptimizerPage() {
               >
                 <option value="berries">Fuerza Máxima (Producción de Bayas)</option>
                 <option value="ingredients">Fuerza Máxima (Producción de Ingredientes base)</option>
-                <option value="recipe">Cobertura de Receta Específica</option>
+                <option value="recipe">Cobertura de Recetas ({recipeType === 'curry' ? 'Curris' : recipeType === 'salad' ? 'Ensaladas' : 'Postres'})</option>
               </select>
             </div>
 
             {objective === 'recipe' && (
               <div>
-                <label className="block text-sm font-medium mb-1">Seleccionar Receta</label>
+                <label className="block text-sm font-medium mb-1 text-text-muted">Priorizar Receta Específica (Opcional)</label>
                 <select 
                   value={targetRecipeId}
                   onChange={e => setTargetRecipeId(e.target.value)}
-                  className="w-full p-2 border border-border-main rounded bg-bg-app"
+                  className="w-full p-2 border border-border-main rounded bg-bg-app text-sm"
                   disabled={isOptimizing}
                 >
-                  <option value="">Selecciona...</option>
-                  {recipes.map(r => (
-                    <option key={r.name} value={r.name}>{r.displayName} ({r.type})</option>
+                  <option value="">Optimizar para TODA la categoría ({recipesForType.length} recetas)</option>
+                  {recipesForType.map(r => (
+                    <option key={r.name} value={r.name}>{r.displayName}</option>
                   ))}
                 </select>
               </div>

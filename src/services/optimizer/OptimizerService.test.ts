@@ -60,6 +60,7 @@ class MockEngine implements CalculationEngine {
 const mockConfig = (): OptimizerConfig => ({
   simulation: { camp: false, bedtime: '22:00', wakeup: '06:00', island: 'cyan', areaBonus: 0 },
   constraints: { uniqueSpecies: false, requiredPokemonIds: [], excludedPokemonIds: [] },
+  recipeType: 'curry',
   objectives: ['berries'],
   maxResults: 3
 });

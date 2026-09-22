@@ -138,7 +138,7 @@ test('IngredientScoringStrategy calculates total value', () => {
 });
 
 test('RecipeScoringStrategy handles missing ingredients and coverage ratio', () => {
-  const strategy = new RecipeScoringStrategy(mockGameData, 'APPLE_HONEY_SALAD');
+  const strategy = new RecipeScoringStrategy(mockGameData, 'salad', 'APPLE_HONEY_SALAD');
   // Requires: 10 Apple, 10 Honey
   
   const context: TeamEvaluationContext = {
@@ -172,7 +172,7 @@ test('RecipeScoringStrategy handles missing ingredients and coverage ratio', () 
 });
 
 test('RecipeScoringStrategy produces identical scores for identical metrics (deterministic)', () => {
-  const strategy = new RecipeScoringStrategy(mockGameData, 'APPLE_JUICE');
+  const strategy = new RecipeScoringStrategy(mockGameData, 'dessert', 'APPLE_JUICE');
   // Requires: 10 Apple. Value: 500
   
   const ctx: TeamEvaluationContext = {

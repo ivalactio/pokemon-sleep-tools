@@ -228,5 +228,14 @@
     "import_success": "Importación completada con éxito.",
     "import_error_format": "Formato de archivo no válido o versión de esquema incorrecta.",
     "import_error_read": "Error al leer el archivo JSON."
+  },
+  "islands": {
+    "greengrass": "Isla Verdegal",
+    "cyan": "Playa Turquesa",
+    "taupe": "Cueva Pardilla",
+    "snowdrop": "Tundra Avellana",
+    "lapis": "Lago Lazuli",
+    "power_plant": "Antigua Planta Eléctrica",
+    "amber_canyon": "Cañón Ámbar"
   }
 }

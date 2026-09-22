@@ -9,9 +9,12 @@ export interface TeamConstraints {
 
 export type OptimizerObjective = 'berries' | 'ingredients' | 'skill' | 'recipe';
 
+export type RecipeType = 'curry' | 'salad' | 'dessert';
+
 export interface OptimizerConfig {
   simulation: SimulationConfig;
   constraints: TeamConstraints;
+  recipeType: RecipeType;          // Tipo de platos disponibles esta semana
   targetRecipeId?: string;       
   objectives: OptimizerObjective[]; 
   maxResults: number;               // Default 10, configurable 5-20
