@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { translateRecipe } from '../../services/i18n-game';
+import { translateRecipe, translateBerry } from '../../services/i18n-game';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
 import { LocalCalculationEngine } from '../../services/optimizer/calculator/LocalCalculationEngine';
@@ -188,7 +188,7 @@ export default function OptimizerPage() {
                             : 'bg-bg-app border-border-main hover:bg-bg-surface-hover'
                         } disabled:opacity-50`}
                       >
-                        {b.name}
+                        {translateBerry(t, b.name)}
                       </button>
                     );
                   })}
