@@ -15,6 +15,8 @@ import './suites/comparatorTest';
 import './suites/persistenceTest';
 import './suites/plannerTest';
 import './suites/integrationTest';
+import './suites/edgeTest';
+import './suites/navigationTest';
 
 export default function TestsPage() {
   const { t, i18n } = useTranslation();
@@ -27,7 +29,7 @@ export default function TestsPage() {
     // Initialize results state with pending
     const initial: Record<string, TestResult> = {};
     globalHarness.getTests().forEach(test => {
-      initial[test.id] = { id: test.id, name: test.name, category: test.category, status: 'PENDING' };
+      initial[test.id] = { id: test.id, name: test.name, category: test.category, layer: test.layer, status: 'PENDING' };
     });
     setResults(initial);
   }, []);
@@ -41,7 +43,7 @@ export default function TestsPage() {
     // Reset
     const reset: Record<string, TestResult> = {};
     globalHarness.getTests().forEach(test => {
-      reset[test.id] = { id: test.id, name: test.name, category: test.category, status: 'PENDING' };
+      reset[test.id] = { id: test.id, name: test.name, category: test.category, layer: test.layer, status: 'PENDING' };
     });
     setResults(reset);
 
@@ -176,6 +178,7 @@ export default function TestsPage() {
               <th className="p-3">ID</th>
               <th className="p-3">Nombre</th>
               <th className="p-3">Categoría</th>
+              <th className="p-3">Capa</th>
               <th className="p-3">Tiempo</th>
               <th className="p-3">Mensaje</th>
             </tr>
@@ -193,6 +196,7 @@ export default function TestsPage() {
                 <td className="p-3 font-mono text-xs">{res.id}</td>
                 <td className="p-3 font-medium">{res.name}</td>
                 <td className="p-3"><span className="px-2 py-0.5 bg-bg-app rounded text-xs border border-border-main">{res.category}</span></td>
+                <td className="p-3"><span className="px-2 py-0.5 bg-bg-surface-hover rounded text-xs font-mono border border-border-main text-indigo-400">{res.layer || 'SERVICE'}</span></td>
                 <td className="p-3 text-text-muted">{res.duration !== undefined ? `${res.duration}ms` : '-'}</td>
                 <td className="p-3">
                   <div className="text-text-main">{res.message}</div>

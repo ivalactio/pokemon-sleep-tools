@@ -12,6 +12,7 @@ globalHarness.register({
   id: 'OPT-001',
   name: 'Optimización estándar (Bayas)',
   category: 'Optimizer',
+  layer: 'SERVICE',
   fn: async () => {
     const all = await collectionRepository.getAll();
     if (all.length < 5) return { status: 'SKIP', message: 'Se necesitan al menos 5 Pokémon' };
@@ -25,7 +26,9 @@ globalHarness.register({
     };
 
     const optimizer = new OptimizerService(gd, engine);
+    const start = performance.now();
     const results = await optimizer.optimize(all, config);
+    const end = performance.now();
 
     if (results.length === 0) {
       return { status: 'FAIL', message: 'No se generaron resultados' };
@@ -35,7 +38,7 @@ globalHarness.register({
       return { status: 'FAIL', message: 'Los equipos no tienen 5 miembros' };
     }
 
-    return { status: 'PASS', message: `Top equipo fuerza: ${Math.round(results[0].score.score)}` };
+    return { status: 'PASS', message: `Top equipo fuerza: ${Math.round(results[0].score.score)} en ${Math.round(end - start)}ms` };
   }
 });
 
@@ -43,6 +46,7 @@ globalHarness.register({
   id: 'OPT-002',
   name: 'Optimización única especie',
   category: 'Optimizer',
+  layer: 'SERVICE',
   fn: async () => {
     const all = await collectionRepository.getAll();
     if (all.length < 5) return { status: 'SKIP', message: 'Se necesitan al menos 5 Pokémon' };
@@ -56,7 +60,9 @@ globalHarness.register({
     };
 
     const optimizer = new OptimizerService(gd, engine);
+    const start = performance.now();
     const results = await optimizer.optimize(all, config);
+    const end = performance.now();
 
     if (results.length === 0) return { status: 'WARN', message: 'No hay equipos suficientes para uniqueSpecies' };
 
@@ -66,7 +72,7 @@ globalHarness.register({
       return { status: 'FAIL', message: 'Se duplicaron especies' };
     }
 
-    return { status: 'PASS', message: 'uniqueSpecies respetado' };
+    return { status: 'PASS', message: `uniqueSpecies respetado en ${Math.round(end - start)}ms` };
   }
 });
 
@@ -74,6 +80,7 @@ globalHarness.register({
   id: 'OPT-003',
   name: 'Optimización con requeridos y excluidos',
   category: 'Optimizer',
+  layer: 'SERVICE',
   fn: async () => {
     const all = await collectionRepository.getAll();
     if (all.length < 5) return { status: 'SKIP', message: 'Se necesitan al menos 5 Pokémon' };
@@ -90,7 +97,9 @@ globalHarness.register({
     };
 
     const optimizer = new OptimizerService(gd, engine);
+    const start = performance.now();
     const results = await optimizer.optimize(all, config);
+    const end = performance.now();
 
     if (results.length === 0) return { status: 'WARN', message: 'No hay resultados' };
 
@@ -98,6 +107,6 @@ globalHarness.register({
     if (!members.includes(required[0])) return { status: 'FAIL', message: 'Pokémon requerido ignorado' };
     if (members.includes(excluded[0]) || members.includes(excluded[1])) return { status: 'FAIL', message: 'Pokémon excluido incluido' };
 
-    return { status: 'PASS', message: 'Filtros respetados' };
+    return { status: 'PASS', message: `Filtros respetados en ${Math.round(end - start)}ms` };
   }
 });

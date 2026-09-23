@@ -1,9 +1,11 @@
 import { globalHarness } from '../testHarness';
 import { collectionRepository } from '../../../data/repositories/DexieCollectionRepository';
+
 globalHarness.register({
   id: 'COL-001',
   name: 'Colección existente accesible',
   category: 'Collection',
+  layer: 'SERVICE',
   fn: async () => {
     const all = await collectionRepository.getAll();
     if (all.length === 0) return { status: 'WARN', message: 'La colección está vacía. Algunos tests pueden no ejecutarse.' };
@@ -15,6 +17,7 @@ globalHarness.register({
   id: 'COL-002',
   name: 'Integridad de datos de la colección',
   category: 'Collection',
+  layer: 'SERVICE',
   fn: async () => {
     const all = await collectionRepository.getAll();
     if (all.length === 0) return { status: 'SKIP', message: 'No hay Pokémon' };
@@ -46,17 +49,36 @@ globalHarness.register({
   id: 'COL-003',
   name: 'Filtros combinados',
   category: 'Collection',
+  layer: 'SERVICE',
   fn: async () => {
     const all = await collectionRepository.getAll();
     if (all.length === 0) return { status: 'SKIP', message: 'No hay Pokémon' };
     
-    // Test filter: minLevel 10
     const filtered = all.filter(p => p.level >= 10);
-    // It's a real collection, we can't assert size, just assert it filtered correctly
     if (filtered.some(p => p.level < 10)) {
       return { status: 'FAIL', message: 'El filtro de nivel no funcionó' };
     }
 
     return { status: 'PASS', message: 'Filtros aplicados correctamente' };
+  }
+});
+
+globalHarness.register({
+  id: 'COL-004',
+  name: 'Collection snapshot consistency',
+  category: 'Collection',
+  layer: 'INTEGRATION',
+  fn: async () => {
+    const all = await collectionRepository.getAll();
+    if (all.length === 0) return { status: 'SKIP', message: 'No hay Pokémon' };
+
+    const expected = 38;
+    if (all.length !== expected) {
+      return { status: 'WARN', message: `Esperados ${expected}, encontrados ${all.length}` };
+    }
+
+    const speciesNames = Array.from(new Set(all.map(p => p.speciesId))).slice(0, 5).join(', ');
+
+    return { status: 'PASS', message: `38 Pokémon verificados. Algunas especies: ${speciesNames}...` };
   }
 });

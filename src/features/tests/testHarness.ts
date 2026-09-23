@@ -13,15 +13,15 @@ export class TestHarness {
 
   async runAll(ctx: TestContext, onProgress: (result: TestResult) => void) {
     for (const test of this.tests) {
-      onProgress({ id: test.id, name: test.name, category: test.category, status: 'RUNNING' });
+      onProgress({ id: test.id, name: test.name, category: test.category, layer: test.layer, status: 'RUNNING' });
       const start = performance.now();
       try {
         const res = await test.fn(ctx);
         const duration = Math.round(performance.now() - start);
-        onProgress({ id: test.id, name: test.name, category: test.category, status: res.status, duration, message: res.message, details: res.details, error: res.error });
+        onProgress({ id: test.id, name: test.name, category: test.category, layer: test.layer, status: res.status, duration, message: res.message, details: res.details, error: res.error });
       } catch (e: any) {
         const duration = Math.round(performance.now() - start);
-        onProgress({ id: test.id, name: test.name, category: test.category, status: 'FAIL', duration, error: e.message || String(e) });
+        onProgress({ id: test.id, name: test.name, category: test.category, layer: test.layer, status: 'FAIL', duration, error: e.message || String(e) });
       }
     }
   }
@@ -29,15 +29,15 @@ export class TestHarness {
   async runCategory(category: string, ctx: TestContext, onProgress: (result: TestResult) => void) {
     const categoryTests = this.tests.filter(t => t.category === category);
     for (const test of categoryTests) {
-      onProgress({ id: test.id, name: test.name, category: test.category, status: 'RUNNING' });
+      onProgress({ id: test.id, name: test.name, category: test.category, layer: test.layer, status: 'RUNNING' });
       const start = performance.now();
       try {
         const res = await test.fn(ctx);
         const duration = Math.round(performance.now() - start);
-        onProgress({ id: test.id, name: test.name, category: test.category, status: res.status, duration, message: res.message, details: res.details, error: res.error });
+        onProgress({ id: test.id, name: test.name, category: test.category, layer: test.layer, status: res.status, duration, message: res.message, details: res.details, error: res.error });
       } catch (e: any) {
         const duration = Math.round(performance.now() - start);
-        onProgress({ id: test.id, name: test.name, category: test.category, status: 'FAIL', duration, error: e.message || String(e) });
+        onProgress({ id: test.id, name: test.name, category: test.category, layer: test.layer, status: 'FAIL', duration, error: e.message || String(e) });
       }
     }
   }
