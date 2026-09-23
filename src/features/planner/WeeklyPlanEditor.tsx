@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import gamedata from '../../data/static/gamedata.json';
-import { translateRecipe } from '../../services/i18n-game';
+import { translateRecipe, translateBerry } from '../../services/i18n-game';
 
 interface Props {
   plan?: WeeklyPlan;
@@ -30,7 +30,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   const [weekStart, setWeekStart] = useState(plan?.weekStart || new Date().toISOString().split('T')[0]);
   const [island, setIsland] = useState<IslandId>(plan?.island || 'greengrass');
   const [areaBonus, setAreaBonus] = useState(plan?.areaBonus || 0);
-  const [favoriteBerries, _setFavoriteBerries] = useState<string[]>(plan?.favoriteBerries || []);
+  const [favoriteBerries, setFavoriteBerries] = useState<string[]>(plan?.favoriteBerries || []);
   const [recipeType, setRecipeType] = useState<RecipeType>(plan?.recipeType || 'curry');
   const [targetRecipeId, setTargetRecipeId] = useState(plan?.targetRecipeId || '');
   const [objective, setObjective] = useState<OptimizerObjective>(plan?.objective || 'berries');
@@ -75,7 +75,6 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   };
 
   const handleOptimize = () => {
-    // Populate localStorage for the Optimizer so it pre-fills this context
     window.localStorage.setItem('opt_island', JSON.stringify(island));
     window.localStorage.setItem('opt_areaBonus', JSON.stringify(areaBonus));
     window.localStorage.setItem('opt_favoriteBerries', JSON.stringify(favoriteBerries));
@@ -86,7 +85,6 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   };
 
   const handleCompare = () => {
-    // Collect all unique team IDs associated with this plan to compare
     const tids = [mainTeamId, ...alternativeTeamIds].filter(Boolean);
     if (tids.length === 2) {
       navigate(`/comparador?t1=${tids[0]}&t2=${tids[1]}`);
@@ -101,6 +99,14 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
     setDailyPlans(newPlans);
   };
 
+  const toggleFavBerry = (berryName: string) => {
+    setFavoriteBerries(prev => {
+      if (prev.includes(berryName)) return prev.filter(b => b !== berryName);
+      if (prev.length >= 3) return prev;
+      return [...prev, berryName];
+    });
+  };
+
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -108,8 +114,8 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
           <ArrowLeft size={20}/> Volver
         </button>
         <div className="flex gap-2">
-          <button onClick={handleOptimize} className="px-4 py-2 border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded font-bold">Optimizar Equipo</button>
-          <button onClick={handleCompare} className="px-4 py-2 border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 rounded font-bold">Comparar Equipos</button>
+          <button onClick={handleOptimize} className="px-4 py-2 border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50 rounded font-bold">Optimizar Equipo</button>
+          <button onClick={handleCompare} className="px-4 py-2 border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50 rounded font-bold">Comparar Equipos</button>
           <button onClick={handleSave} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold flex items-center gap-2">
             <Save size={18}/> Guardar
           </button>
@@ -125,45 +131,61 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             
             <div>
               <label className="block text-sm font-medium mb-1">Nombre del Plan</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main" />
+              <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Semana (Fecha inicio)</label>
-              <input type="date" value={weekStart} onChange={e => setWeekStart(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main" />
+              <input type="date" value={weekStart} onChange={e => setWeekStart(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Isla</label>
-              <select value={island} onChange={e => setIsland(e.target.value as IslandId)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main">
-                {ISLANDS.map(i => <option key={i.id} value={i.id}>{t(`island.${i.id}`)}</option>)}
+              <select value={island} onChange={e => setIsland(e.target.value as IslandId)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
+                {ISLANDS.map(i => <option key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Bonus de Área (%)</label>
-              <input type="number" min="0" max="60" value={areaBonus} onChange={e => setAreaBonus(Number(e.target.value))} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main" />
+              <input type="number" min="0" max="60" value={areaBonus} onChange={e => setAreaBonus(Number(e.target.value))} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main" />
             </div>
             
             {island === 'greengrass' && (
               <div>
-                <label className="block text-sm font-medium mb-1">Bayas Favoritas (Greengrass)</label>
-                {/* Simplified for now, just text or specific selection can be done. 
-                    Ideally reuse BerrySelector here if extracted, or just a multi-select */}
-                <p className="text-xs text-text-muted">Añade bayas favoritas desde el Optimizador.</p>
+                <label className="block text-sm font-medium mb-1">Bayas Favoritas ({favoriteBerries.length}/3)</label>
+                <div className="flex flex-wrap gap-2">
+                  {gamedata.berries.map(b => {
+                    const isSelected = favoriteBerries.includes(b.name);
+                    return (
+                      <button
+                        key={b.name}
+                        onClick={() => toggleFavBerry(b.name)}
+                        disabled={!isSelected && favoriteBerries.length >= 3}
+                        className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                          isSelected 
+                            ? 'bg-amber-500 text-white border-amber-600' 
+                            : 'bg-bg-app text-text-main border-border-main hover:bg-bg-surface-hover'
+                        } disabled:opacity-50`}
+                      >
+                        {translateBerry(t, b.name)}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
             <div>
               <label className="block text-sm font-medium mb-1">Tipo de Platos</label>
-              <select value={recipeType} onChange={e => setRecipeType(e.target.value as RecipeType)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main">
-                <option value="curry">Guisos y curris</option>
-                <option value="salad">Ensaladas</option>
-                <option value="dessert">Postres</option>
+              <select value={recipeType} onChange={e => setRecipeType(e.target.value as RecipeType)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
+                <option value="curry">{t('game.recipeType.curry', { defaultValue: 'Guisos y curris' })}</option>
+                <option value="salad">{t('game.recipeType.salad', { defaultValue: 'Ensaladas' })}</option>
+                <option value="dessert">{t('game.recipeType.dessert', { defaultValue: 'Postres' })}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Receta Principal</label>
-              <select value={targetRecipeId} onChange={e => setTargetRecipeId(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main">
-                <option value="">Ninguna / Variable</option>
+              <select value={targetRecipeId} onChange={e => setTargetRecipeId(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
+                <option value="">{t('app.none', { defaultValue: 'Ninguna / Variable' })}</option>
                 {availableRecipes.map(r => (
                   <option key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
                 ))}
@@ -172,16 +194,16 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
 
             <div>
               <label className="block text-sm font-medium mb-1">Objetivo General</label>
-              <select value={objective} onChange={e => setObjective(e.target.value as OptimizerObjective)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main">
-                <option value="berries">Bayas</option>
-                <option value="ingredients">Ingredientes</option>
-                <option value="recipe">Recetas</option>
+              <select value={objective} onChange={e => setObjective(e.target.value as OptimizerObjective)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
+                <option value="berries">{t('app.berries', { defaultValue: 'Bayas' })}</option>
+                <option value="ingredients">{t('app.ingredients', { defaultValue: 'Ingredientes' })}</option>
+                <option value="recipe">{t('app.recipes', { defaultValue: 'Recetas' })}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Notas Semanales</label>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main h-24" placeholder="Ej: Priorizar subir ingredientes de Miel." />
+              <textarea value={notes} onChange={e => setNotes(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main h-24" placeholder="Ej: Priorizar subir ingredientes de Miel." />
             </div>
 
           </div>
@@ -207,16 +229,16 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                     const nw = [...alternativeTeamIds];
                     nw[idx] = e.target.value;
                     setAlternativeTeamIds(nw);
-                  }} className="flex-1 px-3 py-2 border border-border-main rounded bg-bg-main">
+                  }} className="flex-1 px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
                     <option value="">-- Seleccionar Equipo Guardado --</option>
                     {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                   </select>
-                  <button onClick={() => setAlternativeTeamIds(alternativeTeamIds.filter((_, i) => i !== idx))} className="p-2 text-red-500 hover:bg-red-50 rounded">
+                  <button onClick={() => setAlternativeTeamIds(alternativeTeamIds.filter((_, i) => i !== idx))} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded">
                     <X size={20}/>
                   </button>
                 </div>
               ))}
-              <button onClick={() => setAlternativeTeamIds([...alternativeTeamIds, ''])} className="text-sm text-indigo-600 hover:underline flex items-center gap-1 mt-2">
+              <button onClick={() => setAlternativeTeamIds([...alternativeTeamIds, ''])} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 mt-2">
                 <Plus size={16}/> Añadir Alternativo
               </button>
             </div>
@@ -227,11 +249,11 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {dailyPlans.map((dp, i) => (
                 <div key={i} className="border border-border-main p-3 rounded-lg bg-bg-main flex flex-col gap-2">
-                  <h3 className="font-bold text-md mb-1">{DAYS[i]}</h3>
+                  <h3 className="font-bold text-md mb-1 text-text-main">{DAYS[i]}</h3>
                   
                   <div>
                     <label className="text-xs font-medium text-text-muted">Sobrescribir Equipo</label>
-                    <select value={dp.teamId || ''} onChange={e => updateDaily(i, 'teamId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-sm">
+                    <select value={dp.teamId || ''} onChange={e => updateDaily(i, 'teamId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm">
                       <option value="">(Usar Principal)</option>
                       {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                     </select>
@@ -239,7 +261,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                   
                   <div>
                     <label className="text-xs font-medium text-text-muted">Receta del Día</label>
-                    <select value={dp.recipeId || ''} onChange={e => updateDaily(i, 'recipeId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-sm">
+                    <select value={dp.recipeId || ''} onChange={e => updateDaily(i, 'recipeId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm">
                       <option value="">(Usar Principal / Variable)</option>
                       {availableRecipes.map(r => (
                         <option key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
@@ -249,7 +271,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
 
                   <div>
                     <label className="text-xs font-medium text-text-muted">Notas del día</label>
-                    <input type="text" value={dp.notes || ''} onChange={e => updateDaily(i, 'notes', e.target.value)} placeholder="Ej: Usar pito para energía..." className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-sm" />
+                    <input type="text" value={dp.notes || ''} onChange={e => updateDaily(i, 'notes', e.target.value)} placeholder="Ej: Usar pito para energía..." className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm" />
                   </div>
                 </div>
               ))}
