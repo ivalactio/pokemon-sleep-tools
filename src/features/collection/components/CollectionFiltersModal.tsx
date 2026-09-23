@@ -54,15 +54,44 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
           <div>
             <label className="block text-sm font-bold mb-2">{t('collection.nature')}</label>
             <select value={filters.natureId || ''} onChange={e => setFilters({...filters, natureId: e.target.value || undefined})} className="w-full bg-bg-surface border border-border-main rounded-lg px-3 py-2">
-              <option value="">{t('app.all')}</option>
+              <option className="dark:bg-gray-800 dark:text-white" value="">{t('app.all')}</option>
               {gamedata.natures.map((n: any) => (
-                <option key={n.id} value={n.id}>{getNatureDisplayName(t, n.id)}</option>
+                <option className="dark:bg-gray-800 dark:text-white" key={n.id} value={n.id}>{getNatureDisplayName(t, n.id)}</option>
               ))}
             </select>
           </div>
 
+                    <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-2">Especialidad</label>
+              <select value={filters.specialty || ''} onChange={e => setFilters({...filters, specialty: e.target.value || undefined})} className="w-full bg-bg-surface border border-border-main rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white">
+                <option className="dark:bg-gray-800 dark:text-white" value="">Todas</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="Berries">Bayas</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="Ingredients">Ingredientes</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="Skills">Habilidades</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2">Baya</label>
+              <select value={filters.berryId || ''} onChange={e => setFilters({...filters, berryId: e.target.value || undefined})} className="w-full bg-bg-surface border border-border-main rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white">
+                <option className="dark:bg-gray-800 dark:text-white" value="">Todas</option>
+                {gamedata.berries.map((b: any) => (
+                  <option className="dark:bg-gray-800 dark:text-white" key={b.name} value={b.name}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
           <div>
-            <label className="block text-sm font-bold mb-2">{t('collection.required_subskills')}</label>
+            <label className="block text-sm font-bold mb-2">Habilidad Principal</label>
+            <select value={filters.mainSkillId || ''} onChange={e => setFilters({...filters, mainSkillId: e.target.value || undefined})} className="w-full bg-bg-surface border border-border-main rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white">
+              <option className="dark:bg-gray-800 dark:text-white" value="">Todas</option>
+              {gamedata.mainSkills.map((s: any) => (
+                <option className="dark:bg-gray-800 dark:text-white" key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+<div>
+            <label className="block text-sm font-bold mb-2">{t('collection.required_subskills')} (Activas por nivel)</label>
             <div className="flex flex-wrap gap-2">
               {gamedata.subSkills.map((s: any) => {
                 const active = filters.subSkillIds.includes(s.id);
@@ -76,7 +105,7 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">{t('collection.required_ingredients')}</label>
+            <label className="block text-sm font-bold mb-2">{t('collection.required_ingredients')} (Cualquier slot)</label>
             <div className="flex flex-wrap gap-2">
               {gamedata.ingredients.map((ing: any) => {
                 const active = filters.ingredientIds.includes(ing.name);

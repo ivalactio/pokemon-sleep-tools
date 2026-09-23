@@ -10,7 +10,6 @@ import TestsPage from './features/tests/TestsPage';
 import OptimizerPage from './features/optimizer/OptimizerPage';
 import SavedQueriesPage from './features/saved/SavedQueriesPage';
 import SavedTeamsPage from './features/saved/SavedTeamsPage';
-import TeamComparatorPage from './features/saved/TeamComparatorPage';
 import WeeklyPlannerPage from './features/planner/WeeklyPlannerPage';
 import { VisionConfigProvider } from './domain/vision/VisionConfigContext';
 import './i18n/config';
@@ -33,7 +32,6 @@ function App() {
             <Route path="optimizador" element={<OptimizerPage />} />
             <Route path="consultas-guardadas" element={<SavedQueriesPage />} />
             <Route path="equipos-guardados" element={<SavedTeamsPage />} />
-            <Route path="comparador" element={<TeamComparatorPage />} />
             <Route path="planificador" element={<WeeklyPlannerPage />} />
             <Route path="configuracion" element={<Settings />} />
             <Route path="tests" element={<TestsPage />} />

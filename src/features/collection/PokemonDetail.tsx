@@ -78,7 +78,7 @@ export default function PokemonDetail() {
                   ingredientChoices: { 1: ing0, 30: null, 60: null }
                 });
               }} className="p-1 border border-border-main rounded text-sm bg-bg-app">
-                {gamedata.species.map(s => <option key={s.name} value={s.name}>{s.displayName}</option>)}
+                {gamedata.species.map(s => <option className="dark:bg-gray-800 dark:text-white" key={s.name} value={s.name}>{s.displayName}</option>)}
               </select>
               <span className="text-text-muted">•</span>
               <span className="text-sm font-medium text-text-muted">{t('app.level')}</span>
@@ -99,14 +99,14 @@ export default function PokemonDetail() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-text-muted">{t('pokemon_detail.nature')}</span>
                   <select value={pokemon.natureId} onChange={e => collectionRepository.update({ ...pokemon, natureId: e.target.value })} className="p-1.5 border border-border-main rounded text-sm bg-bg-surface min-w-[120px] max-w-[200px] truncate">
-                    <option value="">{t('pokemon_detail.none')}</option>
-                    {gamedata.natures.map(n => <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
+                    <option className="dark:bg-gray-800 dark:text-white" value="">{t('pokemon_detail.none')}</option>
+                    {gamedata.natures.map(n => <option className="dark:bg-gray-800 dark:text-white" key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
                   </select>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-text-muted">{t('pokemon_detail.ribbon_level')}</span>
                   <select value={pokemon.ribbonLevel || 0} onChange={e => collectionRepository.update({ ...pokemon, ribbonLevel: parseInt(e.target.value) as 0|1|2|3|4 })} className="p-1.5 border border-border-main rounded text-sm bg-bg-surface min-w-[120px]">
-                    {[0, 1, 2, 3, 4].map(r => <option key={r} value={r}>{t('pokemon_detail.level_short')} {r}</option>)}
+                    {[0, 1, 2, 3, 4].map(r => <option className="dark:bg-gray-800 dark:text-white" key={r} value={r}>{t('pokemon_detail.level_short')} {r}</option>)}
                   </select>
                 </div>
                 <div className="flex justify-between items-center">
@@ -128,7 +128,7 @@ export default function PokemonDetail() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-blue-800">{t('pokemon_detail.skill_level')}</span>
                   <select value={pokemon.skillLevel} onChange={e => collectionRepository.update({ ...pokemon, skillLevel: parseInt(e.target.value) || 1 })} className="p-1.5 border border-blue-300 dark:border-blue-800 rounded text-sm bg-bg-surface min-w-[120px]">
-                    {[1, 2, 3, 4, 5, 6, 7].map(l => <option key={l} value={l}>{t('pokemon_detail.level_short')} {l}</option>)}
+                    {[1, 2, 3, 4, 5, 6, 7].map(l => <option className="dark:bg-gray-800 dark:text-white" key={l} value={l}>{t('pokemon_detail.level_short')} {l}</option>)}
                   </select>
                 </div>
               </div>
@@ -148,9 +148,9 @@ export default function PokemonDetail() {
                         onChange={e => collectionRepository.update({ ...pokemon, ingredientChoices: { ...pokemon.ingredientChoices, [lvl]: e.target.value || null } })}
                         className={`p-1.5 border border-amber-300 dark:border-amber-800 rounded text-sm bg-bg-surface min-w-[120px] ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
                       >
-                        <option value="">{t('pokemon_detail.select')}</option>
+                        <option className="dark:bg-gray-800 dark:text-white" value="">{t('pokemon_detail.select')}</option>
                         {options?.map(opt => (
-                          <option key={opt.ingredient.name} value={opt.ingredient.name}>{translateIngredient(t, opt.ingredient.name)} (x{opt.amount})</option>
+                          <option className="dark:bg-gray-800 dark:text-white" key={opt.ingredient.name} value={opt.ingredient.name}>{translateIngredient(t, opt.ingredient.name)} (x{opt.amount})</option>
                         ))}
                       </select>
                     </div>
@@ -172,7 +172,7 @@ export default function PokemonDetail() {
                       onChange={e => collectionRepository.update({ ...pokemon, subskills: { ...pokemon.subskills, [lvl]: e.target.value || null } })}
                       className={`flex-1 p-1.5 border border-purple-300 dark:border-purple-800 rounded text-sm bg-bg-surface ${pokemon.level >= lvl ? '' : 'opacity-70'}`}
                     >
-                      <option value="">{t('pokemon_detail.empty')}</option>
+                      <option className="dark:bg-gray-800 dark:text-white" value="">{t('pokemon_detail.empty')}</option>
                       {gamedata.subSkills
                         .filter(sk => {
                           const isSelectedElsewhere = Object.entries(pokemon.subskills).some(([otherLvl, subskillName]) =>
@@ -181,7 +181,7 @@ export default function PokemonDetail() {
                           return !isSelectedElsewhere;
                         })
                         .map(sk => (
-                          <option key={sk.name} value={sk.name}>{translateSubskill(t, sk.name)}</option>
+                          <option className="dark:bg-gray-800 dark:text-white" key={sk.name} value={sk.name}>{translateSubskill(t, sk.name)}</option>
                       ))}
                     </select>
                   </div>
@@ -213,7 +213,7 @@ export default function PokemonDetail() {
             <label className="flex flex-col gap-1 text-sm font-medium text-text-main">
               {t('pokemon_detail.island')}
               <select value={config.island} onChange={e => setConfig({...config, island: e.target.value as any})} className="border border-border-main rounded px-2 py-1 bg-bg-surface">
-                {ISLANDS.map(island => <option key={island.id} value={island.id}>{island.name}</option>)}
+                {ISLANDS.map(island => <option className="dark:bg-gray-800 dark:text-white" key={island.id} value={island.id}>{island.name}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium text-text-main">

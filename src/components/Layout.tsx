@@ -29,7 +29,7 @@ export default function Layout() {
           <li>
             <Link to="/coleccion" className={linkClass('/coleccion')}>
               <List size={20} />
-              {t('nav.collection')}
+              Caja Pokémon
             </Link>
           </li>
           <li>
@@ -54,12 +54,6 @@ export default function Layout() {
             <Link to="/equipos-guardados" className={linkClass('/equipos-guardados')}>
               <List size={20} />
               Equipos guardados
-            </Link>
-          </li>
-          <li>
-            <Link to="/comparador" className={linkClass('/comparador')}>
-              <Zap size={20} />
-              Comparador
             </Link>
           </li>
           <li>

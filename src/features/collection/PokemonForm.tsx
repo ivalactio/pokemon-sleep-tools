@@ -77,10 +77,10 @@ export default function PokemonForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-text-main mb-1">{t('pokemon_form.species')}</label>
-          <select {...register('speciesId')} className="w-full p-2 border border-border-main bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500">
-            <option value="">{t('pokemon_form.select_species')}</option>
+          <select {...register('speciesId')} className="w-full p-2 border border-border-main bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-800 dark:text-white">
+            <option className="dark:bg-gray-800 dark:text-white" value="">{t('pokemon_form.select_species')}</option>
             {gamedata.species.map(s => (
-              <option key={s.name} value={s.name}>{s.displayName}</option>
+              <option className="dark:bg-gray-800 dark:text-white" key={s.name} value={s.name}>{s.displayName}</option>
             ))}
           </select>
           {errors.speciesId && <p className="text-red-500 text-sm mt-1">{errors.speciesId.message}</p>}
@@ -98,10 +98,10 @@ export default function PokemonForm() {
 
         <div>
           <label className="block text-sm font-medium text-text-main mb-1">{t('pokemon_form.nature')}</label>
-          <select {...register('natureId')} className="w-full p-2 border border-border-main bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500">
-            <option value="">{t('pokemon_form.select_nature')}</option>
+          <select {...register('natureId')} className="w-full p-2 border border-border-main bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-800 dark:text-white">
+            <option className="dark:bg-gray-800 dark:text-white" value="">{t('pokemon_form.select_nature')}</option>
             {gamedata.natures.map(n => (
-              <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>
+              <option className="dark:bg-gray-800 dark:text-white" key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>
             ))}
           </select>
           {errors.natureId && <p className="text-red-500 text-sm mt-1">{errors.natureId.message}</p>}

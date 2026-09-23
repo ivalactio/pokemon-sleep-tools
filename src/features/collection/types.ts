@@ -4,6 +4,8 @@ export interface CollectionFilters {
   maxLevel?: number;
   natureId?: string;
   mainSkillId?: string;
+  specialty?: string;
+  berryId?: string;
   subSkillIds: string[];
   ingredientIds: string[];
   favoritesOnly: boolean;

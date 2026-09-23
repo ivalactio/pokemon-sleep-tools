@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import gamedata from '../../data/static/gamedata.json';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Plus, Image as ImageIcon, Sparkles, FlaskConical, Search, Download } from 'lucide-react';
@@ -57,21 +58,30 @@ export default function Collection() {
     if (filters.search && !p.nickname?.toLowerCase().includes(filters.search.toLowerCase()) && !p.speciesId.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.minLevel && p.level < filters.minLevel) return false;
     if (filters.maxLevel && p.level > filters.maxLevel) return false;
-    if (filters.natureId && p.natureId !== filters.natureId) return false;
+        if (filters.natureId && p.natureId !== filters.natureId) return false;
     if (filters.favoritesOnly && !p.isFavorite) return false;
     if (filters.incompleteOnly && isComplete(p)) return false;
     
+    const species = gamedata.species.find((s: any) => s.name === p.speciesId);
+    if (!species) return false;
+
+    if (filters.specialty && species.specialty !== filters.specialty) return false;
+    if (filters.berryId && species.berry.name !== filters.berryId) return false;
+    if (filters.mainSkillId && species.skill.name !== filters.mainSkillId) return false;
+    
     if (filters.subSkillIds.length > 0) {
       if (!p.subskills) return false;
-      const pSubskills = Object.values(p.subskills).filter(Boolean) as string[];
-      if (!filters.subSkillIds.every(id => pSubskills.includes(id))) return false;
+      const activeLevels = [10, 25, 50, 75, 100].filter(l => p.level >= l);
+      const activeSubskills = activeLevels.map(l => (p.subskills as any)[l]).filter(Boolean);
+      if (!filters.subSkillIds.every(id => activeSubskills.includes(id))) return false;
     }
     
     if (filters.ingredientIds.length > 0) {
       if (!p.ingredientChoices) return false;
-      const pIngs = Object.values(p.ingredientChoices).filter(Boolean) as string[];
+      const pIngs = [species.ingredient0?.[0]?.ingredient.name, (p.ingredientChoices as any)[30], (p.ingredientChoices as any)[60]].filter(Boolean) as string[];
       if (!filters.ingredientIds.every(id => pIngs.includes(id))) return false;
     }
+
     
     return true;
   }).sort((a, b) => {
@@ -148,8 +158,8 @@ export default function Collection() {
             <input type="text" placeholder="Buscar..." value={filters.search} onChange={e => setFilters({...filters, search: e.target.value})} className="pl-9 pr-3 py-2 bg-bg-surface border border-border-main rounded-lg text-sm w-full sm:w-32" />
           </div>
           <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="bg-bg-surface border border-border-main rounded-lg px-3 py-2 text-sm">
-            <option value="level">Nv</option>
-            <option value="name">{t('app.name')}</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="level">Nv</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="name">{t('app.name')}</option>
           </select>
           <button onClick={() => setShowFilters(true)} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover font-bold text-sm">{t('collection.filters')}</button>
           <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover" title="Exportar Backup JSON">

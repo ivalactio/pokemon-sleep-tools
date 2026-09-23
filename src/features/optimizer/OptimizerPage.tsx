@@ -16,6 +16,25 @@ import { Link } from 'react-router-dom';
 import { TeamDetailModal } from './components/TeamDetailModal';
 import { TeamCompareModal } from './components/TeamCompareModal';
 
+function useLocalStorage<T>(key: string, initialValue: T) {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {}
+  };
+  return [storedValue, setValue] as const;
+}
+
 const engine = new LocalCalculationEngine(gamedata as unknown as StaticDataSchema);
 const optimizer = new OptimizerService(gamedata as unknown as StaticDataSchema, engine);
 
@@ -23,17 +42,17 @@ export default function OptimizerPage() {
   const { t } = useTranslation();
   const collection = useLiveQuery(() => collectionRepository.getAll()) || [];
 
-  const [island, setIsland] = useState<IslandId>('cyan');
-  const [areaBonus, setAreaBonus] = useState(0);
-  const [favoriteBerries, setFavoriteBerries] = useState<string[]>([]);
-  const [minLevel, setMinLevel] = useState(1);
-  const [requiredPokemonIds, setRequiredPokemonIds] = useState<string[]>([]);
-  const [excludedPokemonIds, setExcludedPokemonIds] = useState<string[]>([]);
-  const [uniqueSpecies, setUniqueSpecies] = useState(false);
-  const [objective, setObjective] = useState<OptimizerObjective>('berries');
-  const [recipeType, setRecipeType] = useState<'curry' | 'salad' | 'dessert'>('curry');
-  const [targetRecipeId, setTargetRecipeId] = useState<string>('');
-  const [topN, setTopN] = useState(10);
+  const [island, setIsland] = useLocalStorage<IslandId>('opt_island', 'cyan');
+  const [areaBonus, setAreaBonus] = useLocalStorage('opt_areaBonus', 0);
+  const [favoriteBerries, setFavoriteBerries] = useLocalStorage<string[]>('opt_favoriteBerries', []);
+  const [minLevel, setMinLevel] = useLocalStorage('opt_minLevel', 1);
+  const [requiredPokemonIds, setRequiredPokemonIds] = useLocalStorage<string[]>('opt_requiredPokemonIds', []);
+  const [excludedPokemonIds, setExcludedPokemonIds] = useLocalStorage<string[]>('opt_excludedPokemonIds', []);
+  const [uniqueSpecies, setUniqueSpecies] = useLocalStorage('opt_uniqueSpecies', false);
+  const [objective, setObjective] = useLocalStorage<OptimizerObjective>('opt_objective', 'berries');
+  const [recipeType, setRecipeType] = useLocalStorage<'curry' | 'salad' | 'dessert'>('opt_recipeType', 'curry');
+  const [targetRecipeId, setTargetRecipeId] = useLocalStorage<string>('opt_targetRecipeId', '');
+  const [topN, setTopN] = useLocalStorage('opt_topN', 10);
 
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [progress, setProgress] = useState<OptimizerProgress | null>(null);
@@ -45,8 +64,47 @@ export default function OptimizerPage() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Validate greengrass berries
+  const handleReset = () => {
+    setIsland('cyan');
+    setAreaBonus(0);
+    setFavoriteBerries([]);
+    setMinLevel(1);
+    setRequiredPokemonIds([]);
+    setExcludedPokemonIds([]);
+    setUniqueSpecies(false);
+    setObjective('berries');
+    setRecipeType('curry');
+    setTargetRecipeId('');
+    setTopN(10);
+  };
   const isGreengrass = getIsland(island).id === 'greengrass';
   const greengrassReady = !isGreengrass || favoriteBerries.length === 3;
+
+  const handleSaveQuery = async () => {
+    const name = window.prompt('Nombre de la consulta:');
+    if (!name) return;
+    const config = {
+      simulation: { camp: false, bedtime: '22:00', wakeup: '06:00', island, areaBonus, favoriteBerries: isGreengrass ? favoriteBerries : undefined },
+      constraints: { minLevel, uniqueSpecies, requiredPokemonIds, excludedPokemonIds },
+      recipeType,
+      objectives: [objective],
+      targetRecipeId: objective === 'recipe' && targetRecipeId ? targetRecipeId : undefined,
+      maxResults: topN
+    };
+    try {
+      const { db } = await import('../../data/db');
+      await db.savedQueries.add({
+        id: crypto.randomUUID(),
+        name,
+        createdAt: Date.now(),
+        config: config as any
+      });
+      alert('Consulta guardada con éxito.');
+    } catch (e) {
+      console.error(e);
+      alert('Error al guardar consulta.');
+    }
+  };
 
   const handleStart = async () => {
     if (!greengrassReady) {
@@ -152,7 +210,12 @@ export default function OptimizerPage() {
       </div>
 
       <div className="bg-bg-surface border border-border-main rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-4 border-b border-border-main pb-2">{t('optimizer.configuration')}</h2>
+        <div className="flex justify-between items-center mb-4 border-b border-border-main pb-2">
+          <h2 className="text-lg font-semibold">{t('optimizer.configuration')}</h2>
+          <button onClick={handleReset} className="text-sm px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 font-medium transition-colors">
+            Nueva Configuración
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
@@ -164,7 +227,7 @@ export default function OptimizerPage() {
                 disabled={isOptimizing}
               >
                 {ISLANDS.map(i => (
-                  <option key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>
+                  <option className="dark:bg-gray-800 dark:text-white" key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>
                 ))}
               </select>
             </div>
@@ -228,9 +291,9 @@ export default function OptimizerPage() {
                 className="w-full p-2 border border-border-main rounded bg-bg-app"
                 disabled={isOptimizing}
               >
-                <option value="berries">{t('optimizer.objective_berries')}</option>
-                <option value="ingredients">{t('optimizer.objective_ingredients')}</option>
-                <option value="recipe">Cobertura de Recetas ({recipeType === 'curry' ? 'Curris' : recipeType === 'salad' ? 'Ensaladas' : 'Postres'})</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="berries">{t('optimizer.objective_berries')}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="ingredients">{t('optimizer.objective_ingredients')}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="recipe">Cobertura de Recetas ({recipeType === 'curry' ? 'Curris' : recipeType === 'salad' ? 'Ensaladas' : 'Postres'})</option>
               </select>
             </div>
 
@@ -247,9 +310,9 @@ export default function OptimizerPage() {
                     className="w-full p-2 border border-border-main rounded bg-bg-app"
                     disabled={isOptimizing}
                   >
-                    <option value="curry">{t('game.recipeType.curry')}</option>
-                    <option value="salad">{t('game.recipeType.salad')}</option>
-                    <option value="dessert">{t('game.recipeType.dessert')}</option>
+                    <option className="dark:bg-gray-800 dark:text-white" value="curry">{t('game.recipeType.curry')}</option>
+                    <option className="dark:bg-gray-800 dark:text-white" value="salad">{t('game.recipeType.salad')}</option>
+                    <option className="dark:bg-gray-800 dark:text-white" value="dessert">{t('game.recipeType.dessert')}</option>
                   </select>
                 </div>
 
@@ -261,9 +324,9 @@ export default function OptimizerPage() {
                     className="w-full p-2 border border-border-main rounded bg-bg-app text-sm"
                     disabled={isOptimizing}
                   >
-                    <option value="">Optimizar para TODA la categoría ({recipesForType.length} recetas)</option>
+                    <option className="dark:bg-gray-800 dark:text-white" value="">Optimizar para TODA la categoría ({recipesForType.length} recetas)</option>
                     {recipesForType.map(r => (
-                      <option key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
+                      <option className="dark:bg-gray-800 dark:text-white" key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
                     ))}
                   </select>
                 </div>
@@ -334,7 +397,14 @@ export default function OptimizerPage() {
           </details>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex flex-wrap justify-end gap-3">
+          <button 
+            onClick={handleSaveQuery}
+            disabled={isOptimizing}
+            className="flex items-center gap-2 px-6 py-2 bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-medium rounded hover:bg-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+          >
+            Guardar Consulta
+          </button>
           {isOptimizing ? (
             <button 
               onClick={handleCancel}

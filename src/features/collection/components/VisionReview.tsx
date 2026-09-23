@@ -121,8 +121,8 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                 }}
                 className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.species ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
               >
-                <option value="">{t('import.select_species')}</option>
-                {gamedata.species.map(s => <option key={s.name} value={s.name}>{s.displayName}</option>)}
+                <option className="dark:bg-gray-800 dark:text-white" value="">{t('import.select_species')}</option>
+                {gamedata.species.map(s => <option className="dark:bg-gray-800 dark:text-white" key={s.name} value={s.name}>{s.displayName}</option>)}
               </select>
               {renderConfidence(draft.rawExtraction.species, 'Especie', 'species')}
             </div>
@@ -182,11 +182,11 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                 onChange={e => handleChange('ribbonLevel', parseInt(e.target.value) || 0)}
                 className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.ribbon ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
               >
-                <option value={0}>{t('import.none_0')}</option>
-                <option value={1}>{t('import.lv1_inv')}</option>
-                <option value={2}>{t('import.lv2_freq')}</option>
-                <option value={3}>{t('import.lv3_inv')}</option>
-                <option value={4}>{t('import.lv4_freq')}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value={0}>{t('import.none_0')}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value={1}>{t('import.lv1_inv')}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value={2}>{t('import.lv2_freq')}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value={3}>{t('import.lv3_inv')}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value={4}>{t('import.lv4_freq')}</option>
               </select>
               {renderConfidence(draft.rawExtraction.ribbon, 'Cinta', 'ribbon')}
             </div>
@@ -198,8 +198,8 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                 onChange={e => handleChange('natureId', e.target.value)}
                 className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors.nature ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
               >
-                <option value="">{t('pokemon_form.select_nature')}</option>
-                {gamedata.natures.map(n => <option key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
+                <option className="dark:bg-gray-800 dark:text-white" value="">{t('pokemon_form.select_nature')}</option>
+                {gamedata.natures.map(n => <option className="dark:bg-gray-800 dark:text-white" key={n.name} value={n.name}>{getNatureDisplayName(t, n.name)}</option>)}
               </select>
               {renderConfidence(draft.rawExtraction.nature, 'Naturaleza', 'nature')}
             </div>
@@ -235,9 +235,9 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                       onChange={e => handleIngredientChange(lvl, e.target.value)}
                       className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`ingredient_${level}`] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
                     >
-                      <option value="">{t('import.select_ingredient')}</option>
+                      <option className="dark:bg-gray-800 dark:text-white" value="">{t('import.select_ingredient')}</option>
                       {options.map(opt => (
-                        <option key={opt.ingredient.name} value={opt.ingredient.name}>
+                        <option className="dark:bg-gray-800 dark:text-white" key={opt.ingredient.name} value={opt.ingredient.name}>
                           {translateIngredient(t, opt.ingredient.name)} (x{opt.amount})
                         </option>
                       ))}
@@ -260,9 +260,9 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
                       onChange={e => handleSubskillChange(lvl, e.target.value)}
                       className={`w-full p-2 border bg-bg-app text-text-main rounded-lg focus:ring-2 focus:ring-green-500 ${draft.errors[`subskill_${level}`] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border-main'}`}
                     >
-                      <option value="">{t('import.select_subskill')}</option>
+                      <option className="dark:bg-gray-800 dark:text-white" value="">{t('import.select_subskill')}</option>
                       {gamedata.subSkills.map(sk => (
-                        <option key={sk.name} value={sk.name}>{translateSubskill(t, sk.name)}</option>
+                        <option className="dark:bg-gray-800 dark:text-white" key={sk.name} value={sk.name}>{translateSubskill(t, sk.name)}</option>
                       ))}
                     </select>
                     {renderConfidence(draft.rawExtraction.subskills[lvl], `Subhabilidad Nv ${level}`, `subskill_${level}`)}

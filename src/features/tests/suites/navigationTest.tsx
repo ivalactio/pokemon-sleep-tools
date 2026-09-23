@@ -7,7 +7,7 @@ import Recipes from '../../recipes/Recipes';
 import OptimizerPage from '../../optimizer/OptimizerPage';
 import SavedQueriesPage from '../../saved/SavedQueriesPage';
 import SavedTeamsPage from '../../saved/SavedTeamsPage';
-import TeamComparatorPage from '../../saved/TeamComparatorPage';
+
 import WeeklyPlannerPage from '../../planner/WeeklyPlannerPage';
 import Settings from '../../settings/Settings';
 
@@ -17,7 +17,6 @@ const routes = [
   { path: '/optimizador', el: <OptimizerPage /> },
   { path: '/consultas-guardadas', el: <SavedQueriesPage /> },
   { path: '/equipos-guardados', el: <SavedTeamsPage /> },
-  { path: '/comparador', el: <TeamComparatorPage /> },
   { path: '/planificador', el: <WeeklyPlannerPage /> },
   { path: '/configuracion', el: <Settings /> },
 ];
