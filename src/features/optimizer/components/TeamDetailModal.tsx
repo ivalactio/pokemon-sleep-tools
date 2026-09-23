@@ -4,6 +4,7 @@ import type { Recipe } from '../../../domain/models';
 import gamedata from '../../../data/static/gamedata.json';
 import { translateIngredient, translateRecipe } from '../../../services/i18n-game';
 import { useTranslation } from 'react-i18next';
+import { db } from '../../../data/db';
 
 interface TeamDetailModalProps {
   result: TeamResult | null;
@@ -13,6 +14,31 @@ interface TeamDetailModalProps {
 export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
   const { t } = useTranslation();
   if (!result) return null;
+
+  const handleSaveTeam = async () => {
+    const name = window.prompt('Nombre para este equipo:');
+    if (!name) return;
+    try {
+      await db.savedTeams.add({
+        id: crypto.randomUUID(),
+        name,
+        createdAt: Date.now(),
+        queryContext: {} as any,
+        memberIds: result.evaluation.memberEstimates.map((m: any) => m.pokemon.id),
+        metrics: {
+          berries: result.evaluation.memberEstimates.reduce((acc: number, m: any) => acc + m.estimate.berries.reduce((s: number, b: any) => s + b.amount, 0), 0),
+          ingredients: result.evaluation.memberEstimates.reduce((acc: number, m: any) => acc + m.estimate.ingredients.reduce((s: number, i: any) => s + i.amount, 0), 0),
+          skills: result.evaluation.memberEstimates.reduce((acc: number, m: any) => acc + m.estimate.skillProcs, 0),
+          score: result.score.score
+        }
+      });
+      alert('Equipo guardado');
+    } catch (e) {
+      console.error(e);
+      alert('Error guardando');
+    }
+  };
+
 
   const { memberEstimates } = result.evaluation;
   
@@ -59,7 +85,10 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
         {/* HEADER */}
         <div className="flex items-center justify-between p-6 border-b border-border-main bg-bg-surface">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2">Detalle del Equipo</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold flex items-center gap-2">Detalle del Equipo</h2>
+              <button onClick={handleSaveTeam} className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-bold">Guardar Equipo</button>
+            </div>
             <p className="text-sm text-text-muted mt-1">Score: {Math.round(result.score.score).toLocaleString()} ({result.score.objective})</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">

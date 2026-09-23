@@ -17,7 +17,14 @@ export default function Recipes() {
     if (search) {
       const q = search.toLowerCase();
       const translatedName = translateRecipe(t, r.name).toLowerCase();
-      if (!translatedName.includes(q) && !r.name.toLowerCase().includes(q)) return false;
+      const matchName = translatedName.includes(q) || r.name.toLowerCase().includes(q);
+      
+      const matchIng = r.ingredients.some(ing => {
+        const ingName = translateIngredient(t, ing.ingredient.name).toLowerCase();
+        return ingName.includes(q) || ing.ingredient.name.toLowerCase().includes(q);
+      });
+      
+      if (!matchName && !matchIng) return false;
     }
     return true;
   });

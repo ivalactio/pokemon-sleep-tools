@@ -13,12 +13,27 @@ import type { VisionProvider } from '../../domain/services/interfaces';
 import type { PokemonDraft } from '../../domain/vision/models';
 import type { OwnedPokemon } from '../../domain/models';
 import { useVisionConfig, type ProviderKey } from '../../domain/vision/VisionConfigContext';
+import CollectionFiltersModal from './components/CollectionFiltersModal';
+import type { CollectionFilters } from './types';
 
 import JsonImportFlow from './components/JsonImportFlow';
 
 const PROVIDER_LABELS: Record<ProviderKey, string> = {
   mock: 'Mock (test)',
   gemini: 'Gemini',
+};
+
+const isComplete = (p: OwnedPokemon) => {
+  if (!p.natureId) return false;
+  if (!p.ingredientChoices || !p.ingredientChoices[30]) return false;
+  if (p.level >= 60 && !p.ingredientChoices[60]) return false;
+  if (!p.subskills) return false;
+  if (p.level >= 10 && !p.subskills[10]) return false;
+  if (p.level >= 25 && !p.subskills[25]) return false;
+  if (p.level >= 50 && !p.subskills[50]) return false;
+  if (p.level >= 75 && !p.subskills[75]) return false;
+  if (p.level >= 100 && !p.subskills[100]) return false;
+  return true;
 };
 
 export default function Collection() {
@@ -28,17 +43,49 @@ export default function Collection() {
   
   const [isCapturing, setIsCapturing] = useState(false);
   const [draft, setDraft] = useState<PokemonDraft | null>(null);
-  const [search, setSearch] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<CollectionFilters>({
+    search: '',
+    subSkillIds: [],
+    ingredientIds: [],
+    favoritesOnly: false,
+    incompleteOnly: false
+  });
   const [sortBy, setSortBy] = useState<'level' | 'name'>('level');
 
   const filteredList = (pokemonList || []).filter(p => {
-    if (search && !p.nickname?.toLowerCase().includes(search.toLowerCase()) && !p.speciesId.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filters.search && !p.nickname?.toLowerCase().includes(filters.search.toLowerCase()) && !p.speciesId.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.minLevel && p.level < filters.minLevel) return false;
+    if (filters.maxLevel && p.level > filters.maxLevel) return false;
+    if (filters.natureId && p.natureId !== filters.natureId) return false;
+    if (filters.favoritesOnly && !p.isFavorite) return false;
+    if (filters.incompleteOnly && isComplete(p)) return false;
+    
+    if (filters.subSkillIds.length > 0) {
+      if (!p.subskills) return false;
+      const pSubskills = Object.values(p.subskills).filter(Boolean) as string[];
+      if (!filters.subSkillIds.every(id => pSubskills.includes(id))) return false;
+    }
+    
+    if (filters.ingredientIds.length > 0) {
+      if (!p.ingredientChoices) return false;
+      const pIngs = Object.values(p.ingredientChoices).filter(Boolean) as string[];
+      if (!filters.ingredientIds.every(id => pIngs.includes(id))) return false;
+    }
+    
     return true;
   }).sort((a, b) => {
     if (sortBy === 'level') return b.level - a.level;
     if (sortBy === 'name') return (a.nickname || a.speciesId).localeCompare(b.nickname || b.speciesId);
     return b.level - a.level;
   });
+
+  
+  const handleToggleFavorite = async (e: React.MouseEvent, p: OwnedPokemon) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await collectionRepository.update({ ...p, isFavorite: !p.isFavorite });
+  };
 
   const handleExport = () => {
     const data = JSON.stringify(pokemonList, null, 2);
@@ -98,12 +145,13 @@ export default function Collection() {
         <div className="flex flex-col md:flex-row gap-2 items-center">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
-            <input type="text" placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-3 py-2 bg-bg-surface border border-border-main rounded-lg text-sm w-full sm:w-32" />
+            <input type="text" placeholder="Buscar..." value={filters.search} onChange={e => setFilters({...filters, search: e.target.value})} className="pl-9 pr-3 py-2 bg-bg-surface border border-border-main rounded-lg text-sm w-full sm:w-32" />
           </div>
           <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="bg-bg-surface border border-border-main rounded-lg px-3 py-2 text-sm">
             <option value="level">Nv</option>
             <option value="name">Nombre</option>
           </select>
+          <button onClick={() => setShowFilters(true)} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-slate-100 font-bold text-sm">Filtros</button>
           <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-surface hover:bg-slate-100" title="Exportar Backup JSON">
             <Download size={18} className="text-text-muted"/>
           </button>
@@ -169,6 +217,8 @@ export default function Collection() {
             onError={(e) => setCaptureError(e)}
           />
 
+          {showFilters && <CollectionFiltersModal filters={filters} setFilters={setFilters} onClose={() => setShowFilters(false)} />}
+
           {captureError && (
             <div className="text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 p-3 rounded-lg border border-red-200 dark:border-red-800 text-sm">
               <strong>Error:</strong> {captureError}
@@ -187,11 +237,15 @@ export default function Collection() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredList.map(p => (
-            <Link key={p.id} to={`/pokemon/${p.id}`} className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-sm hover:border-green-300 dark:hover:border-green-500 transition-colors">
-              <h3 className="font-bold text-lg text-text-main">{p.nickname || p.speciesId}</h3>
+            <Link key={p.id} to={`/pokemon/${p.id}`} className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-sm hover:border-green-300 dark:hover:border-green-500 transition-colors relative block">
+              <button onClick={(e) => handleToggleFavorite(e, p)} className="absolute top-4 right-4 z-10 text-2xl">
+                {p.isFavorite ? '⭐' : '☆'}
+              </button>
+              <h3 className="font-bold text-lg text-text-main pr-8">{p.nickname || p.speciesId}</h3>
               <p className="text-sm text-text-muted truncate">
                 {t('collection.sort_by_level')} {p.level} • {getNatureDisplayName(t, p.natureId || '')}
               </p>
+              {!isComplete(p) && <p className="text-xs text-red-500 font-bold mt-2">⚠️ Faltan datos (Naturaleza, Ings o Subhabs)</p>}
             </Link>
           ))}
         </div>

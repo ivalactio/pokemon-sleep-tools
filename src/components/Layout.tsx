@@ -41,7 +41,25 @@ export default function Layout() {
           <li>
             <Link to="/optimizador" className={linkClass('/optimizador')}>
               <Zap size={20} />
-              {t('nav.optimizer')}
+              Optimizador
+            </Link>
+          </li>
+          <li>
+            <Link to="/consultas-guardadas" className={linkClass('/consultas-guardadas')}>
+              <List size={20} />
+              Consultas guardadas
+            </Link>
+          </li>
+          <li>
+            <Link to="/equipos-guardados" className={linkClass('/equipos-guardados')}>
+              <List size={20} />
+              Equipos guardados
+            </Link>
+          </li>
+          <li>
+            <Link to="/comparador" className={linkClass('/comparador')}>
+              <Zap size={20} />
+              Comparador
             </Link>
           </li>
           <li>

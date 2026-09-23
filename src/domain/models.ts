@@ -81,6 +81,7 @@ export interface StaticDataSchema {
 }
 
 export interface OwnedPokemon {
+  isFavorite?: boolean;
   id: string;
   speciesId: string;
   nickname: string;

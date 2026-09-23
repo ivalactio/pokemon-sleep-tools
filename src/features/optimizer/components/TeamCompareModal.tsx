@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 interface TeamCompareModalProps {
   teams: [TeamResult, TeamResult];
   onClose: () => void;
+  inline?: boolean;
 }
 
-export function TeamCompareModal({ teams, onClose }: TeamCompareModalProps) {
+export function TeamCompareModal({ teams, onClose, inline }: TeamCompareModalProps) {
   const { t } = useTranslation();
   const [t1, t2] = teams;
 
@@ -38,8 +39,8 @@ export function TeamCompareModal({ teams, onClose }: TeamCompareModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-bg-main w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+    <div className={inline ? "w-full" : "fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"} onClick={inline ? undefined : onClose}>
+      <div className={`bg-bg-main w-full overflow-hidden flex flex-col ${inline ? "" : "max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl"}`} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-6 border-b border-border-main bg-bg-surface">
           <h2 className="text-2xl font-bold">Comparador de Equipos</h2>
           <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full">
