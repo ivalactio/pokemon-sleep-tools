@@ -1,5 +1,6 @@
 import { globalHarness } from '../testHarness';
 import { collectionRepository } from '../../../data/repositories/DexieCollectionRepository';
+import { matchesFilters } from '../../collection/filterPokemon';
 
 globalHarness.register({
   id: 'COL-001',
@@ -80,5 +81,30 @@ globalHarness.register({
     const speciesNames = Array.from(new Set(all.map(p => p.speciesId))).slice(0, 5).join(', ');
 
     return { status: 'PASS', message: `38 Pokémon verificados. Algunas especies: ${speciesNames}...` };
+  }
+});
+
+globalHarness.register({
+  id: 'COL-005',
+  name: 'Filtro de especialidad por valor interno',
+  category: 'Collection',
+  layer: 'SERVICE',
+  fn: async () => {
+    const all = await collectionRepository.getAll();
+    if (all.length === 0) return { status: 'SKIP', message: 'No hay Pokémon' };
+
+    const ingredients = all.filter(p => matchesFilters(p, {
+      search: '',
+      specialty: 'ingredient',
+      subSkillIds: [],
+      ingredientIds: [],
+      favoritesOnly: false,
+      incompleteOnly: false
+    }));
+
+    return { 
+      status: 'PASS', 
+      message: `Filtro de especialidad funcional (${ingredients.length} especialistas de ingredientes detectados).` 
+    };
   }
 });

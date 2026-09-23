@@ -209,9 +209,9 @@ export default function OptimizerPage() {
     <div className="space-y-8 pb-24 max-w-6xl mx-auto">
       {/* Header */}
       <PageHeader 
-        title="Optimizador de Equipos"
+        title={t('nav.optimizer')}
         icon={Cpu}
-        description="Analiza y simula millones de combinaciones de tu colección para hallar el equipo de máxima producción."
+        description={t('optimizer.description')}
         actions={
           <div className="flex items-center gap-2">
             <ActionButton 
@@ -219,9 +219,9 @@ export default function OptimizerPage() {
               onClick={handleReset} 
               icon={RotateCcw}
               disabled={isOptimizing}
-              title="Restablecer filtros"
+              title={t('collection.clear_filters')}
             >
-              Reiniciar
+              {t('optimizer.reset')}
             </ActionButton>
             <ActionButton 
               variant="outline" 
@@ -229,7 +229,7 @@ export default function OptimizerPage() {
               icon={Bookmark}
               disabled={isOptimizing}
             >
-              Guardar Consulta
+              {t('optimizer.save_query')}
             </ActionButton>
           </div>
         }
@@ -241,11 +241,11 @@ export default function OptimizerPage() {
           <div className="flex items-center gap-2">
             <Sliders size={20} className="text-primary-main" />
             <h3 className="font-extrabold text-base text-text-main">
-              Configuración del Análisis
+              {t('optimizer.analysis_config')}
             </h3>
           </div>
           <span className="text-xs font-semibold text-text-muted bg-bg-app px-2.5 py-1 rounded-full border border-border-main">
-            {collection.length} Pokémon en tu caja
+            {t('optimizer.pokemon_in_box', { count: collection.length, defaultValue: `${collection.length} Pokémon en tu caja` })}
           </span>
         </div>
 
@@ -253,7 +253,7 @@ export default function OptimizerPage() {
           {/* Group 1: Island Context */}
           <div className="space-y-4 bg-bg-app p-4 rounded-xl border border-border-main">
             <h4 className="text-xs font-black text-text-muted uppercase tracking-wider">
-              1. Entorno e Isla
+              {t('optimizer.group_environment')}
             </h4>
 
             <div>
@@ -318,7 +318,7 @@ export default function OptimizerPage() {
           {/* Group 2: Strategy & Objective */}
           <div className="space-y-4 bg-bg-app p-4 rounded-xl border border-border-main">
             <h4 className="text-xs font-black text-text-muted uppercase tracking-wider">
-              2. Objetivo Estratégico
+              {t('optimizer.group_strategy')}
             </h4>
 
             <div>
@@ -333,7 +333,7 @@ export default function OptimizerPage() {
               >
                 <option className="bg-bg-surface text-text-main" value="berries">{t('optimizer.objective_berries')}</option>
                 <option className="bg-bg-surface text-text-main" value="ingredients">{t('optimizer.objective_ingredients')}</option>
-                <option className="bg-bg-surface text-text-main" value="recipe">Cobertura de Recetas ({recipeType === 'curry' ? 'Curris' : recipeType === 'salad' ? 'Ensaladas' : 'Postres'})</option>
+                <option className="bg-bg-surface text-text-main" value="recipe">{t('optimizer.objective_recipe')} ({recipeType === 'curry' ? t('game.recipeType.curry') : recipeType === 'salad' ? t('game.recipeType.salad') : t('game.recipeType.dessert')})</option>
               </select>
             </div>
 
@@ -368,7 +368,7 @@ export default function OptimizerPage() {
                     className="w-full p-2 border border-border-main rounded-lg bg-bg-surface text-text-main text-xs focus:border-primary-main focus:outline-none"
                     disabled={isOptimizing}
                   >
-                    <option className="bg-bg-surface text-text-main" value="">Categoría completa ({recipesForType.length} recetas)</option>
+                    <option className="bg-bg-surface text-text-main" value="">{t('optimizer.all_category')} ({recipesForType.length} recetas)</option>
                     {recipesForType.map(r => (
                       <option className="bg-bg-surface text-text-main" key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
                     ))}
@@ -394,7 +394,7 @@ export default function OptimizerPage() {
           {/* Group 3: Constraints */}
           <div className="space-y-4 bg-bg-app p-4 rounded-xl border border-border-main">
             <h4 className="text-xs font-black text-text-muted uppercase tracking-wider">
-              3. Restricciones
+              {t('optimizer.group_constraints')}
             </h4>
 
             <div>
@@ -415,7 +415,7 @@ export default function OptimizerPage() {
                 <label htmlFor="uniqueSpecies" className="text-xs font-bold text-text-main block cursor-pointer">
                   {t('optimizer.force_unique')}
                 </label>
-                <span className="text-[10px] text-text-muted">No repetir la misma especie</span>
+                <span className="text-[10px] text-text-muted">{t('optimizer.unique_species_desc')}</span>
               </div>
               <input 
                 type="checkbox" id="uniqueSpecies"
@@ -431,7 +431,7 @@ export default function OptimizerPage() {
                 onClick={() => setShowFiltersDrawer(!showFiltersDrawer)}
                 className="w-full flex items-center justify-between text-xs font-bold text-primary-main select-none"
               >
-                <span>Pokémon Req / Exc ({requiredPokemonIds.length}/{excludedPokemonIds.length})</span>
+                <span>{t('optimizer.req_exc_title')} ({requiredPokemonIds.length}/{excludedPokemonIds.length})</span>
                 {showFiltersDrawer ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </button>
             </div>
@@ -520,7 +520,7 @@ export default function OptimizerPage() {
                 icon={Square}
                 className="w-full sm:w-auto text-error-main border-error-main/30 hover:bg-error-bg hover:text-error-main"
               >
-                Cancelar Optimización
+                {t('optimizer.cancel_optimization')}
               </ActionButton>
             ) : (
               <ActionButton 
@@ -530,7 +530,7 @@ export default function OptimizerPage() {
                 icon={Play}
                 className="w-full sm:w-auto px-8 py-3 text-base shadow-md"
               >
-                Iniciar Optimización
+                {t('optimizer.start_optimization')}
               </ActionButton>
             )}
           </div>
@@ -577,9 +577,9 @@ export default function OptimizerPage() {
           <div className="inline-flex p-4 rounded-2xl bg-bg-app text-primary-main mb-2">
             <Sparkles size={32} />
           </div>
-          <h3 className="text-lg font-bold text-text-main">Listo para optimizar</h3>
+          <h3 className="text-lg font-bold text-text-main">{t('optimizer.ready_title')}</h3>
           <p className="text-sm text-text-muted max-w-md mx-auto">
-            Configura tus preferencias arriba y pulsa "Iniciar Optimización" para calcular las mejores sinergias de tu caja.
+            {t('optimizer.ready_desc')}
           </p>
         </div>
       )}
@@ -591,7 +591,7 @@ export default function OptimizerPage() {
             <div>
               <h2 className="text-2xl font-black text-text-main flex items-center gap-2">
                 <Trophy size={24} className="text-amber-500" />
-                Mejores Equipos Encontrados ({results.length})
+                {t('optimizer.results_title')} ({results.length})
               </h2>
               <p className="text-xs text-text-muted mt-0.5">
                 Ordenados por puntuación de simulación según el objetivo seleccionado
@@ -601,7 +601,7 @@ export default function OptimizerPage() {
             {compareList.length > 0 && (
               <div className="flex items-center gap-3 bg-bg-surface px-4 py-2 rounded-xl border border-border-main shadow-xs">
                 <span className="text-xs font-bold text-text-muted">
-                  Comparador: <span className="text-primary-main font-black">{compareList.length}/2</span>
+                  {t('optimizer.compare_status')}: <span className="text-primary-main font-black">{compareList.length}/2</span>
                 </span>
                 <ActionButton 
                   variant="primary" 
@@ -610,7 +610,7 @@ export default function OptimizerPage() {
                   icon={GitCompare}
                   className="text-xs py-1.5"
                 >
-                  Comparar
+                  {t('optimizer.compare_action')}
                 </ActionButton>
               </div>
             )}
@@ -618,7 +618,7 @@ export default function OptimizerPage() {
 
           {results.length === 0 ? (
             <div className="p-12 text-center bg-bg-surface rounded-2xl border border-border-main text-text-muted">
-              No se encontraron equipos válidos con los filtros aplicados. Prueba reduciendo el nivel mínimo o retirando exclusiones.
+              {t('optimizer.no_results')}
             </div>
           ) : (
             <div className="space-y-4">
@@ -660,7 +660,7 @@ export default function OptimizerPage() {
                         <div className="flex items-center gap-2">
                           {i === 0 ? (
                             <span className="flex items-center gap-1 bg-amber-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-xs">
-                              <Trophy size={12} /> #1 MEJOR
+                              <Trophy size={12} /> {t('optimizer.top_rank')}
                             </span>
                           ) : (
                             <span className="bg-bg-app text-text-muted border border-border-main text-xs font-black px-2.5 py-1 rounded-full">
@@ -690,7 +690,7 @@ export default function OptimizerPage() {
                           </Badge>
                         )}
                         <span className="text-xs font-bold text-primary-main hover:underline ml-2">
-                          Ver detalle →
+                          {t('optimizer.view_detail')}
                         </span>
                       </div>
                     </div>
@@ -713,7 +713,7 @@ export default function OptimizerPage() {
                                   src={`/pokemon/${mSpecies.pokedexNumber}.png`} 
                                   alt={mSpecies.displayName}
                                   className="w-full h-full object-contain filter drop-shadow group-hover:scale-110 transition-transform"
-                                  onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.ico' }}
+                                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                                 />
                               ) : (
                                 <Package size={24} className="text-text-muted" />
@@ -724,7 +724,7 @@ export default function OptimizerPage() {
                             </span>
                             <div className="flex items-center gap-1 mt-1">
                               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-bg-surface border border-border-main text-text-muted">
-                                Nv. {member.level}
+                                {t('app.level')} {member.level}
                               </span>
                               {member.natureId && (
                                 <span className="text-[10px] text-text-muted truncate max-w-[60px]" title={member.natureId}>
@@ -751,7 +751,7 @@ export default function OptimizerPage() {
             onClick={() => setShowCompare(true)} 
             className="bg-primary-main hover:bg-primary-hover text-white px-8 py-3.5 rounded-full font-black shadow-xl flex items-center gap-2 transition-all transform hover:scale-105"
           >
-            <GitCompare size={20} /> Comparar Equipos Seleccionados (2)
+            <GitCompare size={20} /> {t('optimizer.compare_selected')}
           </button>
         </div>
       )}

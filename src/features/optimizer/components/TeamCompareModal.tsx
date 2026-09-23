@@ -1,7 +1,6 @@
 import { X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { TeamResult } from '../../../domain/optimizer/core';
 import gamedata from '../../../data/static/gamedata.json';
-import { translateIngredient } from '../../../services/i18n-game';
 import { useTranslation } from 'react-i18next';
 
 interface TeamCompareModalProps {
@@ -95,7 +94,7 @@ export function TeamCompareModal({ teams, onClose, inline }: TeamCompareModalPro
                   const sp = gamedata.species.find(s => s.name === m.pokemon.speciesId);
                   return (
                     <div key={i} className="flex justify-between p-3 bg-bg-surface border border-border-main rounded-lg text-sm">
-                      <span className="font-bold">{m.pokemon.nickname || translateIngredient(t, sp?.name || m.pokemon.speciesId)} (Nv {m.pokemon.level})</span>
+                      <span className="font-bold">{m.pokemon.nickname || sp?.displayName || m.pokemon.speciesId} ({t('app.level')} {m.pokemon.level})</span>
                       <span className="text-text-muted">{Math.round(m.estimate.berries.reduce((s,b)=>s+b.amount,0))} bayas, {Math.round(m.estimate.ingredients.reduce((s,i)=>s+i.amount,0))} ings</span>
                     </div>
                   );
@@ -109,7 +108,7 @@ export function TeamCompareModal({ teams, onClose, inline }: TeamCompareModalPro
                   const sp = gamedata.species.find(s => s.name === m.pokemon.speciesId);
                   return (
                     <div key={i} className="flex justify-between p-3 bg-bg-surface border border-border-main rounded-lg text-sm">
-                      <span className="font-bold">{m.pokemon.nickname || translateIngredient(t, sp?.name || m.pokemon.speciesId)} (Nv {m.pokemon.level})</span>
+                      <span className="font-bold">{m.pokemon.nickname || sp?.displayName || m.pokemon.speciesId} ({t('app.level')} {m.pokemon.level})</span>
                       <span className="text-text-muted">{Math.round(m.estimate.berries.reduce((s,b)=>s+b.amount,0))} bayas, {Math.round(m.estimate.ingredients.reduce((s,i)=>s+i.amount,0))} ings</span>
                     </div>
                   );

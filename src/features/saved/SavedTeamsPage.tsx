@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../data/db';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TeamDetailModal } from '../optimizer/components/TeamDetailModal';
 import { TeamCompareModal } from '../optimizer/components/TeamCompareModal';
 import { LocalCalculationEngine } from '../../services/optimizer/calculator/LocalCalculationEngine';
@@ -9,14 +10,16 @@ import { BerryScoringStrategy, IngredientScoringStrategy, RecipeScoringStrategy 
 import gamedata from '../../data/static/gamedata.json';
 import type { TeamResult } from '../../domain/optimizer/core';
 import type { OwnedPokemon, StaticDataSchema } from '../../domain/models';
+import { ISLANDS } from '../../domain/optimizer/islands';
 
 const engine = new LocalCalculationEngine(gamedata as any as StaticDataSchema);
 
 export default function SavedTeamsPage() {
+  const { t } = useTranslation();
   const teams = useLiveQuery(() => db.savedTeams.toArray()) || [];
   const collection = useLiveQuery(() => db.ownedPokemon.toArray()) || [];
   
-    const [search, setSearch] = useState('');
+  const [search, setSearch] = useState('');
   const [filterIsland, setFilterIsland] = useState('');
   const [sortBy, setSortBy] = useState('score');
 
@@ -31,7 +34,7 @@ export default function SavedTeamsPage() {
       setSelectedForCompare(selectedForCompare.filter(x => x !== id));
     } else {
       if (selectedForCompare.length >= 2) {
-        alert('Solo puedes comparar 2 equipos.');
+        alert(t('saved.select_two', { defaultValue: 'Solo puedes comparar 2 equipos.' }));
         return;
       }
       setSelectedForCompare([...selectedForCompare, id]);
@@ -39,7 +42,7 @@ export default function SavedTeamsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('¿Borrar equipo guardado?')) {
+    if (window.confirm(t('app.delete') + '?')) {
       await db.savedTeams.delete(id);
       setSelectedForCompare(selectedForCompare.filter(x => x !== id));
     }
@@ -71,12 +74,11 @@ export default function SavedTeamsPage() {
         setCompareTeams([t1, t2]);
       } catch (e) {
         console.error("Error comparando", e);
-        alert("Error al comparar equipos");
+        alert(t('saved.comparator_title'));
       }
     }
   };
 
-  
   const filteredTeams = teams.filter(t => {
     if (search && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
     if (filterIsland && t.queryContext?.simulation?.island !== filterIsland) return false;
@@ -94,86 +96,88 @@ export default function SavedTeamsPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Equipos Guardados</h1>
+        <h1 className="text-2xl font-bold">{t('saved.teams_title')}</h1>
         <div className="flex gap-2 items-center">
           <label className="flex items-center gap-2 cursor-pointer font-medium text-sm">
             <input type="checkbox" checked={isCompareMode} onChange={e => {
               setIsCompareMode(e.target.checked);
               setSelectedForCompare([]);
-            }} className="w-4 h-4" />
-            Modo Comparación
+            }} className="w-4 h-4 rounded text-primary-main" />
+            {t('optimizer.compare_status', { defaultValue: 'Modo Comparación' })}
           </label>
           
           {isCompareMode && (
             <button 
               onClick={handleCompare}
               disabled={selectedForCompare.length !== 2}
-              className={`px-4 py-2 rounded font-bold ${selectedForCompare.length === 2 ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-slate-300 text-slate-500'}`}
+              className={`px-4 py-2 rounded-lg font-bold transition-colors ${selectedForCompare.length === 2 ? 'bg-primary-main hover:bg-primary-hover text-white' : 'bg-bg-app text-text-muted border border-border-main'}`}
             >
-              Comparar ({selectedForCompare.length}/2)
+              {t('optimizer.compare_action', { defaultValue: 'Comparar' })} ({selectedForCompare.length}/2)
             </button>
           )}
         </div>
       </div>
 
-            <div className="flex flex-col md:flex-row gap-4 p-4 bg-bg-surface border border-border-main rounded-xl">
+      <div className="flex flex-col md:flex-row gap-4 p-4 bg-bg-surface border border-border-main rounded-xl">
         <input 
           type="text" 
-          placeholder="Buscar por nombre..." 
+          placeholder={t('collection.search', { defaultValue: 'Buscar por nombre...' })} 
           value={search} 
           onChange={e => setSearch(e.target.value)} 
-          className="flex-1 p-2 rounded border border-border-main bg-bg-main"
+          className="flex-1 p-2 rounded-lg border border-border-main bg-bg-surface text-text-main focus:outline-none focus:border-primary-main"
         />
         <select 
           value={filterIsland} 
           onChange={e => setFilterIsland(e.target.value)}
-          className="p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main"
+          className="p-2 rounded-lg border border-border-main bg-bg-surface text-text-main font-semibold focus:outline-none"
         >
-          <option className="bg-bg-surface text-text-main" value="">Todas las islas</option>
-          <option className="bg-bg-surface text-text-main" value="greengrass">Verdegal</option>
-          <option className="bg-bg-surface text-text-main" value="cyan">Playa Turquesa</option>
-          <option className="bg-bg-surface text-text-main" value="taupe">Cueva Pardilla</option>
-          <option className="bg-bg-surface text-text-main" value="snowdrop">Tundra Galleta</option>
-          <option className="bg-bg-surface text-text-main" value="lapis">Lago Lazulita</option>
-          <option className="bg-bg-surface text-text-main" value="gold">Central Oro</option>
-          <option className="bg-bg-surface text-text-main" value="crimson">Volcán Carmesí</option>
+          <option className="bg-bg-surface text-text-main" value="">{t('app.all', { defaultValue: 'Todas las islas' })}</option>
+          {ISLANDS.map(i => (
+            <option className="bg-bg-surface text-text-main" key={i.id} value={i.id}>
+              {t(`islands.${i.id}`)}
+            </option>
+          ))}
         </select>
         <select 
           value={sortBy} 
           onChange={e => setSortBy(e.target.value)}
-          className="p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main"
+          className="p-2 rounded-lg border border-border-main bg-bg-surface text-text-main font-semibold focus:outline-none"
         >
-          <option className="bg-bg-surface text-text-main" value="score">Puntuación más alta</option>
-          <option className="bg-bg-surface text-text-main" value="recent">Más recientes</option>
+          <option className="bg-bg-surface text-text-main" value="score">Score DESC</option>
+          <option className="bg-bg-surface text-text-main" value="recent">Recientes</option>
         </select>
       </div>
 
       <div className="space-y-4">
-        {filteredTeams.map(t => {
-          const isSelected = selectedForCompare.includes(t.id);
+        {filteredTeams.map(item => {
+          const isSelected = selectedForCompare.includes(item.id);
           return (
-            <div key={t.id} className={`p-4 border-2 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm ${isSelected ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'border-border-main bg-bg-surface'}`}>
+            <div key={item.id} className={`p-4 border rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs transition-colors ${isSelected ? 'border-primary-main bg-primary-bg/20' : 'border-border-main bg-bg-surface'}`}>
               <div className="flex-1 flex items-center gap-3">
                 {isCompareMode && (
-                  <input type="checkbox" checked={isSelected} onChange={() => toggleCompare(t.id)} className="w-5 h-5 rounded cursor-pointer" />
+                  <input type="checkbox" checked={isSelected} onChange={() => toggleCompare(item.id)} className="w-5 h-5 rounded cursor-pointer text-primary-main" />
                 )}
                 <div>
-                  <h2 className="text-lg font-bold">
-                    {t.name}
+                  <h2 className="text-lg font-bold text-text-main">
+                    {item.name}
                   </h2>
                   <div className="text-sm text-text-muted mt-1">
-                    <p>Score Guardado: {Math.round(t.metrics?.score || 0).toLocaleString()}</p>
+                    <p>Score: {Math.round(item.metrics?.score || 0).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => handleViewDetail(t.id)} className="px-4 py-2 bg-indigo-50 text-primary-main border border-indigo-200 hover:bg-indigo-100 rounded font-bold dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800">Detalles</button>
-                <button onClick={() => handleDelete(t.id)} className="px-4 py-2 border border-red-200 text-error-main hover:bg-red-50 rounded font-bold dark:hover:bg-red-900/30">Eliminar</button>
+                <button onClick={() => handleViewDetail(item.id)} className="px-4 py-2 bg-primary-bg text-primary-main hover:bg-primary-main hover:text-white border border-primary-main/30 rounded-lg font-bold transition-colors">
+                  {t('team.detail')}
+                </button>
+                <button onClick={() => handleDelete(item.id)} className="px-4 py-2 border border-error-main/30 text-error-main hover:bg-error-bg rounded-lg font-bold transition-colors">
+                  {t('app.delete')}
+                </button>
               </div>
             </div>
           );
         })}
-        {filteredTeams.length === 0 && <p className="text-text-muted text-center py-12">No hay equipos guardados.</p>}
+        {filteredTeams.length === 0 && <p className="text-text-muted text-center py-12">{t('saved.empty_teams')}</p>}
       </div>
 
       {detailTeam && <TeamDetailModal result={detailTeam} onClose={() => setDetailTeam(null)} />}

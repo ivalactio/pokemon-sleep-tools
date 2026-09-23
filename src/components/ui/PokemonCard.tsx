@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { OwnedPokemon } from '../../domain/models';
 import { Badge } from './index';
 import gamedata from '../../data/static/gamedata.json';
-import { translateIngredient } from '../../services/i18n-game';
+import { translateIngredient, translateMainSkill, translateSpecialty, getNatureDisplayName } from '../../services/i18n-game';
 import { useTranslation } from 'react-i18next';
 import { Star, AlertCircle, Package } from 'lucide-react';
 import { isComplete } from '../../utils/pokemonUtils';
@@ -31,15 +31,10 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
   ].filter(Boolean) as string[];
 
   const getSpecialtyColor = (spec: string): 'success' | 'warning' | 'info' => {
-    if (spec === 'Berries') return 'success';
-    if (spec === 'Ingredients') return 'warning';
+    const s = spec?.toLowerCase();
+    if (s === 'berry' || s === 'berries') return 'warning';
+    if (s === 'ingredient' || s === 'ingredients') return 'success';
     return 'info';
-  };
-
-  const getSpecialtyLabel = (spec: string) => {
-    if (spec === 'Berries') return 'Bayas';
-    if (spec === 'Ingredients') return 'Ing.';
-    return 'Hab.';
   };
 
   return (
@@ -60,13 +55,12 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
       {/* Header Info */}
       <div className="p-4 flex gap-4 items-center bg-bg-app border-b border-border-main group-hover:bg-primary-bg transition-colors">
         <div className="w-16 h-16 flex-shrink-0 bg-bg-surface rounded-full border-2 border-border-main p-1 overflow-hidden flex items-center justify-center">
-          {/* Simple sprite fallback for now, assuming standard icon path */}
           {imageError ? (
             <Package size={32} className="text-text-muted opacity-50" />
           ) : (
             <img 
               src={`/pokemon/${species.pokedexNumber}.png`} 
-              alt={species.name}
+              alt={species.displayName || species.name}
               className="w-full h-full object-contain"
               onError={() => setImageError(true)}
             />
@@ -75,13 +69,13 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-bold text-lg text-text-main truncate">
-              {pokemon.nickname || species.name}
+              {pokemon.nickname || species.displayName || species.name}
             </h3>
-            <span className="text-xs font-black text-text-muted">Nv. {pokemon.level}</span>
+            <span className="text-xs font-black text-text-muted">{t('app.level')} {pokemon.level}</span>
           </div>
           <div className="flex gap-1 flex-wrap">
-            <Badge variant={getSpecialtyColor(species.specialty)}>{getSpecialtyLabel(species.specialty)}</Badge>
-            {pokemon.natureId && <Badge>{pokemon.natureId}</Badge>}
+            <Badge variant={getSpecialtyColor(species.specialty)}>{translateSpecialty(t, species.specialty)}</Badge>
+            {pokemon.natureId && <Badge>{getNatureDisplayName(t, pokemon.natureId)}</Badge>}
           </div>
         </div>
       </div>
@@ -100,8 +94,8 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
 
         {/* Skill */}
         <div>
-          <p className="text-xs font-bold text-text-muted uppercase mb-1">Habilidad</p>
-          <p className="text-sm text-text-main truncate">{species.skill.name}</p>
+          <p className="text-xs font-bold text-text-muted uppercase mb-1">{t('pokemon_detail.skill')}</p>
+          <p className="text-sm text-text-main truncate">{species.skill ? translateMainSkill(t, species.skill.name) : '-'}</p>
         </div>
       </div>
 
@@ -109,7 +103,7 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
       {!complete && (
         <div className="px-4 py-2 bg-error-bg border-t border-error-main/20 flex items-center gap-2 text-error-text text-xs font-bold">
           <AlertCircle size={14} />
-          Datos incompletos
+          {t('collection.missing_data')}
         </div>
       )}
     </div>

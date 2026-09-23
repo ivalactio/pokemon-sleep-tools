@@ -14,12 +14,12 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
   const { t } = useTranslation();
 
   const handleDuplicate = async (p: WeeklyPlan) => {
-    const newPlan = { ...p, id: crypto.randomUUID(), name: p.name + ' (Copia)', createdAt: Date.now() };
+    const newPlan = { ...p, id: crypto.randomUUID(), name: `${p.name} ${t('planner.copy_suffix', { defaultValue: '(Copia)' })}`, createdAt: Date.now() };
     await db.weeklyPlans.add(newPlan);
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('¿Eliminar esta planificación?')) {
+    if (window.confirm(t('planner.confirm_delete', { defaultValue: '¿Eliminar esta planificación?' }))) {
       await db.weeklyPlans.delete(id);
     }
   };
@@ -27,9 +27,9 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
   return (
     <div className="space-y-6 pb-20 max-w-6xl mx-auto">
       <PageHeader 
-        title="Planificador Semanal"
+        title={t('planner.title')}
         icon={Calendar}
-        description="Estructura la semana de sueño: asigna equipos por día, planifica comidas y proyecta la fuerza de Snorlax."
+        description={t('planner.description')}
         actions={
           <ActionButton 
             variant="primary" 
@@ -37,7 +37,7 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
             icon={Plus}
             className="shadow-sm"
           >
-            Nueva Planificación
+            {t('planner.new_plan')}
           </ActionButton>
         }
       />
@@ -45,11 +45,11 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
       {plans.length === 0 ? (
         <EmptyState 
           icon={Calendar}
-          title="Sin planes semanales"
-          description="Aún no has creado ninguna planificación. Diseña tu estrategia semanal para optimizar recetas y fuerza."
+          title={t('planner.empty_title', { defaultValue: 'Sin planes semanales' })}
+          description={t('planner.empty', { defaultValue: 'No hay planificaciones guardadas. Crea una nueva para empezar.' })}
           action={
             <ActionButton variant="primary" onClick={onCreate} icon={Plus}>
-              Crear primer plan
+              {t('planner.create_first', { defaultValue: 'Crear primer plan' })}
             </ActionButton>
           }
         />
@@ -69,7 +69,7 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
 
                 <div className="flex items-center gap-2 text-xs font-semibold text-text-muted bg-bg-app px-3 py-2 rounded-lg border border-border-main">
                   <Calendar size={14} className="text-primary-main" />
-                  <span>Inicio: {p.weekStart || 'Sin fecha'}</span>
+                  <span>{t('planner.starts', { defaultValue: 'Inicia:' })} {p.weekStart || 'Sin fecha'}</span>
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -80,7 +80,7 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
                   )}
                   {p.objective && (
                     <Badge variant="default">
-                      {p.objective === 'berries' ? 'Bayas' : p.objective === 'ingredients' ? 'Ingredientes' : 'Recetas'}
+                      {p.objective === 'berries' ? t('app.berries', { defaultValue: 'Bayas' }) : p.objective === 'ingredients' ? t('app.ingredients', { defaultValue: 'Ingredientes' }) : t('app.recipes', { defaultValue: 'Recetas' })}
                     </Badge>
                   )}
                 </div>
@@ -99,20 +99,20 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
                   icon={Edit}
                   className="flex-1 text-xs py-2"
                 >
-                  Abrir Plan
+                  {t('planner.open_plan', { defaultValue: 'Abrir Plan' })}
                 </ActionButton>
                 <ActionButton 
                   variant="outline" 
                   onClick={() => handleDuplicate(p)} 
                   icon={Copy}
-                  title="Duplicar plan"
+                  title={t('app.duplicate', { defaultValue: 'Duplicar' })}
                   className="py-2"
                 />
                 <ActionButton 
                   variant="outline" 
                   onClick={() => handleDelete(p.id)} 
                   icon={Trash}
-                  title="Eliminar"
+                  title={t('app.delete', { defaultValue: 'Eliminar' })}
                   className="py-2 text-error-main border-error-main/20 hover:bg-error-bg hover:text-error-main"
                 />
               </div>

@@ -88,27 +88,27 @@ export default function Dashboard() {
     <div className="space-y-8">
       <PageHeader 
         title={t('dashboard.title')} 
-        description="Resumen del estado de tu colección y herramientas." 
+        description={t('dashboard.description', { defaultValue: 'Resumen del estado de tu colección y herramientas.' })} 
       />
 
       {/* Collection Stats */}
       <section>
-        <SectionHeader title="Estado de la Caja Pokémon" icon={Package} />
+        <SectionHeader title={t('dashboard.box_status', { defaultValue: 'Estado de la Caja Pokémon' })} icon={Package} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard 
-            title="Total Pokémon" 
+            title={t('dashboard.total_pokemon')} 
             value={stats.total} 
             icon={Package} 
             colorClass="text-info-main" 
           />
           <StatCard 
-            title="Favoritos" 
+            title={t('collection.only_favorites', { defaultValue: 'Favoritos' })} 
             value={stats.favorites} 
             icon={Star} 
             colorClass="text-warning-main" 
           />
           <StatCard 
-            title="Datos Incompletos" 
+            title={t('dashboard.incomplete', { defaultValue: 'Datos Incompletos' })} 
             value={stats.incomplete} 
             icon={AlertCircle} 
             colorClass={stats.incomplete > 0 ? "text-error-main" : "text-success-main"} 
@@ -118,33 +118,33 @@ export default function Dashboard() {
 
       {/* Tools Stats & Shortcuts */}
       <section>
-        <SectionHeader title="Herramientas y Planificación" icon={Zap} />
+        <SectionHeader title={t('dashboard.tools_planning', { defaultValue: 'Herramientas y Planificación' })} icon={Zap} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <StatCard 
-            title="Consultas de Optimización" 
+            title={t('saved.queries_title')} 
             value={savedQueries} 
             icon={Search} 
           />
           <StatCard 
-            title="Equipos Guardados" 
+            title={t('saved.teams_title')} 
             value={savedTeams} 
             icon={Users} 
           />
           <StatCard 
-            title="Planes Semanales" 
+            title={t('planner.title')} 
             value={weeklyPlans} 
             icon={CalendarDays} 
           />
         </div>
         <Panel className="flex flex-wrap gap-4 bg-primary-bg/30 border-primary-main/20">
           <ActionButton icon={Zap} variant="primary" onClick={() => navigate('/optimizador')}>
-            Ir al Optimizador
+            {t('planner.open_optimizer')}
           </ActionButton>
           <ActionButton icon={CalendarDays} onClick={() => navigate('/planificador')}>
-            Planificador Semanal
+            {t('planner.title')}
           </ActionButton>
           <ActionButton icon={Package} onClick={() => navigate('/coleccion')}>
-            Ver Caja Pokémon
+            {t('collection.title')}
           </ActionButton>
         </Panel>
       </section>

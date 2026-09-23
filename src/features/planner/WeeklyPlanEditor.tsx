@@ -27,11 +27,15 @@ interface Props {
   onBack: () => void;
 }
 
-const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const DAY_NAMES: Record<string, string[]> = {
+  es: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+  en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+};
 
 export function WeeklyPlanEditor({ plan, onBack }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const days = DAY_NAMES[i18n.language?.startsWith('en') ? 'en' : 'es'];
 
   const [savedTeams, setSavedTeams] = useState<SavedTeam[]>([]);
   useEffect(() => {
@@ -49,7 +53,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   
   const [mainTeamId, setMainTeamId] = useState(plan?.mainTeamId || '');
   const [alternativeTeamIds, setAlternativeTeamIds] = useState<string[]>(plan?.alternativeTeamIds || []);
-  const [dailyPlans, setDailyPlans] = useState<DailyPlan[]>(plan?.dailyPlans || DAYS.map((_, i) => ({ dayOfWeek: i + 1 })));
+  const [dailyPlans, setDailyPlans] = useState<DailyPlan[]>(plan?.dailyPlans || Array.from({ length: 7 }, (_, i) => ({ dayOfWeek: i + 1 })));
   const [notes, setNotes] = useState(plan?.notes || '');
 
   const availableRecipes = gamedata.recipes.filter(r => r.type === recipeType);
@@ -310,7 +314,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                   src={`/pokemon/${sp.pokedexNumber}.png`} 
                   alt={sp.displayName}
                   className="w-full h-full object-contain"
-                  onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.ico' }}
+                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                 />
               ) : (
                 <Package size={14} className="text-text-muted" />
@@ -326,16 +330,16 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
     <div className="space-y-6 pb-24 max-w-6xl mx-auto">
       {/* Top Header */}
       <PageHeader 
-        title={name || 'Plan Semanal'}
+        title={name || t('planner.title')}
         icon={Calendar}
-        description="Planifica la asignación de equipos, rotación de recetas y calcula el balance de despensa para la semana."
+        description={t('planner.description')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <ActionButton variant="outline" onClick={onBack} icon={ArrowLeft}>
-              Volver
+              {t('app.back')}
             </ActionButton>
             <ActionButton variant="outline" onClick={handleOptimize} icon={ExternalLink}>
-              Abrir Optimizador
+              {t('planner.open_optimizer')}
             </ActionButton>
             <ActionButton 
               variant="outline" 
@@ -343,10 +347,10 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
               icon={GitCompare}
               disabled={[mainTeamId, ...alternativeTeamIds].filter(Boolean).length !== 2}
             >
-              Comparar Equipos
+              {t('planner.compare')}
             </ActionButton>
             <ActionButton variant="primary" onClick={handleSave} icon={Save} className="shadow-sm">
-              Guardar Plan
+              {t('app.save')}
             </ActionButton>
           </div>
         }
@@ -359,15 +363,15 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
           <Panel className="border-primary-main/40 bg-gradient-to-b from-primary-bg/20 to-bg-surface space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-primary-main uppercase tracking-wider flex items-center gap-1.5">
-                <TrendingUp size={16} /> Proyección Snorlax
+                <TrendingUp size={16} /> {t('planner.snorlax_projection')}
               </span>
-              <Badge variant="primary">Domingo noche</Badge>
+              <Badge variant="primary">{t('planner.sunday_night')}</Badge>
             </div>
             <div className="flex items-baseline gap-2 pt-1">
               <p className="text-3xl font-black text-text-main">
                 {Math.round(projectedStrength).toLocaleString()}
               </p>
-              <span className="text-xs font-bold text-text-muted">fuerza est.</span>
+              <span className="text-xs font-bold text-text-muted">{t('planner.est_strength')}</span>
             </div>
             <p className="text-[11px] text-text-muted">
               Suma estimada de bayas, habilidades y 3 comidas diarias con el bonus de área aplicado.
@@ -377,7 +381,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
           {/* Context Configuration Panel */}
           <Panel className="space-y-4">
             <h3 className="font-extrabold text-sm text-text-main uppercase tracking-wider border-b border-border-main pb-2">
-              Contexto de la Semana
+              {t('planner.context')}
             </h3>
 
             <div className="space-y-3">
@@ -536,7 +540,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
               icon={Wand2}
               className="w-full py-2.5 text-primary-main font-bold border-primary-main/30 hover:bg-primary-bg"
             >
-              {isSuggesting ? 'Calculando sugerencia...' : 'Sugerir Equipo Óptimo'}
+              {isSuggesting ? 'Calculando sugerencia...' : t('planner.suggest_team')}
             </ActionButton>
 
             <div className="space-y-3 pt-2">
@@ -592,7 +596,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                   onClick={() => setAlternativeTeamIds([...alternativeTeamIds, ''])} 
                   className="text-xs font-bold text-primary-main hover:underline flex items-center gap-1 mt-1"
                 >
-                  <Plus size={14} /> Añadir Alternativo
+                  <Plus size={14} /> {t('planner.add_alt_team')}
                 </button>
               </div>
             </div>
@@ -606,7 +610,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             <div className="flex items-center justify-between border-b border-border-main pb-3">
               <div>
                 <h3 className="font-extrabold text-base text-text-main">
-                  Planificación de los 7 Días
+                  {t('planner.daily_schedule')}
                 </h3>
                 <p className="text-xs text-text-muted">
                   Personaliza qué equipo y qué receta se cocina cada día de la semana
@@ -636,13 +640,13 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                             ? 'bg-warning-main text-white shadow-xs' 
                             : 'bg-bg-surface border border-border-main text-text-main'
                         }`}>
-                          {DAYS[i]}
+                          {days[i]}
                         </span>
-                        <span className="text-[11px] font-bold text-text-muted">Día {i + 1}</span>
+                        <span className="text-[11px] font-bold text-text-muted">{t('planner.day_num')} {i + 1}</span>
                       </div>
                       {isWeekend && (
                         <span className="text-[10px] font-black text-warning-main uppercase tracking-wider">
-                          Fin de Semana (x1.5 Pote)
+                          {t('planner.weekend_pot')}
                         </span>
                       )}
                     </div>
@@ -650,7 +654,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                     {/* Team Selector & Mini Visual Avatars */}
                     <div>
                       <label className="block text-[10px] font-bold text-text-muted uppercase mb-1">
-                        Equipo
+                        {t('planner.team')}
                       </label>
                       <select 
                         value={dp.teamId || ''} 
@@ -668,14 +672,14 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                     {/* Recipe Override */}
                     <div>
                       <label className="block text-[10px] font-bold text-text-muted uppercase mb-1 flex items-center gap-1">
-                        <Utensils size={10} /> Receta del Día
+                        <Utensils size={10} /> {t('planner.recipe_day')}
                       </label>
                       <select 
                         value={dp.recipeId || ''} 
                         onChange={e => updateDaily(i, 'recipeId', e.target.value)} 
                         className="w-full px-2.5 py-1.5 border border-border-main rounded-lg bg-bg-surface text-text-main text-xs focus:border-primary-main focus:outline-none"
                       >
-                        <option className="bg-bg-surface text-text-main" value="">(Receta semanal: {targetRecipeId ? translateRecipe(t, targetRecipeId) : 'Automática'})</option>
+                        <option className="bg-bg-surface text-text-main" value="">{t('planner.use_main_recipe')}</option>
                         {availableRecipes.map(r => (
                           <option className="bg-bg-surface text-text-main" key={r.name} value={r.name}>
                             {translateRecipe(t, r.name)}
@@ -690,7 +694,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                         type="text" 
                         value={dp.notes || ''} 
                         onChange={e => updateDaily(i, 'notes', e.target.value)} 
-                        placeholder="Nota rápida para el día..." 
+                        placeholder={t('planner.daily_notes', { defaultValue: 'Nota rápida para el día...' })}
                         className="w-full px-2.5 py-1 border border-border-main rounded-md bg-bg-surface text-text-main text-xs focus:outline-none focus:border-primary-main" 
                       />
                     </div>
@@ -705,10 +709,10 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             <div className="flex items-center justify-between border-b border-border-main pb-3">
               <div>
                 <h3 className="font-extrabold text-base text-text-main">
-                  Auditoría de Despensa (7 Días)
+                  {t('planner.pantry_audit')}
                 </h3>
                 <p className="text-xs text-text-muted">
-                  Balance entre ingredientes consumidos por recetas (3 comidas/día) y producidos por tus equipos
+                  {t('planner.pantry_audit_desc')}
                 </p>
               </div>
             </div>
@@ -717,10 +721,10 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
               <table className="w-full text-xs text-left">
                 <thead className="bg-bg-app text-text-muted uppercase font-bold border-b border-border-main">
                   <tr>
-                    <th className="px-3 py-2.5 rounded-l-lg">Ingrediente</th>
-                    <th className="px-3 py-2.5 text-right">Coste Recetas</th>
-                    <th className="px-3 py-2.5 text-right">Producción Est.</th>
-                    <th className="px-3 py-2.5 text-right rounded-r-lg">Balance Semanal</th>
+                    <th className="px-3 py-2.5 rounded-l-lg">{t('pokemon_detail.ingredient')}</th>
+                    <th className="px-3 py-2.5 text-right">{t('planner.recipe_cost')}</th>
+                    <th className="px-3 py-2.5 text-right">{t('planner.est_prod')}</th>
+                    <th className="px-3 py-2.5 text-right rounded-r-lg">{t('planner.weekly_balance')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-main">

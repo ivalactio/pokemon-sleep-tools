@@ -66,7 +66,7 @@ export default function Settings() {
           <select
             value={i18n.language}
             onChange={handleLanguageChange}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main bg-bg-surface text-text-main"
+            className="p-2 border border-border-main rounded-lg max-w-xs focus:ring-primary-main focus:border-primary-main bg-bg-surface text-text-main font-semibold"
           >
             <option className="bg-bg-surface text-text-main" value="es">Español</option>
             <option className="bg-bg-surface text-text-main" value="en">English</option>
@@ -78,7 +78,7 @@ export default function Settings() {
           <select
             value={theme}
             onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface"
+            className="p-2 border border-border-main rounded-lg max-w-xs focus:ring-primary-main focus:border-primary-main bg-bg-surface text-text-main font-semibold"
           >
             <option className="bg-bg-surface text-text-main" value="light">{t('settings.light')}</option>
             <option className="bg-bg-surface text-text-main" value="dark">{t('settings.dark')}</option>
@@ -87,14 +87,14 @@ export default function Settings() {
       </div>
 
       <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm space-y-6">
-        <h2 className="text-xl font-bold text-text-main border-b pb-2">{t('settings.gemini.title')}</h2>
+        <h2 className="text-xl font-bold text-text-main border-b border-border-main pb-2">{t('settings.gemini.title')}</h2>
         
         <div className="flex flex-col gap-2">
           <label className="font-bold text-text-main">{t('settings.gemini.provider_label')}</label>
           <select
             value={provider}
             onChange={handleProviderChange}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main"
+            className="p-2 border border-border-main rounded-lg max-w-xs focus:ring-primary-main focus:border-primary-main bg-bg-surface text-text-main font-semibold"
           >
             <option className="bg-bg-surface text-text-main" value="mock">{t('settings.gemini.provider_mock')}</option>
             <option className="bg-bg-surface text-text-main" value="gemini">{t('settings.gemini.provider_gemini')}</option>
@@ -113,7 +113,7 @@ export default function Settings() {
                     value={inputKey}
                     onChange={handleKeyChange}
                     placeholder={t('settings.gemini.api_key_placeholder')}
-                    className="w-full p-2 pr-10 border border-border-main rounded focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full p-2 pr-10 border border-border-main rounded-lg focus:ring-primary-main focus:border-primary-main bg-bg-surface text-text-main"
                   />
                   <button
                     type="button"

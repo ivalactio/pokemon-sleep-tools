@@ -39,7 +39,14 @@
     "required_subskills": "Required Subskills",
     "required_ingredients": "Required Ingredients",
     "only_favorites": "Only Favorites",
-    "only_incomplete": "Only Incomplete Data"
+    "only_incomplete": "Only Incomplete Data",
+    "clear_filters": "Clear Filters",
+    "view_results": "View Results",
+    "active_by_level": "Active by level",
+    "any_slot": "Any slot",
+    "berry": "Berry",
+    "main_skill": "Main Skill",
+    "management": "Management"
   },
   "pokemon_form": {
     "title_add": "Add Pokémon",
@@ -131,7 +138,28 @@
     "none": "(None)",
     "select": "(Select)",
     "unknown": "Unknown",
-    "level_short": "Lv."
+    "level_short": "Lv.",
+    "back_to_box": "Back to Box",
+    "completeness": "Configuration",
+    "ready_for_sim": "Ready for simulation",
+    "missing_config": "Missing data",
+    "main_skill_desc": "Species main skill",
+    "base_stats_desc": "Individual traits and nature",
+    "nature_desc": "Affects production bonuses",
+    "ribbon_desc": "Shared sleep hours",
+    "sneaky_snacking_desc": "Continues producing when inventory is full",
+    "ingredients_desc": "Ingredient unlock slots by level",
+    "subskills_desc": "Secondary skills (Slots 10 to 100)",
+    "calc_production_desc": "Simulate production estimates with calculation engine",
+    "active": "Active",
+    "locked": "Locked",
+    "ingredient": "Ingredient",
+    "camp_bonus": "+20% speed",
+    "total_day": "Total / day",
+    "no_production": "No significant production",
+    "frequency": "Frequency",
+    "expected_per_day": "expected per day",
+    "berry": "Berry"
   },
   "game": {
     "nature": {
@@ -330,6 +358,12 @@
       "curry": "Curries & Stews",
       "salad": "Salads",
       "dessert": "Desserts"
+    },
+    "specialty": {
+      "berry": "Berries",
+      "ingredient": "Ingredients",
+      "skill": "Skills",
+      "all": "All"
     }
   },
   "dashboard": {
@@ -368,7 +402,28 @@
     "top_n": "Number of Results (Top N)",
     "empty_collection": "Your collection is empty.",
     "analyzing": "Analyzing Teams...",
-    "all_category": "Optimize for WHOLE category"
+    "all_category": "Optimize for WHOLE category",
+    "description": "Analyzes and simulates millions of combinations to find your maximum production team.",
+    "reset": "Reset",
+    "save_query": "Save Query",
+    "analysis_config": "Analysis Configuration",
+    "pokemon_in_box": "Pokémon in your box",
+    "group_environment": "1. Environment & Island",
+    "group_strategy": "2. Strategic Objective",
+    "group_constraints": "3. Constraints",
+    "unique_species_desc": "Do not repeat the same species",
+    "req_exc_title": "Pokémon Req / Exc",
+    "cancel_optimization": "Cancel Optimization",
+    "start_optimization": "Start Optimization",
+    "ready_title": "Ready to optimize",
+    "ready_desc": "Configure your preferences above and click \"Start Optimization\" to calculate your best team synergies.",
+    "results_title": "Top Teams Found",
+    "compare_status": "Comparator",
+    "compare_action": "Compare",
+    "no_results": "No valid teams found with the applied filters. Try lowering the minimum level or removing exclusions.",
+    "top_rank": "#1 BEST",
+    "view_detail": "View detail →",
+    "compare_selected": "Compare Selected Teams (2)"
   },
   "team": {
     "compare": "Team Comparator",
@@ -422,7 +477,26 @@
     "empty": "No saved plans. Create a new one to start.",
     "confirm_delete": "Delete this plan?",
     "compare_error": "To compare directly, you must have exactly 2 defined teams (Main and 1 Alternative).",
-    "copy_suffix": "(Copy)"
+    "copy_suffix": "(Copy)",
+    "description": "Structure your sleep week: assign teams by day, plan meals, and project Snorlax strength.",
+    "open_optimizer": "Open Optimizer",
+    "snorlax_projection": "Snorlax Projection",
+    "sunday_night": "Sunday night",
+    "est_strength": "est. strength",
+    "suggest_team": "Suggest Optimal Team",
+    "add_alt_team": "Add Alternative",
+    "daily_schedule": "7-Day Schedule",
+    "day_num": "Day",
+    "weekend_pot": "Weekend (x1.5 Pot)",
+    "team": "Team",
+    "pantry_audit": "Pantry Audit (7 Days)",
+    "pantry_audit_desc": "Balance between recipe ingredient costs (3 meals/day) and your teams' estimated production",
+    "recipe_cost": "Recipe Cost",
+    "est_prod": "Est. Production",
+    "weekly_balance": "Weekly Balance",
+    "empty_title": "No weekly plans",
+    "create_first": "Create first plan",
+    "open_plan": "Open Plan"
   },
   "import": {
     "editing": "Editing Pokémon",

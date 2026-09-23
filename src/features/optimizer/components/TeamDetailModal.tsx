@@ -108,7 +108,7 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
                 return (
                   <div key={i} className="bg-bg-surface border border-border-main rounded-xl p-4 shadow-sm text-sm">
                     <div className="font-bold text-center border-b border-border-main pb-2 mb-2 truncate">
-                      {m.pokemon.nickname || translateIngredient(t, pokemonData?.name || m.pokemon.speciesId)}
+                      {m.pokemon.nickname || pokemonData?.displayName || m.pokemon.speciesId}
                     </div>
                     <div className="space-y-2 text-text-muted">
                       <div className="flex justify-between">

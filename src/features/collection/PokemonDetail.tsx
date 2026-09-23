@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import gamedata from '../../data/static/gamedata.json';
 import { useTranslation } from 'react-i18next';
-import { translateSubskill, translateMainSkill, translateIngredient, translateBerry, getNatureDisplayName } from '../../services/i18n-game';
+import { translateSubskill, translateMainSkill, translateIngredient, translateBerry, getNatureDisplayName, translateSpecialty } from '../../services/i18n-game';
 import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
 import type { ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
 import { ISLANDS } from '../../domain/optimizer/islands';
@@ -76,13 +76,13 @@ export default function PokemonDetail() {
   const getSpecialtyBadge = () => {
     const specialty = species?.specialty;
     if (specialty === 'berry') {
-      return <Badge variant="warning">🍓 Productor de Bayas</Badge>;
+      return <Badge variant="warning">🍓 {translateSpecialty(t, 'berry')}</Badge>;
     }
     if (specialty === 'ingredient') {
-      return <Badge variant="success">🥗 Productor de Ingredientes</Badge>;
+      return <Badge variant="success">🥗 {translateSpecialty(t, 'ingredient')}</Badge>;
     }
     if (specialty === 'skill') {
-      return <Badge variant="primary">⚡ Especialista en Habilidad</Badge>;
+      return <Badge variant="primary">⚡ {translateSpecialty(t, 'skill')}</Badge>;
     }
     return null;
   };
@@ -95,7 +95,7 @@ export default function PokemonDetail() {
           onClick={() => navigate(-1)} 
           className="inline-flex items-center gap-2 text-sm font-semibold text-text-muted hover:text-text-main transition-colors"
         >
-          <ArrowLeft size={18} /> Volver a la Caja
+          <ArrowLeft size={18} /> {t('pokemon_detail.back_to_box', { defaultValue: 'Volver a la Caja' })}
         </button>
 
         <div className="flex items-center gap-2">
@@ -105,7 +105,7 @@ export default function PokemonDetail() {
             icon={Trash2}
             className="text-error-main hover:bg-error-bg hover:text-error-main border-error-main/20"
           >
-            Eliminar
+            {t('app.delete', { defaultValue: 'Eliminar' })}
           </ActionButton>
         </div>
       </div>
@@ -175,7 +175,9 @@ export default function PokemonDetail() {
               {/* Completeness Pill */}
               <div className="bg-bg-app border border-border-main p-3 rounded-xl flex items-center gap-3 shrink-0">
                 <div className="text-right">
-                  <p className="text-[10px] font-bold text-text-muted uppercase">Configuración</p>
+                  <p className="text-[10px] font-bold text-text-muted uppercase">
+                    {t('pokemon_detail.completeness', { defaultValue: 'Configuración' })}
+                  </p>
                   <p className={`text-lg font-black ${completenessPercent === 100 ? 'text-success-main' : 'text-primary-main'}`}>
                     {completenessPercent}%
                   </p>
@@ -196,13 +198,13 @@ export default function PokemonDetail() {
 
               {species?.berry && (
                 <Badge variant="default">
-                  🫐 Baya {translateBerry(t, species.berry.name)}
+                  🫐 {translateBerry(t, species.berry.name)}
                 </Badge>
               )}
 
               {/* Level Control */}
               <div className="inline-flex items-center gap-1.5 bg-bg-app border border-border-main px-2.5 py-1 rounded-lg text-xs font-bold text-text-main">
-                <span className="text-text-muted">Nv.</span>
+                <span className="text-text-muted">{t('app.level', { defaultValue: 'Nv.' })}</span>
                 <input 
                   type="number" 
                   min="1" 
@@ -244,15 +246,19 @@ export default function PokemonDetail() {
                   <h3 className="font-extrabold text-text-main text-sm uppercase tracking-wide">
                     {t('pokemon_detail.main_skill')}
                   </h3>
-                  <p className="text-xs text-text-muted">Habilidad principal de la especie</p>
+                  <p className="text-xs text-text-muted">
+                    {t('pokemon_detail.main_skill_desc', { defaultValue: 'Habilidad principal de la especie' })}
+                  </p>
                 </div>
               </div>
-              <Badge variant="primary">Nv. {pokemon.skillLevel}</Badge>
+              <Badge variant="primary">{t('app.level', { defaultValue: 'Nv.' })} {pokemon.skillLevel}</Badge>
             </div>
 
             <div className="bg-bg-app p-4 rounded-xl border border-border-main space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-text-muted uppercase">Habilidad</span>
+                <span className="text-xs font-bold text-text-muted uppercase">
+                  {t('pokemon_detail.skill', { defaultValue: 'Habilidad' })}
+                </span>
                 <span className="font-bold text-sm text-text-main">
                   {translateMainSkill(t, species?.skill?.name || '') || t('pokemon_detail.unknown')}
                 </span>
@@ -267,7 +273,7 @@ export default function PokemonDetail() {
                 >
                   {[1, 2, 3, 4, 5, 6, 7].map(l => (
                     <option className="bg-bg-surface text-text-main" key={l} value={l}>
-                      Nivel {l}
+                      {t('app.level', { defaultValue: 'Nv.' })} {l}
                     </option>
                   ))}
                 </select>
@@ -285,7 +291,9 @@ export default function PokemonDetail() {
                 <h3 className="font-extrabold text-text-main text-sm uppercase tracking-wide">
                   {t('pokemon_detail.base_stats')}
                 </h3>
-                <p className="text-xs text-text-muted">Rasgos individuales y naturaleza</p>
+                <p className="text-xs text-text-muted">
+                  {t('pokemon_detail.base_stats_desc', { defaultValue: 'Rasgos individuales y naturaleza' })}
+                </p>
               </div>
             </div>
 
@@ -294,7 +302,9 @@ export default function PokemonDetail() {
               <div className="bg-bg-app p-3 rounded-xl border border-border-main flex items-center justify-between gap-3">
                 <div>
                   <span className="text-xs font-bold text-text-muted uppercase block">{t('pokemon_detail.nature')}</span>
-                  <span className="text-xs text-text-muted">Afecta bonos de producción</span>
+                  <span className="text-xs text-text-muted">
+                    {t('pokemon_detail.nature_desc', { defaultValue: 'Afecta bonos de producción' })}
+                  </span>
                 </div>
                 <select 
                   value={pokemon.natureId} 
@@ -316,7 +326,9 @@ export default function PokemonDetail() {
                   <Award size={16} className="text-amber-500" />
                   <div>
                     <span className="text-xs font-bold text-text-muted uppercase block">{t('pokemon_detail.ribbon_level')}</span>
-                    <span className="text-xs text-text-muted">Horas de sueño compartidas</span>
+                    <span className="text-xs text-text-muted">
+                      {t('pokemon_detail.ribbon_desc', { defaultValue: 'Horas de sueño compartidas' })}
+                    </span>
                   </div>
                 </div>
                 <select 
@@ -336,7 +348,9 @@ export default function PokemonDetail() {
               <div className="bg-bg-app p-3 rounded-xl border border-border-main flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-text-muted uppercase block">{t('pokemon_detail.sneaky_snacking')}</span>
-                  <span className="text-xs text-text-muted">Continúa produciendo tras llenar inventario</span>
+                  <span className="text-xs text-text-muted">
+                    {t('pokemon_detail.sneaky_snacking_desc', { defaultValue: 'Continúa produciendo tras llenar inventario' })}
+                  </span>
                 </div>
                 <input 
                   type="checkbox" 
@@ -362,7 +376,9 @@ export default function PokemonDetail() {
                   <h3 className="font-extrabold text-text-main text-sm uppercase tracking-wide">
                     {t('pokemon_detail.ingredients')}
                   </h3>
-                  <p className="text-xs text-text-muted">Desbloqueo de ingredientes por nivel</p>
+                  <p className="text-xs text-text-muted">
+                    {t('pokemon_detail.ingredients_desc', { defaultValue: 'Desbloqueo de ingredientes por nivel' })}
+                  </p>
                 </div>
               </div>
             </div>
@@ -384,17 +400,21 @@ export default function PokemonDetail() {
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-black px-2 py-0.5 rounded bg-bg-surface border border-border-main text-text-main">
-                        Nv. {lvl}
+                        {t('app.level', { defaultValue: 'Nv.' })} {lvl}
                       </span>
                       {isUnlocked ? (
-                        <span className="text-[10px] font-bold text-success-main">Activo</span>
+                        <span className="text-[10px] font-bold text-success-main">
+                          {t('pokemon_detail.active', { defaultValue: 'Activo' })}
+                        </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-text-muted">Bloqueado</span>
+                        <span className="text-[10px] font-bold text-text-muted">
+                          {t('pokemon_detail.locked', { defaultValue: 'Bloqueado' })}
+                        </span>
                       )}
                     </div>
 
                     <label className="block text-xs font-semibold text-text-muted mb-1">
-                      Ingrediente
+                      {t('pokemon_detail.ingredient', { defaultValue: 'Ingrediente' })}
                     </label>
                     <select
                       value={chosen || ''}
@@ -428,7 +448,9 @@ export default function PokemonDetail() {
                   <h3 className="font-extrabold text-text-main text-sm uppercase tracking-wide">
                     {t('pokemon_detail.subskills')}
                   </h3>
-                  <p className="text-xs text-text-muted">Habilidades secundarias (Slots 10 a 100)</p>
+                  <p className="text-xs text-text-muted">
+                    {t('pokemon_detail.subskills_desc', { defaultValue: 'Habilidades secundarias (Slots 10 a 100)' })}
+                  </p>
                 </div>
               </div>
             </div>
@@ -449,12 +471,16 @@ export default function PokemonDetail() {
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-black px-2 py-0.5 rounded bg-bg-surface border border-border-main text-text-main">
-                        Nv. {lvl}
+                        {t('app.level', { defaultValue: 'Nv.' })} {lvl}
                       </span>
                       {isUnlocked ? (
-                        <span className="text-[10px] font-bold text-success-main">Activo</span>
+                        <span className="text-[10px] font-bold text-success-main">
+                          {t('pokemon_detail.active', { defaultValue: 'Activo' })}
+                        </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-text-muted">Bloqueado</span>
+                        <span className="text-[10px] font-bold text-text-muted">
+                          {t('pokemon_detail.locked', { defaultValue: 'Bloqueado' })}
+                        </span>
                       )}
                     </div>
 
@@ -499,7 +525,7 @@ export default function PokemonDetail() {
               <h3 className="font-extrabold text-text-main text-base">
                 {t('pokemon_detail.calc_production')}
               </h3>
-              <p className="text-xs text-text-muted">Simula la producción estimada de este Pokémon con el motor de cálculo</p>
+              <p className="text-xs text-text-muted">{t('pokemon_detail.calc_production_desc')}</p>
             </div>
           </div>
 
@@ -572,7 +598,7 @@ export default function PokemonDetail() {
           <div className="bg-bg-app p-3 rounded-xl border border-border-main flex items-center justify-between">
             <div>
               <span className="block text-[10px] font-bold text-text-muted uppercase">{t('pokemon_detail.camp')}</span>
-              <span className="text-xs text-text-muted">+20% velocidad</span>
+              <span className="text-xs text-text-muted">{t('pokemon_detail.camp_bonus')}</span>
             </div>
             <input 
               type="checkbox" 
@@ -606,7 +632,7 @@ export default function PokemonDetail() {
               <div className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-xs space-y-2">
                 <div className="flex items-center justify-between text-warning-main font-bold text-xs uppercase">
                   <span>🍓 {t('pokemon_detail.berries')}</span>
-                  <span>Total / día</span>
+                  <span>{t('pokemon_detail.total_day')}</span>
                 </div>
                 {estimate.berries.map((b, i) => (
                   <div key={i} className="flex justify-between items-baseline pt-1">
@@ -620,7 +646,7 @@ export default function PokemonDetail() {
               <div className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-xs space-y-2">
                 <div className="flex items-center justify-between text-success-main font-bold text-xs uppercase">
                   <span>🥗 {t('pokemon_detail.ingredients')}</span>
-                  <span>Total / día</span>
+                  <span>{t('pokemon_detail.total_day')}</span>
                 </div>
                 <div className="space-y-1">
                   {estimate.ingredients.map((ing, i) => (
@@ -630,7 +656,7 @@ export default function PokemonDetail() {
                     </div>
                   ))}
                   {estimate.ingredients.length === 0 && (
-                    <span className="text-xs text-text-muted">Sin producción relevante</span>
+                    <span className="text-xs text-text-muted">{t('pokemon_detail.no_production')}</span>
                   )}
                 </div>
               </div>
@@ -639,13 +665,13 @@ export default function PokemonDetail() {
               <div className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-xs space-y-2">
                 <div className="flex items-center justify-between text-primary-main font-bold text-xs uppercase">
                   <span>⚡ {t('pokemon_detail.skill')}</span>
-                  <span>Frecuencia</span>
+                  <span>{t('pokemon_detail.frequency')}</span>
                 </div>
                 <div className="pt-2">
                   <div className="text-2xl font-black text-primary-main">
                     {estimate.skillProcs.toFixed(2)}
                   </div>
-                  <span className="text-xs text-text-muted">{t('pokemon_detail.procs')} esperados al día</span>
+                  <span className="text-xs text-text-muted">{t('pokemon_detail.procs')} {t('pokemon_detail.expected_per_day')}</span>
                 </div>
               </div>
             </div>

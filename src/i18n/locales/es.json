@@ -39,7 +39,14 @@
     "required_subskills": "Subhabilidades Requeridas",
     "required_ingredients": "Ingredientes Requeridos",
     "only_favorites": "Solo Favoritos",
-    "only_incomplete": "Solo Datos Incompletos"
+    "only_incomplete": "Solo Datos Incompletos",
+    "clear_filters": "Limpiar Filtros",
+    "view_results": "Ver Resultados",
+    "active_by_level": "Activas por nivel",
+    "any_slot": "Cualquier slot",
+    "berry": "Baya",
+    "main_skill": "Habilidad Principal",
+    "management": "Gestión"
   },
   "pokemon_form": {
     "title_add": "Añadir Pokémon",
@@ -131,7 +138,28 @@
     "none": "(Ninguna)",
     "select": "(Selecciona)",
     "unknown": "Desconocida",
-    "level_short": "Nv."
+    "level_short": "Nv.",
+    "back_to_box": "Volver a la Caja",
+    "completeness": "Configuración",
+    "ready_for_sim": "Listo para simulación",
+    "missing_config": "Faltan datos",
+    "main_skill_desc": "Habilidad principal de la especie",
+    "base_stats_desc": "Rasgos individuales y naturaleza",
+    "nature_desc": "Afecta bonos de producción",
+    "ribbon_desc": "Horas de sueño compartidas",
+    "sneaky_snacking_desc": "Continúa produciendo tras llenar inventario",
+    "ingredients_desc": "Desbloqueo de ingredientes por nivel",
+    "subskills_desc": "Habilidades secundarias (Slots 10 a 100)",
+    "calc_production_desc": "Simula la producción estimada de este Pokémon con el motor de cálculo",
+    "active": "Activo",
+    "locked": "Bloqueado",
+    "ingredient": "Ingrediente",
+    "camp_bonus": "+20% velocidad",
+    "total_day": "Total / día",
+    "no_production": "Sin producción relevante",
+    "frequency": "Frecuencia",
+    "expected_per_day": "esperados al día",
+    "berry": "Baya"
   },
   "game": {
     "nature": {
@@ -330,6 +358,12 @@
       "curry": "Guisos y curris",
       "salad": "Ensaladas",
       "dessert": "Postres"
+    },
+    "specialty": {
+      "berry": "Bayas",
+      "ingredient": "Ingredientes",
+      "skill": "Habilidades",
+      "all": "Todas"
     }
   },
   "dashboard": {
@@ -368,7 +402,28 @@
     "top_n": "Cantidad de Resultados (Top N)",
     "empty_collection": "Tu colección está vacía.",
     "analyzing": "Analizando Equipos...",
-    "all_category": "Optimizar para TODA la categoría"
+    "all_category": "Optimizar para TODA la categoría",
+    "description": "Analiza y simula millones de combinaciones de tu colección para hallar el equipo de máxima producción.",
+    "reset": "Reiniciar",
+    "save_query": "Guardar Consulta",
+    "analysis_config": "Configuración del Análisis",
+    "pokemon_in_box": "Pokémon en tu caja",
+    "group_environment": "1. Entorno e Isla",
+    "group_strategy": "2. Objetivo Estratégico",
+    "group_constraints": "3. Restricciones",
+    "unique_species_desc": "No repetir la misma especie",
+    "req_exc_title": "Pokémon Req / Exc",
+    "cancel_optimization": "Cancelar Optimización",
+    "start_optimization": "Iniciar Optimización",
+    "ready_title": "Listo para optimizar",
+    "ready_desc": "Configura tus preferencias arriba y pulsa \"Iniciar Optimización\" para calcular las mejores sinergias de tu caja.",
+    "results_title": "Mejores Equipos Encontrados",
+    "compare_status": "Comparador",
+    "compare_action": "Comparar",
+    "no_results": "No se encontraron equipos válidos con los filtros aplicados. Prueba reduciendo el nivel mínimo o retirando exclusiones.",
+    "top_rank": "#1 MEJOR",
+    "view_detail": "Ver detalle →",
+    "compare_selected": "Comparar Equipos Seleccionados (2)"
   },
   "team": {
     "compare": "Comparador de Equipos",
@@ -422,7 +477,26 @@
     "empty": "No hay planificaciones guardadas. Crea una nueva para empezar.",
     "confirm_delete": "¿Eliminar esta planificación?",
     "compare_error": "Para comparar directamente, debes tener exactamente 2 equipos definidos (Principal y 1 Alternativo).",
-    "copy_suffix": "(Copia)"
+    "copy_suffix": "(Copia)",
+    "description": "Estructura la semana de sueño: asigna equipos por día, planifica comidas y proyecta la fuerza de Snorlax.",
+    "open_optimizer": "Abrir Optimizador",
+    "snorlax_projection": "Proyección Snorlax",
+    "sunday_night": "Domingo noche",
+    "est_strength": "fuerza est.",
+    "suggest_team": "Sugerir Equipo Óptimo",
+    "add_alt_team": "Añadir Alternativo",
+    "daily_schedule": "Planificación de los 7 Días",
+    "day_num": "Día",
+    "weekend_pot": "Fin de Semana (x1.5 Pote)",
+    "team": "Equipo",
+    "pantry_audit": "Auditoría de Despensa (7 Días)",
+    "pantry_audit_desc": "Balance entre ingredientes consumidos por recetas (3 comidas/día) y producidos por tus equipos",
+    "recipe_cost": "Coste Recetas",
+    "est_prod": "Producción Est.",
+    "weekly_balance": "Balance Semanal",
+    "empty_title": "Sin planes semanales",
+    "create_first": "Crear primer plan",
+    "open_plan": "Abrir Plan"
   },
   "import": {
     "editing": "Editando Pokémon",

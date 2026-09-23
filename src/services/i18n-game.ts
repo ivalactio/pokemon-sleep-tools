@@ -30,8 +30,8 @@ export function translateSubskill(t: TFunction, id: string): string {
   return t(`game.subskill.${id}`, { defaultValue: id });
 }
 
-export function translateMainSkill(t: TFunction, id: string): string {
-  if (!id) return id;
+export function translateMainSkill(t: TFunction, id?: string): string {
+  if (!id) return '';
   return t(`game.mainSkill.${id}`, { defaultValue: id });
 }
 
@@ -48,4 +48,9 @@ export function translateBerry(t: TFunction, id: string): string {
 export function translateRecipe(t: TFunction, id: string): string {
   if (!id) return id;
   return t(`game.recipe.${id}`, { defaultValue: id });
+}
+
+export function translateSpecialty(t: TFunction, specialty: string): string {
+  if (!specialty) return specialty;
+  return t(`game.specialty.${specialty.toLowerCase()}`, { defaultValue: specialty });
 }

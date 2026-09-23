@@ -29,15 +29,13 @@ export default function Recipes() {
 
   const getCategoryName = (type: string) => {
     switch (type) {
-      case 'curry': return 'Guisos y curris';
-      case 'salad': return 'Ensaladas';
-      case 'dessert': return 'Postres';
+      case 'curry': return t('game.recipeType.curry', { defaultValue: 'Guisos y curris' });
+      case 'salad': return t('game.recipeType.salad', { defaultValue: 'Ensaladas' });
+      case 'dessert': return t('game.recipeType.dessert', { defaultValue: 'Postres' });
       default: return type;
     }
   };
 
-  
-  
   const filteredRecipes = (gamedata.recipes as unknown as Recipe[]).filter(r => {
     // Legacy filter
     if (filter !== 'ALL' && r.type !== filter) return false;
@@ -65,19 +63,19 @@ export default function Recipes() {
 
   return (
     <div className="max-w-7xl mx-auto pb-10">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><ChefHat className="text-indigo-500" /> {t('recipes.title')}</h2>
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><ChefHat className="text-primary-main" /> {t('recipes.title')}</h2>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex bg-bg-surface p-1 rounded-lg border border-border-main overflow-x-auto">
-          <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'ALL' ? 'bg-indigo-500 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>{t('app.all')}</button>
-          <button onClick={() => setFilter('curry')} className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'curry' ? 'bg-orange-500 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>
-            <Utensils size={16} /> Guisos y curris
+          <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'ALL' ? 'bg-primary-main text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>{t('app.all')}</button>
+          <button onClick={() => setFilter('curry')} className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'curry' ? 'bg-amber-600 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>
+            <Utensils size={16} /> {t('game.recipeType.curry', { defaultValue: 'Guisos y curris' })}
           </button>
-          <button onClick={() => setFilter('salad')} className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'salad' ? 'bg-green-500 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>
-            <Salad size={16} /> Ensaladas
+          <button onClick={() => setFilter('salad')} className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'salad' ? 'bg-emerald-600 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>
+            <Salad size={16} /> {t('game.recipeType.salad', { defaultValue: 'Ensaladas' })}
           </button>
-          <button onClick={() => setFilter('dessert')} className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'dessert' ? 'bg-pink-500 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>
-            <IceCream size={16} /> Postres
+          <button onClick={() => setFilter('dessert')} className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'dessert' ? 'bg-pink-600 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>
+            <IceCream size={16} /> {t('game.recipeType.dessert', { defaultValue: 'Postres' })}
           </button>
         </div>
 
@@ -87,42 +85,42 @@ export default function Recipes() {
           </div>
           <input
             type="text"
-            placeholder="Buscar receta..."
+            placeholder={t('recipes.search', { defaultValue: 'Buscar receta...' })}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-border-main rounded-lg bg-bg-surface text-text-main focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 border border-border-main rounded-lg bg-bg-surface text-text-main focus:ring-2 focus:ring-primary-main focus:outline-none"
           />
         </div>
       </div>
 
-            <div className="flex flex-col md:flex-row gap-4 mb-6 p-4 bg-bg-surface border border-border-main rounded-xl">
-        <select value={recipeType} onChange={e => setRecipeType(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main">
-          <option className="bg-bg-surface text-text-main" value="">Todos los Tipos</option>
-          <option className="bg-bg-surface text-text-main" value="curry">Curris</option>
-          <option className="bg-bg-surface text-text-main" value="salad">Ensaladas</option>
-          <option className="bg-bg-surface text-text-main" value="dessert">Postres</option>
+      <div className="flex flex-col md:flex-row gap-4 mb-6 p-4 bg-bg-surface border border-border-main rounded-xl">
+        <select value={recipeType} onChange={e => setRecipeType(e.target.value)} className="flex-1 p-2 rounded-lg border border-border-main bg-bg-surface text-text-main font-semibold">
+          <option className="bg-bg-surface text-text-main" value="">{t('recipes.all_types', { defaultValue: 'Todos los Tipos' })}</option>
+          <option className="bg-bg-surface text-text-main" value="curry">{t('game.recipeType.curry', { defaultValue: 'Guisos y curris' })}</option>
+          <option className="bg-bg-surface text-text-main" value="salad">{t('game.recipeType.salad', { defaultValue: 'Ensaladas' })}</option>
+          <option className="bg-bg-surface text-text-main" value="dessert">{t('game.recipeType.dessert', { defaultValue: 'Postres' })}</option>
         </select>
-        <select value={ingredient} onChange={e => setIngredient(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main">
-          <option className="bg-bg-surface text-text-main" value="">Cualquier Ingrediente</option>
+        <select value={ingredient} onChange={e => setIngredient(e.target.value)} className="flex-1 p-2 rounded-lg border border-border-main bg-bg-surface text-text-main font-semibold">
+          <option className="bg-bg-surface text-text-main" value="">{t('recipes.any_ingredient', { defaultValue: 'Cualquier Ingrediente' })}</option>
           {allIngredients.map(i => (
             <option className="bg-bg-surface text-text-main" key={i} value={i}>{translateIngredient(t, i)}</option>
           ))}
         </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main">
-          <option className="bg-bg-surface text-text-main" value="strength_desc">Fuerza Base DESC</option>
-          <option className="bg-bg-surface text-text-main" value="pot_asc">Tamaño Olla ASC</option>
-          <option className="bg-bg-surface text-text-main" value="pot_desc">Tamaño Olla DESC</option>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 p-2 rounded-lg border border-border-main bg-bg-surface text-text-main font-semibold">
+          <option className="bg-bg-surface text-text-main" value="strength_desc">{t('recipes.sort_strength_desc', { defaultValue: 'Fuerza Base DESC' })}</option>
+          <option className="bg-bg-surface text-text-main" value="pot_asc">{t('recipes.sort_pot_asc', { defaultValue: 'Tamaño Olla ASC' })}</option>
+          <option className="bg-bg-surface text-text-main" value="pot_desc">{t('recipes.sort_pot_desc', { defaultValue: 'Tamaño Olla DESC' })}</option>
         </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredRecipes.map((recipe: Recipe) => (
           <div key={recipe.name} className="bg-bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden flex flex-col">
-            <div className="p-4 border-b border-border-main bg-slate-50/50 dark:bg-slate-800/30">
+            <div className="p-4 border-b border-border-main bg-bg-app">
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-bold text-lg leading-tight">{translateRecipe(t, recipe.name)}</h3>
-                <span className="flex items-center text-xs font-bold px-2 py-1 rounded-full bg-border-main text-text-main">
-                  {recipe.nrOfIngredients} ings
+                <span className="flex items-center text-xs font-bold px-2 py-1 rounded-full bg-bg-surface border border-border-main text-text-main">
+                  {recipe.nrOfIngredients} {t('team.ings', { defaultValue: 'ings' })}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-text-muted">
@@ -136,7 +134,7 @@ export default function Recipes() {
                 {recipe.ingredients.map(ing => (
                   <div key={ing.ingredient.name} className="flex justify-between items-center text-sm">
                     <span className="font-medium text-text-main">{translateIngredient(t, ing.ingredient.name)}</span>
-                    <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">
+                    <span className="bg-primary-bg text-primary-main px-2 py-0.5 rounded text-xs font-bold">
                       x{ing.amount}
                     </span>
                   </div>
@@ -144,7 +142,7 @@ export default function Recipes() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-border-main bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center text-sm">
+            <div className="p-4 border-t border-border-main bg-bg-app flex justify-between items-center text-sm">
               <div className="flex flex-col">
                 <span className="text-text-muted text-xs">{t('recipes.base_power')}</span>
                 <span className="font-bold text-success-main">{recipe.value.toLocaleString()}</span>
