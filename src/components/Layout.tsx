@@ -9,7 +9,8 @@ import {
   TestTube,
   Search,
   Users,
-  CalendarDays
+  CalendarDays,
+  GitCompare
 } from 'lucide-react';
 
 export default function Layout() {
@@ -64,6 +65,12 @@ export default function Layout() {
                 <Link to="/optimizador" className={linkClass('/optimizador')}>
                   <Zap size={18} />
                   Optimizador
+                </Link>
+              </li>
+              <li>
+                <Link to="/comparador" className={linkClass('/comparador')}>
+                  <GitCompare size={18} />
+                  {t('team.compare', { defaultValue: 'Comparador' })}
                 </Link>
               </li>
               <li>

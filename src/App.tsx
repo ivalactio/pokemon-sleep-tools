@@ -11,6 +11,7 @@ import OptimizerPage from './features/optimizer/OptimizerPage';
 import SavedQueriesPage from './features/saved/SavedQueriesPage';
 import SavedTeamsPage from './features/saved/SavedTeamsPage';
 import WeeklyPlannerPage from './features/planner/WeeklyPlannerPage';
+import ComparatorPage from './features/collection/ComparatorPage';
 import { VisionConfigProvider } from './domain/vision/VisionConfigContext';
 import './i18n/config';
 import { useTheme } from './hooks/useTheme';
@@ -28,6 +29,7 @@ function App() {
             <Route path="coleccion/nuevo" element={<PokemonForm />} />
             <Route path="pokemon/:id" element={<PokemonDetail />} />
             <Route path="pokemon/:id/editar" element={<PokemonForm />} />
+            <Route path="comparador" element={<ComparatorPage />} />
             <Route path="recetas" element={<Recipes />} />
             <Route path="optimizador" element={<OptimizerPage />} />
             <Route path="consultas-guardadas" element={<SavedQueriesPage />} />

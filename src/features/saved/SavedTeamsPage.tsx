@@ -50,17 +50,18 @@ export default function SavedTeamsPage() {
 
   const buildTeamResult = async (teamId: string): Promise<TeamResult> => {
     const saved = await db.savedTeams.get(teamId);
-    if (!saved) throw new Error('Not found');
-    const members = saved.memberIds.map(id => collection.find(p => p.id === id)).filter(Boolean) as OwnedPokemon[];
+    if (!saved) throw new Error('Equipo no encontrado');
+    const members = (saved.memberIds || []).map(id => collection.find(p => p.id === id)).filter(Boolean) as OwnedPokemon[];
     const teamObj = { members };
     const evaluator = new TeamEvaluator(engine, gamedata as any as StaticDataSchema);
-    const ctx = await evaluator.evaluate(teamObj, saved.queryContext.simulation);
+    const simConfig = saved.queryContext?.simulation || { camp: false, bedtime: '22:00', wakeup: '06:00', island: 'greengrass', areaBonus: 0 };
+    const ctx = await evaluator.evaluate(teamObj, simConfig);
     
-    const obj = saved.queryContext.objectives[0];
+    const obj = saved.queryContext?.objectives?.[0] || 'berries';
     let strategy;
     if (obj === 'berries') strategy = new BerryScoringStrategy(gamedata as any as StaticDataSchema);
     else if (obj === 'ingredients') strategy = new IngredientScoringStrategy(gamedata as any as StaticDataSchema);
-    else strategy = new RecipeScoringStrategy(gamedata as any as StaticDataSchema, saved.queryContext.recipeType || 'curry', saved.queryContext.targetRecipeId);
+    else strategy = new RecipeScoringStrategy(gamedata as any as StaticDataSchema, saved.queryContext?.recipeType || 'curry', saved.queryContext?.targetRecipeId);
     
     const score = strategy.score(ctx);
     return { evaluation: ctx, score };
@@ -72,9 +73,10 @@ export default function SavedTeamsPage() {
         const t1 = await buildTeamResult(selectedForCompare[0]);
         const t2 = await buildTeamResult(selectedForCompare[1]);
         setCompareTeams([t1, t2]);
-      } catch (e) {
+      } catch (e: unknown) {
         console.error("Error comparando", e);
-        alert(t('saved.comparator_title'));
+        const msg = e instanceof Error ? e.message : 'Error al comparar equipos';
+        alert(`Error al comparar equipos: ${msg}`);
       }
     }
   };

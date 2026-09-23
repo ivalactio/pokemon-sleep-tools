@@ -27,7 +27,7 @@ describe('Pokemon Validator & Special Species Handling', () => {
       natureId: 'Modest',
       subskills: {
         10: 'Helping Speed M',
-        25: 'Skill Trigger M',
+        25: 'Skill Chance M',
         50: 'Berry Finding S',
         75: null,
         100: null

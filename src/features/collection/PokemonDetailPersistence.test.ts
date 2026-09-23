@@ -24,7 +24,7 @@ describe('Pokemon Detail Persistence & Edit Flow Tests', () => {
       level: 25,
       ribbonLevel: 1,
       natureId: 'Modest',
-      subskills: { 10: 'Skill Trigger M', 25: null, 50: null, 75: null, 100: null },
+      subskills: { 10: 'Skill Chance M', 25: null, 50: null, 75: null, 100: null },
       ingredientChoices: { 1: mewSpecies.ingredient0[0].ingredient.name, 30: null, 60: null },
       skillLevel: 3,
       shiny: true,
@@ -51,7 +51,7 @@ describe('Pokemon Detail Persistence & Edit Flow Tests', () => {
       nickname: 'CosmicMew',
       level: 50,
       skillLevel: 6,
-      subskills: { 10: 'Skill Trigger M', 25: 'Helping Speed M', 50: 'Berry Finding S', 75: null, 100: null },
+      subskills: { 10: 'Skill Chance M', 25: 'Helping Speed M', 50: 'Berry Finding S', 75: null, 100: null },
       ingredientChoices: {
         1: mewSpecies.ingredient0[0].ingredient.name,
         30: mewSpecies.ingredient30[0].ingredient.name,
