@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { OwnedPokemon } from '../../domain/models';
 import { Badge } from './index';
 import gamedata from '../../data/static/gamedata.json';
 import { translateIngredient } from '../../services/i18n-game';
 import { useTranslation } from 'react-i18next';
-import { Star, AlertCircle } from 'lucide-react';
+import { Star, AlertCircle, Package } from 'lucide-react';
 import { isComplete } from '../../utils/pokemonUtils';
 
 interface PokemonCardProps {
@@ -17,6 +17,7 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
   const { t } = useTranslation();
   const species = gamedata.species.find(s => s.name === pokemon.speciesId) || gamedata.species[0];
   const complete = isComplete(pokemon);
+  const [imageError, setImageError] = useState(false);
 
   // Derive ingredients
   const ing30 = (pokemon.ingredientChoices as any)?.[30];
@@ -60,15 +61,16 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
       <div className="p-4 flex gap-4 items-center bg-bg-app border-b border-border-main group-hover:bg-primary-bg transition-colors">
         <div className="w-16 h-16 flex-shrink-0 bg-bg-surface rounded-full border-2 border-border-main p-1 overflow-hidden flex items-center justify-center">
           {/* Simple sprite fallback for now, assuming standard icon path */}
-          <img 
-            src={`/images/pokemon/${species.pokedexNumber}.png`} 
-            alt={species.name}
-            className="w-full h-full object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/favicon.ico';
-              (e.target as HTMLImageElement).className = "w-8 h-8 opacity-50 grayscale";
-            }}
-          />
+          {imageError ? (
+            <Package size={32} className="text-text-muted opacity-50" />
+          ) : (
+            <img 
+              src={`/pokemon/${species.pokedexNumber}.png`} 
+              alt={species.name}
+              className="w-full h-full object-contain"
+              onError={() => setImageError(true)}
+            />
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
