@@ -2,7 +2,7 @@ import { useState } from 'react';
 import gamedata from '../../data/static/gamedata.json';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Plus, Image as ImageIcon, Sparkles, FlaskConical, Search, Download } from 'lucide-react';
+import { Plus, Sparkles, FlaskConical, Search, Download, Package, Filter, Settings2, FileJson, Camera, ArrowUpDown } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
 import { getNatureDisplayName } from '../../services/i18n-game';
@@ -151,39 +151,62 @@ export default function Collection() {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <h2 className="text-2xl font-bold">{t('collection.title')}</h2>
-        <div className="flex flex-col md:flex-row gap-2 items-center">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
-            <input type="text" placeholder="Buscar..." value={filters.search} onChange={e => setFilters({...filters, search: e.target.value})} className="pl-9 pr-3 py-2 bg-bg-surface border border-border-main rounded-lg text-sm w-full sm:w-32" />
+      <div className="space-y-6 mb-8">
+        {/* Fila 1: Exploración */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-border-main pb-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <Package size={24} className="text-indigo-500" />
+            {t('collection.title')}
+          </h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
+              <input type="text" placeholder="Buscar..." value={filters.search} onChange={e => setFilters({...filters, search: e.target.value})} className="pl-9 pr-3 py-2 bg-bg-surface border border-border-main rounded-lg text-sm w-full sm:w-48" />
+            </div>
+            <div className="flex items-center gap-2">
+              <ArrowUpDown size={16} className="text-text-muted hidden sm:block" />
+              <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="bg-bg-surface border border-border-main rounded-lg px-3 py-2 text-sm dark:bg-slate-800 dark:text-white">
+                <option className="dark:bg-slate-800 dark:text-white" value="level">Nv</option>
+                <option className="dark:bg-slate-800 dark:text-white" value="name">{t('app.name')}</option>
+              </select>
+            </div>
+            <button onClick={() => { console.log('Clic en Filtros'); setShowFilters(true); }} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover font-bold text-sm flex items-center gap-2">
+              <Filter size={16} className="text-indigo-500" />
+              {t('collection.filters')}
+            </button>
           </div>
-          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="bg-bg-surface border border-border-main rounded-lg px-3 py-2 text-sm">
-            <option className="dark:bg-gray-800 dark:text-white" value="level">Nv</option>
-            <option className="dark:bg-gray-800 dark:text-white" value="name">{t('app.name')}</option>
-          </select>
-          <button onClick={() => { console.log('Clic en Filtros'); setShowFilters(true); }} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover font-bold text-sm">{t('collection.filters')}</button>
-          <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover" title="Exportar Backup JSON">
-            <Download size={18} className="text-text-muted"/>
-          </button>
-          <button 
-            onClick={() => setIsImportingJson(true)}
-            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover`}
-          >
-            <ImageIcon size={20} />
-            Importar JSON
-          </button>
-          <button 
-            onClick={() => setIsCapturing(!isCapturing)} 
-            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${isCapturing ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-bg-surface border border-border-main text-text-main hover:bg-bg-surface-hover'}`}
-          >
-            <ImageIcon size={20} />
-            Importar captura
-          </button>
-          <Link to="/coleccion/nuevo" className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
-            <Plus size={20} />
-            {t('nav.add_pokemon')}
-          </Link>
+        </div>
+
+        {/* Fila 2: Gestión */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-bg-surface p-4 rounded-xl border border-border-main shadow-sm">
+          <h3 className="text-sm font-bold text-text-muted flex items-center gap-2 uppercase tracking-wider">
+            <Settings2 size={16} />
+            Gestión
+          </h3>
+          <div className="flex flex-wrap items-center gap-3">
+            <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-main hover:bg-bg-surface-hover flex items-center gap-2" title="Exportar Backup JSON">
+              <Download size={18} className="text-text-muted"/>
+              <span className="text-sm font-medium hidden sm:inline">Backup JSON</span>
+            </button>
+            <button
+              onClick={() => setIsImportingJson(true)}
+              className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors bg-bg-main border border-border-main text-text-main hover:bg-bg-surface-hover text-sm`}
+            >
+              <FileJson size={18} className="text-amber-500" />
+              Importar JSON
+            </button>
+            <button
+              onClick={() => setIsCapturing(!isCapturing)}
+              className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors text-sm ${isCapturing ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-bg-main border border-border-main text-text-main hover:bg-bg-surface-hover'}`}
+            >
+              <Camera size={18} className="text-blue-500" />
+              Importar captura
+            </button>
+            <Link to="/coleccion/nuevo" className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors text-sm">
+              <Plus size={18} />
+              {t('nav.add_pokemon')}
+            </Link>
+          </div>
         </div>
       </div>
 
