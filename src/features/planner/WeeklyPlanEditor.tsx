@@ -9,6 +9,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import gamedata from '../../data/static/gamedata.json';
 import { translateRecipe, translateBerry } from '../../services/i18n-game';
+import { LocalCalculationEngine } from '../../services/optimizer/calculator/LocalCalculationEngine';
+import { OptimizerService } from '../../services/optimizer/OptimizerService';
+import type { OwnedPokemon } from '../../domain/models';
+import { Wand2 } from 'lucide-react';
 
 interface Props {
   plan?: WeeklyPlan;
@@ -41,6 +45,143 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   const [notes, setNotes] = useState(plan?.notes || '');
 
   const availableRecipes = gamedata.recipes.filter(r => r.type === recipeType);
+
+  const [collection, setCollection] = useState<OwnedPokemon[]>([]);
+  useEffect(() => {
+    db.ownedPokemon.toArray().then(setCollection);
+  }, []);
+
+  const [audit, setAudit] = useState<{ing: string, cost: number, prod: number, diff: number}[]>([]);
+  const [projectedStrength, setProjectedStrength] = useState(0);
+  const [isSuggesting, setIsSuggesting] = useState(false);
+
+  useEffect(() => {
+    const recalculateAudit = async () => {
+      if (!collection.length) return;
+      const engine = new LocalCalculationEngine(gamedata as any);
+      
+      const costMap = new Map<string, number>();
+      for (const dp of dailyPlans) {
+        const recId = dp.recipeId || targetRecipeId;
+        if (recId) {
+          const recipe = gamedata.recipes.find(r => r.name === recId);
+          if (recipe) {
+            for (const ing of recipe.ingredients) {
+              costMap.set(ing.ingredient.name, (costMap.get(ing.ingredient.name) || 0) + ing.amount * 3);
+            }
+          }
+        }
+      }
+
+      const prodMap = new Map<string, number>();
+      let totalStrength = 0;
+      const teamProdCache = new Map<string, any[]>();
+      
+      const config = {
+        camp: false,
+        bedtime: '22:00',
+        wakeup: '06:00',
+        island,
+        areaBonus,
+        favoriteBerries: island === 'greengrass' ? favoriteBerries : undefined
+      };
+
+      for (const dp of dailyPlans) {
+        const tId = dp.teamId || mainTeamId;
+        if (!tId) continue;
+        const team = savedTeams.find(t => t.id === tId);
+        if (!team) continue;
+        
+        let estimates = teamProdCache.get(tId);
+        if (!estimates) {
+          const members = team.memberIds.map(id => collection.find(p => p.id === id)).filter(Boolean) as OwnedPokemon[];
+          if (members.length > 0) {
+            estimates = await engine.simulateTeam(members, config as any);
+            teamProdCache.set(tId, estimates);
+          } else {
+            estimates = [];
+          }
+        }
+        
+        for (const est of estimates) {
+          for (const ing of est.ingredients) {
+             prodMap.set(ing.name, (prodMap.get(ing.name) || 0) + ing.amount);
+          }
+          for (const berry of est.berries) {
+             const bData = gamedata.berries.find(b => b.name === berry.name);
+             if (bData) {
+                totalStrength += berry.amount * bData.value * (1 + areaBonus / 100);
+             }
+          }
+          totalStrength += est.skillProcs * 400 * (1 + areaBonus / 100);
+        }
+      }
+      
+      for (const dp of dailyPlans) {
+        const recId = dp.recipeId || targetRecipeId;
+        if (recId) {
+          const recipe = gamedata.recipes.find(r => r.name === recId);
+          if (recipe) {
+             totalStrength += recipe.value * 3 * (1 + areaBonus / 100);
+          }
+        }
+      }
+
+      const allIngs = new Set([...costMap.keys(), ...prodMap.keys()]);
+      const newAudit = Array.from(allIngs).map(ing => {
+        const cost = costMap.get(ing) || 0;
+        const prod = prodMap.get(ing) || 0;
+        return { ing, cost, prod, diff: prod - cost };
+      }).sort((a, b) => a.diff - b.diff);
+      
+      setAudit(newAudit);
+      setProjectedStrength(totalStrength);
+    };
+
+    recalculateAudit();
+  }, [dailyPlans, targetRecipeId, mainTeamId, savedTeams, collection, island, favoriteBerries, areaBonus]);
+
+  const handleSuggestTeam = async () => {
+    if (!collection.length) return;
+    setIsSuggesting(true);
+    await new Promise(r => setTimeout(r, 50));
+    
+    try {
+      const engine = new LocalCalculationEngine(gamedata as any);
+      const opt = new OptimizerService(gamedata as any, engine);
+      
+      const config = {
+        simulation: { camp: false, bedtime: '22:00', wakeup: '06:00', island, areaBonus, favoriteBerries: island === 'greengrass' ? favoriteBerries : undefined },
+        constraints: { minLevel: 1, uniqueSpecies: false, requiredPokemonIds: [], excludedPokemonIds: [] },
+        recipeType,
+        targetRecipeId: objective === 'recipe' ? targetRecipeId : undefined,
+        objectives: [objective],
+        maxResults: 1
+      };
+      
+      const results = await opt.optimize(collection, config as any);
+      if (results.length > 0) {
+        const bestTeam = results[0].evaluation.team;
+        const newTeam = {
+          id: crypto.randomUUID(),
+          name: `Asistente: ${Math.round(results[0].score.score)} pt`,
+          createdAt: Date.now(),
+          queryContext: config as any,
+          memberIds: bestTeam.members.map(m => m.id)
+        };
+        await db.savedTeams.add(newTeam);
+        setSavedTeams(prev => [...prev, newTeam]);
+        setMainTeamId(newTeam.id);
+      } else {
+        alert('No se pudo encontrar un equipo válido para esta configuración.');
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert('Error sugiriendo equipo: ' + e.message);
+    }
+    setIsSuggesting(false);
+  };
+
 
   // When recipeType changes, reset target recipe if invalid
   useEffect(() => {
@@ -206,6 +347,13 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
               <textarea value={notes} onChange={e => setNotes(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main h-24" placeholder="Ej: Priorizar subir ingredientes de Miel." />
             </div>
 
+            <div className="mt-4 p-4 bg-indigo-50 border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 rounded-lg">
+              <h3 className="font-bold text-indigo-900 dark:text-indigo-300 mb-1">Proyección de Fuerza</h3>
+              <p className="text-2xl font-black text-indigo-700 dark:text-indigo-400">{Math.round(projectedStrength).toLocaleString()}</p>
+              <p className="text-xs text-indigo-600 dark:text-indigo-500">Fuerza estimada Snorlax (Domingo noche)</p>
+            </div>
+
+
           </div>
         </div>
 
@@ -213,6 +361,13 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
         <div className="col-span-1 lg:col-span-2 space-y-6">
           <div className="bg-bg-surface border border-border-main p-4 rounded-xl shadow-sm space-y-4">
             <h2 className="font-bold text-lg border-b border-border-main pb-2">{t('planner.assigned_teams')}</h2>
+            <div className="mb-2 mt-4">
+              <button onClick={handleSuggestTeam} disabled={isSuggesting} className="w-full py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-300 rounded flex items-center justify-center gap-2 font-bold transition-colors">
+                <Wand2 size={18} />
+                {isSuggesting ? 'Calculando...' : 'Sugerir Equipo Óptimo'}
+              </button>
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-1">{t('planner.main_team')}</label>
               <select value={mainTeamId} onChange={e => setMainTeamId(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main font-bold text-indigo-700 dark:text-indigo-400">
@@ -275,6 +430,37 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="bg-bg-surface border border-border-main p-4 rounded-xl shadow-sm">
+            <h2 className="font-bold text-lg border-b border-border-main pb-4 mb-4">Auditoría de Despensa</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-bg-main text-text-muted">
+                  <tr>
+                    <th className="px-3 py-2 rounded-l-lg">Ingrediente</th>
+                    <th className="px-3 py-2 text-right">Coste 7d</th>
+                    <th className="px-3 py-2 text-right">Prod 7d</th>
+                    <th className="px-3 py-2 text-right rounded-r-lg">Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {audit.map((row, i) => (
+                    <tr key={i} className="border-b border-border-main last:border-0">
+                      <td className="px-3 py-2 font-medium">{row.ing}</td>
+                      <td className="px-3 py-2 text-right text-text-muted">{Math.round(row.cost)}</td>
+                      <td className="px-3 py-2 text-right text-text-muted">{Math.round(row.prod)}</td>
+                      <td className={`px-3 py-2 text-right font-bold ${row.diff < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        {row.diff > 0 ? '+' : ''}{Math.round(row.diff)}
+                      </td>
+                    </tr>
+                  ))}
+                  {audit.length === 0 && (
+                    <tr><td colSpan={4} className="px-3 py-4 text-center text-text-muted">No hay ingredientes proyectados.</td></tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
           
