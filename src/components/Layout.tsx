@@ -63,6 +63,12 @@ export default function Layout() {
             </Link>
           </li>
           <li>
+            <Link to="/planificador" className={linkClass('/planificador')}>
+              <List size={20} />
+              Planificador semanal
+            </Link>
+          </li>
+          <li>
             <Link to="/configuracion" className={linkClass('/configuracion')}>
               <SettingsIcon size={20} />
               {t('nav.settings')}
