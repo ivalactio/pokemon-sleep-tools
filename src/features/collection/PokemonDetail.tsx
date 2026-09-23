@@ -1,19 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
 import { 
   ArrowLeft, Trash2, Calculator, AlertCircle, Sparkles, 
   Award, Shield, CheckCircle2, Package, Flame, Clock, 
-  Compass, Zap, UtensilsCrossed
+  Compass, Zap, UtensilsCrossed, Save, Check
 } from 'lucide-react';
 import gamedata from '../../data/static/gamedata.json';
 import { useTranslation } from 'react-i18next';
 import { translateSubskill, getSpeciesMainSkillDisplayName, translateIngredient, translateBerry, getNatureDisplayName, translateSpecialty } from '../../services/i18n-game';
 import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
-import type { ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
+import type { OwnedPokemon, ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
 import { ISLANDS } from '../../domain/optimizer/islands';
 import { Badge, ActionButton, Panel } from '../../components/ui';
+import { validatePokemon } from '../../utils/pokemonValidator';
 
 const engine = new SleepApiEngine(gamedata as unknown as StaticDataSchema);
 
@@ -23,6 +24,11 @@ export default function PokemonDetail() {
   const navigate = useNavigate();
 
   const pokemon = useLiveQuery(() => id ? collectionRepository.getById(id) : undefined, [id]);
+
+  const [draft, setDraft] = useState<OwnedPokemon | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'dirty' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveErrorMessage, setSaveErrorMessage] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const [config, setConfig] = useState<SimulationConfig>({
     camp: false,
@@ -37,19 +43,34 @@ export default function PokemonDetail() {
   const [error, setError] = useState<string | null>(null);
   const [spriteError, setSpriteError] = useState(false);
 
-  if (!pokemon) return <div className="p-8 text-center text-text-muted">{t('app.loading')}</div>;
+  // Sync draft when pokemon is loaded or updated from Dexie
+  useEffect(() => {
+    if (pokemon) {
+      if (!draft || draft.id !== pokemon.id || saveStatus === 'idle') {
+        setDraft(JSON.parse(JSON.stringify(pokemon)));
+      }
+    }
+  }, [pokemon]);
 
-  const species = gamedata.species.find(s => s.name === pokemon.speciesId);
+  // Compute dirty status
+  const isDirty = useMemo(() => {
+    if (!pokemon || !draft) return false;
+    return JSON.stringify(pokemon) !== JSON.stringify(draft);
+  }, [pokemon, draft]);
+
+  if (!pokemon || !draft) return <div className="p-8 text-center text-text-muted">{t('app.loading')}</div>;
+
+  const species = gamedata.species.find(s => s.name === draft.speciesId);
 
   // Calculate configuration completeness
   let filledPoints = 0;
-  if (pokemon.natureId) filledPoints += 1;
-  if (pokemon.ingredientChoices[1]) filledPoints += 1;
-  if (pokemon.ingredientChoices[30]) filledPoints += 1;
-  if (pokemon.ingredientChoices[60]) filledPoints += 1;
+  if (draft.natureId) filledPoints += 1;
+  if (draft.ingredientChoices[1]) filledPoints += 1;
+  if (draft.ingredientChoices[30]) filledPoints += 1;
+  if (draft.ingredientChoices[60]) filledPoints += 1;
   const subskillLevels: (10 | 25 | 50 | 75 | 100)[] = [10, 25, 50, 75, 100];
   subskillLevels.forEach(lvl => {
-    if (pokemon.subskills[lvl]) filledPoints += 1;
+    if (draft.subskills[lvl]) filledPoints += 1;
   });
   const completenessPercent = Math.round((filledPoints / 9) * 100);
 
@@ -60,11 +81,43 @@ export default function PokemonDetail() {
     }
   };
 
+  const handleSave = async () => {
+    if (!draft) return;
+
+    // Run domain validation
+    const validation = validatePokemon(draft, gamedata as unknown as StaticDataSchema);
+    if (!validation.isValid) {
+      setValidationErrors(validation.errors);
+      const errorList = Object.values(validation.errors).join('. ');
+      setSaveErrorMessage(`Validación fallida: ${errorList}`);
+      setSaveStatus('error');
+      return;
+    }
+
+    setValidationErrors({});
+    setSaveErrorMessage(null);
+    setSaveStatus('saving');
+
+    try {
+      await collectionRepository.update({
+        ...draft,
+        updatedAt: Date.now()
+      });
+      setSaveStatus('saved');
+      setTimeout(() => {
+        setSaveStatus('idle');
+      }, 3000);
+    } catch (err: unknown) {
+      setSaveStatus('error');
+      setSaveErrorMessage(err instanceof Error ? err.message : 'Error al guardar en la base de datos');
+    }
+  };
+
   const handleCalculate = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await engine.estimateProduction(pokemon, config);
+      const res = await engine.estimateProduction(draft, config);
       setEstimate(res);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -75,6 +128,7 @@ export default function PokemonDetail() {
 
   const getSpecialtyBadge = () => {
     const specialty = species?.specialty;
+    if (!specialty) return null;
     if (specialty === 'berry') {
       return <Badge variant="warning">🍓 {translateSpecialty(t, 'berry')}</Badge>;
     }
@@ -84,7 +138,7 @@ export default function PokemonDetail() {
     if (specialty === 'skill') {
       return <Badge variant="primary">⚡ {translateSpecialty(t, 'skill')}</Badge>;
     }
-    return null;
+    return <Badge variant="info">✨ {translateSpecialty(t, specialty)}</Badge>;
   };
 
   return (
@@ -98,7 +152,29 @@ export default function PokemonDetail() {
           <ArrowLeft size={18} /> {t('pokemon_detail.back_to_box', { defaultValue: 'Volver a la Caja' })}
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <ActionButton 
+            variant="primary" 
+            onClick={handleSave}
+            disabled={!isDirty || saveStatus === 'saving'}
+            icon={saveStatus === 'saving' ? Clock : saveStatus === 'saved' ? Check : Save}
+            className={
+              saveStatus === 'saved'
+                ? 'bg-success-main border-success-main text-white'
+                : isDirty
+                ? 'bg-primary-main text-white shadow-md hover:bg-primary-main/90'
+                : 'opacity-50 cursor-not-allowed'
+            }
+          >
+            {saveStatus === 'saving' 
+              ? 'Guardando...' 
+              : saveStatus === 'saved' 
+              ? '¡Guardado!' 
+              : isDirty 
+              ? 'Guardar' 
+              : 'Sin cambios'}
+          </ActionButton>
+
           <ActionButton 
             variant="outline" 
             onClick={handleDelete}
@@ -109,6 +185,24 @@ export default function PokemonDetail() {
           </ActionButton>
         </div>
       </div>
+
+      {/* Global Save / Validation Status Banners */}
+      {saveErrorMessage && (
+        <div className="bg-error-bg text-error-text p-4 rounded-xl border border-error-main/30 flex items-start gap-3 text-sm shadow-sm">
+          <AlertCircle size={20} className="shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-bold">No se pudieron guardar los cambios:</p>
+            <p className="mt-0.5">{saveErrorMessage}</p>
+          </div>
+        </div>
+      )}
+
+      {saveStatus === 'saved' && (
+        <div className="bg-success-bg text-success-main p-4 rounded-xl border border-success-main/30 flex items-center gap-3 text-sm shadow-sm">
+          <CheckCircle2 size={20} className="shrink-0" />
+          <span className="font-bold">¡Los cambios se han guardado correctamente!</span>
+        </div>
+      )}
 
       {/* Hero Profile Card */}
       <div className="bg-bg-surface border border-border-main rounded-2xl p-6 shadow-sm relative overflow-hidden">
@@ -127,7 +221,7 @@ export default function PokemonDetail() {
                 <Package size={52} className="text-text-muted opacity-40" />
               )}
             </div>
-            {pokemon.shiny && (
+            {draft.shiny && (
               <span className="absolute -top-2 -right-2 bg-amber-400 text-amber-950 font-black text-[10px] px-2 py-0.5 rounded-full shadow border border-amber-300 flex items-center gap-1">
                 <Sparkles size={10} /> SHINY
               </span>
@@ -141,27 +235,34 @@ export default function PokemonDetail() {
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <input 
                     type="text" 
-                    value={pokemon.nickname || ''} 
-                    placeholder={species?.displayName || pokemon.speciesId} 
-                    onChange={e => collectionRepository.update({ ...pokemon, nickname: e.target.value })} 
+                    value={draft.nickname || ''} 
+                    placeholder={species?.displayName || draft.speciesId} 
+                    onChange={e => setDraft({ ...draft, nickname: e.target.value })} 
                     className="text-2xl md:text-3xl font-black text-text-main bg-transparent border-b border-dashed border-border-main hover:border-primary-main focus:border-primary-main focus:outline-none transition-colors" 
                   />
                   <span className="text-xs text-text-muted font-bold">✎</span>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2 mt-1">
                   <select 
-                    value={pokemon.speciesId} 
+                    value={draft.speciesId} 
                     onChange={e => {
-                      const newSpecies = gamedata.species.find(s => s.name === e.target.value);
+                      const newSpeciesId = e.target.value;
+                      const newSpecies = gamedata.species.find(s => s.name === newSpeciesId);
                       const ing0 = newSpecies?.ingredient0?.[0]?.ingredient.name || null;
+                      const ing30Opts = newSpecies?.ingredient30?.map(i => i.ingredient.name) || [];
+                      const ing60Opts = newSpecies?.ingredient60?.map(i => i.ingredient.name) || [];
+
+                      const newIng30 = ing30Opts.includes(draft.ingredientChoices[30] || '') ? draft.ingredientChoices[30] : null;
+                      const newIng60 = ing60Opts.includes(draft.ingredientChoices[60] || '') ? draft.ingredientChoices[60] : null;
+
                       setSpriteError(false);
-                      collectionRepository.update({
-                        ...pokemon,
-                        speciesId: e.target.value,
-                        ingredientChoices: { 1: ing0, 30: null, 60: null }
+                      setDraft({
+                        ...draft,
+                        speciesId: newSpeciesId,
+                        ingredientChoices: { 1: ing0, 30: newIng30, 60: newIng60 }
                       });
                     }} 
-                    className="text-sm font-semibold text-text-muted bg-bg-app border border-border-main rounded-md px-2 py-1 focus:outline-none focus:border-primary-main"
+                    className={`text-sm font-semibold text-text-muted bg-bg-app border rounded-md px-2 py-1 focus:outline-none focus:border-primary-main ${validationErrors.speciesId ? 'border-error-main bg-error-bg/10' : 'border-border-main'}`}
                   >
                     {gamedata.species.map(s => (
                       <option className="bg-bg-surface text-text-main" key={s.name} value={s.name}>
@@ -169,6 +270,9 @@ export default function PokemonDetail() {
                       </option>
                     ))}
                   </select>
+                  {validationErrors.speciesId && (
+                    <span className="text-xs text-error-main font-bold">{validationErrors.speciesId}</span>
+                  )}
                 </div>
               </div>
 
@@ -203,23 +307,23 @@ export default function PokemonDetail() {
               )}
 
               {/* Level Control */}
-              <div className="inline-flex items-center gap-1.5 bg-bg-app border border-border-main px-2.5 py-1 rounded-lg text-xs font-bold text-text-main">
+              <div className={`inline-flex items-center gap-1.5 bg-bg-app border px-2.5 py-1 rounded-lg text-xs font-bold text-text-main ${validationErrors.level ? 'border-error-main bg-error-bg/10' : 'border-border-main'}`}>
                 <span className="text-text-muted">{t('app.level', { defaultValue: 'Nv.' })}</span>
                 <input 
                   type="number" 
                   min="1" 
                   max="100" 
-                  value={pokemon.level} 
-                  onChange={e => collectionRepository.update({ ...pokemon, level: parseInt(e.target.value) || 1 })} 
+                  value={draft.level} 
+                  onChange={e => setDraft({ ...draft, level: parseInt(e.target.value) || 1 })} 
                   className="w-12 bg-transparent text-center font-extrabold focus:outline-none focus:ring-1 focus:ring-primary-main rounded" 
                 />
               </div>
 
               {/* Shiny Toggle */}
               <button 
-                onClick={() => collectionRepository.update({ ...pokemon, shiny: !pokemon.shiny })}
+                onClick={() => setDraft({ ...draft, shiny: !draft.shiny })}
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${
-                  pokemon.shiny 
+                  draft.shiny 
                     ? 'bg-amber-500/10 text-amber-500 border-amber-500/30' 
                     : 'bg-bg-app text-text-muted border-border-main hover:text-text-main'
                 }`}
@@ -227,6 +331,9 @@ export default function PokemonDetail() {
                 <Sparkles size={12} /> Shiny
               </button>
             </div>
+            {validationErrors.level && (
+              <p className="text-xs text-error-main font-bold mt-1">{validationErrors.level}</p>
+            )}
           </div>
         </div>
       </div>
@@ -251,7 +358,7 @@ export default function PokemonDetail() {
                   </p>
                 </div>
               </div>
-              <Badge variant="primary">{t('app.level', { defaultValue: 'Nv.' })} {pokemon.skillLevel}</Badge>
+              <Badge variant="primary">{t('app.level', { defaultValue: 'Nv.' })} {draft.skillLevel}</Badge>
             </div>
 
             <div className="bg-bg-app p-4 rounded-xl border border-border-main space-y-3">
@@ -267,8 +374,8 @@ export default function PokemonDetail() {
               <div className="flex justify-between items-center pt-2 border-t border-border-main">
                 <span className="text-xs font-bold text-text-muted uppercase">{t('pokemon_detail.skill_level')}</span>
                 <select 
-                  value={pokemon.skillLevel} 
-                  onChange={e => collectionRepository.update({ ...pokemon, skillLevel: parseInt(e.target.value) || 1 })} 
+                  value={draft.skillLevel} 
+                  onChange={e => setDraft({ ...draft, skillLevel: parseInt(e.target.value) || 1 })} 
                   className="px-3 py-1.5 border border-border-main rounded-lg text-sm bg-bg-surface text-text-main font-bold focus:border-primary-main focus:outline-none"
                 >
                   {[1, 2, 3, 4, 5, 6, 7].map(l => (
@@ -278,6 +385,9 @@ export default function PokemonDetail() {
                   ))}
                 </select>
               </div>
+              {validationErrors.skillLevel && (
+                <p className="text-xs text-error-main font-bold mt-1">{validationErrors.skillLevel}</p>
+              )}
             </div>
           </Panel>
 
@@ -307,9 +417,9 @@ export default function PokemonDetail() {
                   </span>
                 </div>
                 <select 
-                  value={pokemon.natureId} 
-                  onChange={e => collectionRepository.update({ ...pokemon, natureId: e.target.value })} 
-                  className="p-2 border border-border-main rounded-lg text-sm bg-bg-surface text-text-main font-semibold min-w-[140px] focus:border-primary-main focus:outline-none"
+                  value={draft.natureId} 
+                  onChange={e => setDraft({ ...draft, natureId: e.target.value })} 
+                  className={`p-2 border rounded-lg text-sm bg-bg-surface text-text-main font-semibold min-w-[140px] focus:border-primary-main focus:outline-none ${validationErrors.natureId ? 'border-error-main' : 'border-border-main'}`}
                 >
                   <option className="bg-bg-surface text-text-main" value="">{t('pokemon_detail.none')}</option>
                   {gamedata.natures.map(n => (
@@ -332,8 +442,8 @@ export default function PokemonDetail() {
                   </div>
                 </div>
                 <select 
-                  value={pokemon.ribbonLevel || 0} 
-                  onChange={e => collectionRepository.update({ ...pokemon, ribbonLevel: parseInt(e.target.value) as 0|1|2|3|4 })} 
+                  value={draft.ribbonLevel || 0} 
+                  onChange={e => setDraft({ ...draft, ribbonLevel: parseInt(e.target.value) as 0|1|2|3|4 })} 
                   className="p-2 border border-border-main rounded-lg text-sm bg-bg-surface text-text-main font-semibold focus:border-primary-main focus:outline-none"
                 >
                   {[0, 1, 2, 3, 4].map(r => (
@@ -354,8 +464,8 @@ export default function PokemonDetail() {
                 </div>
                 <input 
                   type="checkbox" 
-                  checked={pokemon.sneakySnacking} 
-                  onChange={e => collectionRepository.update({ ...pokemon, sneakySnacking: e.target.checked })} 
+                  checked={draft.sneakySnacking} 
+                  onChange={e => setDraft({ ...draft, sneakySnacking: e.target.checked })} 
                   className="w-5 h-5 rounded border-border-main text-primary-main focus:ring-primary-main bg-bg-surface cursor-pointer" 
                 />
               </div>
@@ -386,14 +496,18 @@ export default function PokemonDetail() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {[1, 30, 60].map(lvl => {
                 const options = species ? (lvl === 1 ? species.ingredient0 : lvl === 30 ? species.ingredient30 : species.ingredient60) : [];
-                const isUnlocked = pokemon.level >= lvl;
-                const chosen = pokemon.ingredientChoices[lvl as 1|30|60];
+                const isUnlocked = draft.level >= lvl;
+                const chosen = draft.ingredientChoices[lvl as 1|30|60];
+                const errKey = `ingredient_${lvl}`;
+                const hasErr = Boolean(validationErrors[errKey]);
 
                 return (
                   <div 
                     key={lvl} 
                     className={`p-4 rounded-xl border transition-all ${
-                      isUnlocked 
+                      hasErr
+                        ? 'bg-error-bg/10 border-error-main'
+                        : isUnlocked 
                         ? 'bg-bg-app border-border-main shadow-xs' 
                         : 'bg-bg-app/50 border-border-main/50 opacity-60'
                     }`}
@@ -418,9 +532,9 @@ export default function PokemonDetail() {
                     </label>
                     <select
                       value={chosen || ''}
-                      onChange={e => collectionRepository.update({ 
-                        ...pokemon, 
-                        ingredientChoices: { ...pokemon.ingredientChoices, [lvl]: e.target.value || null } 
+                      onChange={e => setDraft({ 
+                        ...draft, 
+                        ingredientChoices: { ...draft.ingredientChoices, [lvl]: e.target.value || null } 
                       })}
                       className="w-full p-2 border border-border-main rounded-lg text-sm bg-bg-surface text-text-main font-medium focus:border-primary-main focus:outline-none"
                     >
@@ -431,6 +545,9 @@ export default function PokemonDetail() {
                         </option>
                       ))}
                     </select>
+                    {hasErr && (
+                      <p className="text-[10px] font-bold text-error-main mt-1.5">{validationErrors[errKey]}</p>
+                    )}
                   </div>
                 );
               })}
@@ -457,14 +574,18 @@ export default function PokemonDetail() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {subskillLevels.map(lvl => {
-                const isUnlocked = pokemon.level >= lvl;
-                const chosen = pokemon.subskills[lvl];
+                const isUnlocked = draft.level >= lvl;
+                const chosen = draft.subskills[lvl];
+                const errKey = `subskill_${lvl}`;
+                const hasErr = Boolean(validationErrors[errKey]);
 
                 return (
                   <div 
                     key={lvl} 
                     className={`p-3 rounded-xl border flex flex-col justify-between transition-all ${
-                      isUnlocked 
+                      hasErr
+                        ? 'bg-error-bg/10 border-error-main'
+                        : isUnlocked 
                         ? 'bg-bg-app border-border-main shadow-xs' 
                         : 'bg-bg-app/50 border-border-main/50 opacity-60'
                     }`}
@@ -486,16 +607,16 @@ export default function PokemonDetail() {
 
                     <select
                       value={chosen || ''}
-                      onChange={e => collectionRepository.update({ 
-                        ...pokemon, 
-                        subskills: { ...pokemon.subskills, [lvl]: e.target.value || null } 
+                      onChange={e => setDraft({ 
+                        ...draft, 
+                        subskills: { ...draft.subskills, [lvl]: e.target.value || null } 
                       })}
                       className="w-full p-2 border border-border-main rounded-lg text-xs bg-bg-surface text-text-main font-semibold truncate focus:border-primary-main focus:outline-none"
                     >
                       <option className="bg-bg-surface text-text-main" value="">{t('pokemon_detail.empty')}</option>
                       {gamedata.subSkills
                         .filter(sk => {
-                          const isSelectedElsewhere = Object.entries(pokemon.subskills).some(([otherLvl, subskillName]) =>
+                          const isSelectedElsewhere = Object.entries(draft.subskills).some(([otherLvl, subskillName]) =>
                             Number(otherLvl) !== lvl && subskillName === sk.name
                           );
                           return !isSelectedElsewhere;
@@ -506,6 +627,9 @@ export default function PokemonDetail() {
                           </option>
                       ))}
                     </select>
+                    {hasErr && (
+                      <p className="text-[10px] font-bold text-error-main mt-1.5">{validationErrors[errKey]}</p>
+                    )}
                   </div>
                 );
               })}
