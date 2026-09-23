@@ -9,8 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Save, Plus, X, Wand2, Calendar, 
   Utensils, Users, TrendingUp, 
-  GitCompare, ExternalLink, Package
+  GitCompare, ExternalLink, Package, Bookmark
 } from 'lucide-react';
+import { plannerStore } from './plannerStore';
 import gamedata from '../../data/static/gamedata.json';
 import { translateRecipe, translateBerry, translateIngredient } from '../../services/i18n-game';
 import { LocalCalculationEngine } from '../../services/optimizer/calculator/LocalCalculationEngine';
@@ -235,6 +236,56 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
     }
   }, [recipeType, targetRecipeId, availableRecipes]);
 
+  useEffect(() => {
+    plannerStore.setDraft({
+      id: plan?.id,
+      name,
+      weekStart,
+      island,
+      areaBonus,
+      favoriteBerries,
+      recipeType,
+      targetRecipeId,
+      objective,
+      mainTeamId,
+      alternativeTeamIds,
+      dailyPlans,
+      notes
+    });
+  }, [name, weekStart, island, areaBonus, favoriteBerries, recipeType, targetRecipeId, objective, mainTeamId, alternativeTeamIds, dailyPlans, notes, plan?.id]);
+
+  const handleSaveQuery = async () => {
+    const queryName = window.prompt(
+      t('planner.save_query_prompt', { defaultValue: 'Nombre para esta consulta de planificador:' }), 
+      name || 'Consulta Planificador'
+    );
+    if (!queryName) return;
+    const currentPlan: WeeklyPlan = {
+      id: plan?.id || crypto.randomUUID(),
+      createdAt: plan?.createdAt || Date.now(),
+      name,
+      weekStart,
+      island,
+      areaBonus,
+      favoriteBerries,
+      recipeType,
+      targetRecipeId,
+      objective,
+      mainTeamId,
+      alternativeTeamIds,
+      dailyPlans,
+      notes
+    };
+    await db.savedQueries.add({
+      id: crypto.randomUUID(),
+      name: queryName,
+      createdAt: Date.now(),
+      type: 'planner',
+      plannerContext: currentPlan
+    });
+    alert(t('planner.query_saved', { defaultValue: 'Consulta del planificador guardada en Consultas' }));
+  };
+
   const handleSave = async () => {
     const data: WeeklyPlan = {
       id: plan?.id || crypto.randomUUID(),
@@ -348,6 +399,13 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
               disabled={[mainTeamId, ...alternativeTeamIds].filter(Boolean).length !== 2}
             >
               {t('planner.compare')}
+            </ActionButton>
+            <ActionButton 
+              variant="outline" 
+              onClick={handleSaveQuery} 
+              icon={Bookmark}
+            >
+              {t('planner.save_query', { defaultValue: 'Guardar consulta' })}
             </ActionButton>
             <ActionButton variant="primary" onClick={handleSave} icon={Save} className="shadow-sm">
               {t('app.save')}

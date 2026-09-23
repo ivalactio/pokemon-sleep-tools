@@ -62,3 +62,68 @@ globalHarness.register({
     return { status: 'PASS', message: 'UI renderizó correctamente overrides, recetas y notas (PLAN-002 a 006 comprobados pasivamente)' };
   }
 });
+
+globalHarness.register({
+  id: 'PLAN-007',
+  name: 'Planner store persistent state retention across tab navigation',
+  category: 'Planner',
+  layer: 'SERVICE',
+  fn: async () => {
+    const { plannerStore } = await import('../../planner/plannerStore');
+    plannerStore.resetForNewQuery();
+    plannerStore.setDraft({ name: 'Draft Test Plan', island: 'cyan' });
+
+    const state1 = plannerStore.getState();
+    if (state1.selectedPlanId !== 'new' || state1.draft?.name !== 'Draft Test Plan') {
+      return { status: 'FAIL', message: 'El estado del planificador no se guardó en memoria' };
+    }
+
+    plannerStore.resetForNewQuery();
+    const state2 = plannerStore.getState();
+    if (state2.draft !== null) {
+      return { status: 'FAIL', message: 'Nueva consulta no limpió el borrador borrador previo' };
+    }
+
+    plannerStore.clear();
+    return { status: 'PASS', message: 'Persistencia y reseteo del planificador funcionan correctamente' };
+  }
+});
+
+globalHarness.register({
+  id: 'PLAN-008',
+  name: 'SavedQuery supports type planner and organizer',
+  category: 'Planner',
+  layer: 'SERVICE',
+  fn: async () => {
+    const qId = '__test_query_' + Date.now();
+    await db.savedQueries.put({
+      id: qId,
+      name: 'Consulta Planificador Test',
+      createdAt: Date.now(),
+      type: 'planner',
+      plannerContext: {
+        id: 'plan_1',
+        name: 'Plan 1',
+        createdAt: Date.now(),
+        weekStart: '2026-09-28',
+        island: 'greengrass',
+        areaBonus: 10,
+        favoriteBerries: [],
+        recipeType: 'curry',
+        objective: 'berries',
+        alternativeTeamIds: [],
+        dailyPlans: []
+      }
+    });
+
+    const retrieved = await db.savedQueries.get(qId);
+    await db.savedQueries.delete(qId);
+
+    if (!retrieved || retrieved.type !== 'planner' || retrieved.plannerContext?.island !== 'greengrass') {
+      return { status: 'FAIL', message: 'La consulta de tipo planner no se guardó o recuperó adecuadamente' };
+    }
+
+    return { status: 'PASS', message: 'SavedQuery con type planner guardado y verificado en Dexie' };
+  }
+});
+

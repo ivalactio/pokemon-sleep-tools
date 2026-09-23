@@ -8,10 +8,11 @@ import { db } from '../../../data/db';
 
 interface TeamDetailModalProps {
   result: TeamResult | null;
+  targetRecipeId?: string;
   onClose: () => void;
 }
 
-export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
+export function TeamDetailModal({ result, targetRecipeId, onClose }: TeamDetailModalProps) {
   const { t } = useTranslation();
   if (!result) return null;
 
@@ -52,6 +53,8 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
     }
   }
 
+  const targetId = targetRecipeId || (result as any)?.queryContext?.targetRecipeId || result.score.recipeDetails?.recipeName;
+
   // Evaluar cobertura de recetas
   const recipes = (gamedata.recipes as unknown as Recipe[]).map(recipe => {
     let minCoverage = Infinity;
@@ -74,9 +77,18 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
       timesCookable: Math.floor(minCoverage),
       missing
     };
-  }).sort((a, b) => b.coverage - a.coverage);
+  });
 
-  const topRecipes = recipes.filter(r => r.coverage > 0).slice(0, 5);
+  const sortedRecipes = recipes.filter(r => r.coverage > 0).sort((a, b) => b.coverage - a.coverage);
+  let topRecipes = sortedRecipes.slice(0, 5);
+
+  if (targetId) {
+    const targetItem = recipes.find(r => r.name === targetId || (r as any).id === targetId);
+    if (targetItem) {
+      const remaining = sortedRecipes.filter(r => r.name !== targetItem.name);
+      topRecipes = [targetItem, ...remaining].slice(0, 5);
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={onClose}>
@@ -139,12 +151,21 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
             
             {topRecipes.length > 0 ? (
               <div className="space-y-3">
-                {topRecipes.map(recipe => (
-                  <div key={recipe.name} className="bg-bg-surface border border-border-main rounded-lg p-4 flex flex-col md:flex-row md:items-center gap-4">
-                    <div className="flex-1">
-                      <h4 className="font-bold">{translateRecipe(t, recipe.name)}</h4>
-                      <p className="text-xs text-text-muted capitalize">{recipe.type} • {recipe.value} poder base</p>
-                    </div>
+                {topRecipes.map(recipe => {
+                  const isTarget = targetId && (recipe.name === targetId || (recipe as any).id === targetId);
+                  return (
+                    <div key={recipe.name} className={`bg-bg-surface border rounded-lg p-4 flex flex-col md:flex-row md:items-center gap-4 ${isTarget ? 'border-amber-500/60 shadow-sm' : 'border-border-main'}`}>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold">{translateRecipe(t, recipe.name)}</h4>
+                          {isTarget && (
+                            <span className="text-xs bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold px-2 py-0.5 rounded-full">
+                              ★ {t('team.target_recipe_badge', { defaultValue: 'Receta Objetivo' })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-text-muted capitalize">{recipe.type} • {recipe.value} poder base</p>
+                      </div>
                     
                     <div className="flex-1">
                       <div className="flex justify-between text-sm mb-1">
@@ -176,7 +197,8 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
                       )}
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
             ) : (
               <div className="p-4 bg-bg-surface rounded-lg border border-border-main text-center text-text-muted">

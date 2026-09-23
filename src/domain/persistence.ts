@@ -2,11 +2,15 @@ import type { OptimizerConfig } from './optimizer/core';
 import type { IslandId } from './optimizer/islands';
 import type { OptimizerObjective, RecipeType } from './optimizer/core';
 
+export type QueryType = 'organizer' | 'planner';
+
 export interface SavedQuery {
   id: string;
   name: string;
   createdAt: number;
-  config: OptimizerConfig;
+  type?: QueryType;
+  config?: OptimizerConfig;
+  plannerContext?: WeeklyPlan;
 }
 
 export interface SavedTeam {

@@ -122,7 +122,7 @@ export default function ComparatorPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-text-main">
-              {t('team.compare', { defaultValue: 'Comparador de Pokémon' })}
+              {t('nav.comparator', { defaultValue: 'Comparador de Pokémon' })}
             </h1>
             <p className="text-xs text-text-muted">
               {t('saved.comparator_desc', { defaultValue: 'Selecciona dos Pokémon de tu caja para comparar su producción y habilidades cara a cara.' })}

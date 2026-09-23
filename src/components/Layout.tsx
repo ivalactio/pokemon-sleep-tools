@@ -70,7 +70,7 @@ export default function Layout() {
               <li>
                 <Link to="/comparador" className={linkClass('/comparador')}>
                   <GitCompare size={18} />
-                  {t('team.compare', { defaultValue: 'Comparador' })}
+                  {t('nav.comparator', { defaultValue: 'Comparador de Pokémon' })}
                 </Link>
               </li>
               <li>

@@ -19,7 +19,8 @@
     "recipes": "Recipes",
     "add_pokemon": "Add Pokémon",
     "settings": "Settings",
-    "optimizer": "Optimizer"
+    "optimizer": "Optimizer",
+    "comparator": "Pokemon Comparator"
   },
   "collection": {
     "title": "Collection",
@@ -441,21 +442,31 @@
     "recipe_coverage_desc": "Based on the estimated daily ingredient production of the full team.",
     "coverage": "Coverage",
     "missing": "Missing:",
-    "ings": "ings"
+    "ings": "ings",
+    "target_recipe_badge": "Target Recipe"
   },
   "saved": {
     "queries_title": "Saved Queries",
+    "queries_description": "Saved queries and configurations for Optimizer and Planner.",
     "load": "Load",
     "empty_queries": "No saved queries.",
+    "no_queries_found": "No saved queries found in this category.",
+    "tab_organizer": "Organizer",
+    "tab_planner": "Planner",
+    "confirm_delete_query": "Delete saved query?",
     "teams_title": "Saved Teams",
     "empty_teams": "No saved teams.",
-    "comparator_title": "Standalone Comparator",
+    "comparator_title": "Pokemon Comparator",
+    "comparator_desc": "Select two Pokémon from your box to compare their production and skills side by side.",
     "select_two": "Please select 2 teams from Saved Teams.",
     "comparing": "Comparing:",
     "eval_context": "Evaluation Context"
   },
   "planner": {
     "title": "Weekly Planner",
+    "save_query": "Save Query",
+    "save_query_prompt": "Name for this planner query:",
+    "query_saved": "Planner query saved in Saved Queries",
     "optimize": "Optimize Team",
     "compare": "Compare Teams",
     "context": "Context",

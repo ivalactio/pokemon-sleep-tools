@@ -1,35 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../data/db';
 import { WeeklyPlanList } from './WeeklyPlanList';
 import { WeeklyPlanEditor } from './WeeklyPlanEditor';
+import { plannerStore } from './plannerStore';
 
 export default function WeeklyPlannerPage() {
   const plans = useLiveQuery(() => db.weeklyPlans.toArray()) || [];
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [activeState, setActiveState] = useState(plannerStore.getState());
+
+  useEffect(() => {
+    return plannerStore.subscribe(() => {
+      setActiveState(plannerStore.getState());
+    });
+  }, []);
 
   const handleCreate = () => {
-    setSelectedPlanId('new');
+    plannerStore.resetForNewQuery();
   };
 
   const handleEdit = (id: string) => {
-    setSelectedPlanId(id);
+    plannerStore.setSelectedPlanId(id);
   };
 
   const handleBack = () => {
-    setSelectedPlanId(null);
+    plannerStore.clear();
   };
 
+  const { selectedPlanId, draft } = activeState;
+
   if (selectedPlanId === 'new') {
-    return <WeeklyPlanEditor onBack={handleBack} />;
+    const initialPlan = draft ? (draft as any) : undefined;
+    return <WeeklyPlanEditor plan={initialPlan} onBack={handleBack} />;
   }
 
   if (selectedPlanId) {
-    const plan = plans.find(p => p.id === selectedPlanId);
+    const plan = plans.find(p => p.id === selectedPlanId) || (draft ? (draft as any) : undefined);
     if (plan) {
       return <WeeklyPlanEditor plan={plan} onBack={handleBack} />;
     } else {
-      setSelectedPlanId(null);
+      plannerStore.clear();
     }
   }
 

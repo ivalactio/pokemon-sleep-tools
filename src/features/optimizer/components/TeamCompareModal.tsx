@@ -5,13 +5,37 @@ import { useTranslation } from 'react-i18next';
 
 interface TeamCompareModalProps {
   teams: [TeamResult, TeamResult];
+  targetRecipeId?: string;
   onClose: () => void;
   inline?: boolean;
 }
 
-export function TeamCompareModal({ teams, onClose, inline }: TeamCompareModalProps) {
+export function TeamCompareModal({ teams, targetRecipeId, onClose, inline }: TeamCompareModalProps) {
   const { t } = useTranslation();
   const [t1, t2] = teams;
+
+  const targetId = targetRecipeId || (t1 as any)?.queryContext?.targetRecipeId || (t2 as any)?.queryContext?.targetRecipeId || t1.score.recipeDetails?.recipeName || t2.score.recipeDetails?.recipeName;
+  const targetRecipeObj = targetId ? gamedata.recipes.find(r => r.name === targetId || (r as any).id === targetId) : null;
+
+  const calcCoverage = (res: TeamResult) => {
+    if (!targetRecipeObj) return null;
+    const teamIngs = new Map<string, number>();
+    for (const m of res.evaluation.memberEstimates) {
+      for (const ing of m.estimate.ingredients) {
+        teamIngs.set(ing.name, (teamIngs.get(ing.name) || 0) + ing.amount);
+      }
+    }
+    let minCov = Infinity;
+    for (const req of targetRecipeObj.ingredients) {
+      const prod = teamIngs.get(req.ingredient.name) || 0;
+      const cov = prod / req.amount;
+      if (cov < minCov) minCov = cov;
+    }
+    return Math.min(minCov * 100, 999);
+  };
+
+  const cov1 = calcCoverage(t1);
+  const cov2 = calcCoverage(t2);
 
   const t1Berries = t1.evaluation.memberEstimates.reduce((acc, m) => acc + m.estimate.berries.reduce((s, b) => s + b.amount, 0), 0);
   const t2Berries = t2.evaluation.memberEstimates.reduce((acc, m) => acc + m.estimate.berries.reduce((s, b) => s + b.amount, 0), 0);
@@ -60,6 +84,19 @@ export function TeamCompareModal({ teams, onClose, inline }: TeamCompareModalPro
               <span className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{renderDiff(diffScore)}</span>
               <span className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{renderDiff(pctDiff(t1.score.score, t2.score.score), true)}</span>
             </div>
+
+            {cov1 !== null && cov2 !== null && (
+              <>
+                <div className="py-2 text-orange-600 dark:text-orange-400 font-bold truncate" title={targetRecipeObj?.name}>
+                  ★ Receta Objetivo ({targetRecipeObj?.name})
+                </div>
+                <div className="py-2 font-bold">{cov1.toFixed(1)}%</div>
+                <div className="py-2 flex items-center gap-2 font-bold">
+                  {cov2.toFixed(1)}%
+                  <span className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{renderDiff(cov2 - cov1, true)}</span>
+                </div>
+              </>
+            )}
 
             <div className="py-2 text-amber-600 dark:text-amber-400">{t('team.berries_day')}</div>
             <div className="py-2">{t1Berries.toFixed(1)}</div>

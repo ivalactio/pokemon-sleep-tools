@@ -19,7 +19,8 @@
     "recipes": "Recetas",
     "add_pokemon": "Añadir Pokémon",
     "settings": "Configuración",
-    "optimizer": "Optimizador"
+    "optimizer": "Optimizador",
+    "comparator": "Comparador de Pokémon"
   },
   "collection": {
     "title": "Caja Pokémon",
@@ -441,21 +442,31 @@
     "recipe_coverage_desc": "Basado en la producción diaria estimada de ingredientes del equipo completo.",
     "coverage": "Cobertura",
     "missing": "Falta:",
-    "ings": "ings"
+    "ings": "ings",
+    "target_recipe_badge": "Receta Objetivo"
   },
   "saved": {
     "queries_title": "Consultas Guardadas",
+    "queries_description": "Consultas y configuraciones guardadas para Optimizador y Planificador.",
     "load": "Cargar",
     "empty_queries": "No hay consultas guardadas.",
+    "no_queries_found": "No se encontraron consultas guardadas en esta categoría.",
+    "tab_organizer": "Organizador",
+    "tab_planner": "Planificador",
+    "confirm_delete_query": "¿Borrar consulta guardada?",
     "teams_title": "Equipos Guardados",
     "empty_teams": "No hay equipos guardados.",
-    "comparator_title": "Comparador Independiente",
+    "comparator_title": "Comparador de Pokémon",
+    "comparator_desc": "Selecciona dos Pokémon de tu caja para comparar su producción y habilidades cara a cara.",
     "select_two": "Por favor selecciona 2 equipos desde Equipos Guardados.",
     "comparing": "Comparando:",
     "eval_context": "Contexto de Evaluación"
   },
   "planner": {
     "title": "Planificador Semanal",
+    "save_query": "Guardar consulta",
+    "save_query_prompt": "Nombre para esta consulta de planificador:",
+    "query_saved": "Consulta del planificador guardada en Consultas",
     "optimize": "Optimizar Equipo",
     "compare": "Comparar Equipos",
     "context": "Contexto",
