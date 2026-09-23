@@ -1,9 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../../data/db';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
-import { Download, Upload, AlertCircle } from 'lucide-react';
+import { Download, Upload, AlertCircle, Package, Star, CalendarDays, Search, Users, Zap } from 'lucide-react';
 import { z } from 'zod';
 import { useRef, useState } from 'react';
+import { isComplete } from '../../utils/pokemonUtils';
+import { PageHeader, SectionHeader, StatCard, Panel, ActionButton } from '../../components/ui';
+import { useNavigate } from 'react-router-dom';
 
 const exportSchema = z.object({
   schemaVersion: z.literal(1),
@@ -13,11 +17,22 @@ const exportSchema = z.object({
 
 export default function Dashboard() {
   const { t } = useTranslation();
-  const pokemonList = useLiveQuery(() => collectionRepository.getAll()) || [];
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   
+  const pokemonList = useLiveQuery(() => collectionRepository.getAll()) || [];
+  const savedQueries = useLiveQuery(() => db.savedQueries.count()) || 0;
+  const savedTeams = useLiveQuery(() => db.savedTeams.count()) || 0;
+  const weeklyPlans = useLiveQuery(() => db.weeklyPlans.count()) || 0;
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [importMessage, setImportMessage] = useState<string | null>(null);
+
+  const stats = {
+    total: pokemonList.length,
+    favorites: pokemonList.filter(p => p.isFavorite).length,
+    incomplete: pokemonList.filter(p => !isComplete(p)).length,
+  };
 
   const handleExport = () => {
     try {
@@ -70,64 +85,105 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">{t('dashboard.title')}</h2>
+    <div className="space-y-8">
+      <PageHeader 
+        title={t('dashboard.title')} 
+        description="Resumen del estado de tu colección y herramientas." 
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm">
-          <h3 className="font-bold text-text-main mb-4">{t('dashboard.collection_summary')}</h3>
-          <div className="flex items-center gap-4">
-            <div className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 p-4 rounded-lg w-24 text-center">
-              <span className="block text-3xl font-black">{pokemonList.length}</span>
-              <span className="text-xs font-medium uppercase tracking-wider">{t('dashboard.total_pokemon')}</span>
-            </div>
-          </div>
+      {/* Collection Stats */}
+      <section>
+        <SectionHeader title="Estado de la Caja Pokémon" icon={Package} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StatCard 
+            title="Total Pokémon" 
+            value={stats.total} 
+            icon={Package} 
+            colorClass="text-info-main" 
+          />
+          <StatCard 
+            title="Favoritos" 
+            value={stats.favorites} 
+            icon={Star} 
+            colorClass="text-warning-main" 
+          />
+          <StatCard 
+            title="Datos Incompletos" 
+            value={stats.incomplete} 
+            icon={AlertCircle} 
+            colorClass={stats.incomplete > 0 ? "text-error-main" : "text-success-main"} 
+          />
         </div>
+      </section>
 
-        <div className="bg-bg-surface p-6 rounded-xl border border-border-main shadow-sm">
-          <h3 className="font-bold text-text-main mb-4">{t('dashboard.backup')}</h3>
+      {/* Tools Stats & Shortcuts */}
+      <section>
+        <SectionHeader title="Herramientas y Planificación" icon={Zap} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <StatCard 
+            title="Consultas de Optimización" 
+            value={savedQueries} 
+            icon={Search} 
+          />
+          <StatCard 
+            title="Equipos Guardados" 
+            value={savedTeams} 
+            icon={Users} 
+          />
+          <StatCard 
+            title="Planes Semanales" 
+            value={weeklyPlans} 
+            icon={CalendarDays} 
+          />
+        </div>
+        <Panel className="flex flex-wrap gap-4 bg-primary-bg/30 border-primary-main/20">
+          <ActionButton icon={Zap} variant="primary" onClick={() => navigate('/optimizador')}>
+            Ir al Optimizador
+          </ActionButton>
+          <ActionButton icon={CalendarDays} onClick={() => navigate('/planificador')}>
+            Planificador Semanal
+          </ActionButton>
+          <ActionButton icon={Package} onClick={() => navigate('/coleccion')}>
+            Ver Caja Pokémon
+          </ActionButton>
+        </Panel>
+      </section>
 
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={handleExport}
-              className="flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 p-3 rounded-lg font-medium transition-colors border border-indigo-200 dark:border-indigo-800"
-            >
-              <Download size={20} />
+      {/* Data Management */}
+      <section>
+        <SectionHeader title={t('dashboard.backup')} icon={Download} />
+        <Panel>
+          <div className="flex flex-wrap items-center gap-4">
+            <ActionButton icon={Download} variant="default" onClick={handleExport}>
               {t('dashboard.export')}
-            </button>
+            </ActionButton>
             
-            <div>
-              <input
-                type="file"
-                accept=".json"
-                ref={fileInputRef}
-                onChange={handleImport}
-                className="hidden"
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 bg-bg-surface hover:bg-bg-surface-hover text-text-main p-3 rounded-lg font-medium transition-colors border border-border-main"
-              >
-                <Upload size={20} />
-                {t('dashboard.import')}
-              </button>
-            </div>
-
-            {importStatus === 'error' && (
-              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm flex items-start gap-2">
-                <AlertCircle size={18} className="shrink-0 mt-0.5" />
-                {importMessage}
-              </div>
-            )}
-            
-            {importStatus === 'success' && (
-              <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg text-sm">
-                {importMessage}
-              </div>
-            )}
+            <input
+              type="file"
+              accept=".json"
+              ref={fileInputRef}
+              onChange={handleImport}
+              className="hidden"
+            />
+            <ActionButton icon={Upload} variant="outline" onClick={() => fileInputRef.current?.click()}>
+              {t('dashboard.import')}
+            </ActionButton>
           </div>
-        </div>
-      </div>
+
+          {importStatus === 'error' && (
+            <div className="mt-4 p-3 bg-error-bg text-error-text rounded-lg text-sm flex items-start gap-2 border border-error-main/20">
+              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              {importMessage}
+            </div>
+          )}
+          
+          {importStatus === 'success' && (
+            <div className="mt-4 p-3 bg-success-bg text-success-text rounded-lg text-sm border border-success-main/20">
+              {importMessage}
+            </div>
+          )}
+        </Panel>
+      </section>
     </div>
   );
 }

@@ -66,10 +66,10 @@ export default function Settings() {
           <select
             value={i18n.language}
             onChange={handleLanguageChange}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main"
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main dark:bg-gray-800 dark:text-white"
           >
-            <option value="es">Español</option>
-            <option value="en">English</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="es">Español</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="en">English</option>
           </select>
         </div>
 
@@ -80,8 +80,8 @@ export default function Settings() {
             onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
             className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface"
           >
-            <option value="light">{t('settings.light')}</option>
-            <option value="dark">{t('settings.dark')}</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="light">{t('settings.light')}</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="dark">{t('settings.dark')}</option>
           </select>
         </div>
       </div>
@@ -94,10 +94,10 @@ export default function Settings() {
           <select
             value={provider}
             onChange={handleProviderChange}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500"
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
           >
-            <option value="mock">{t('settings.gemini.provider_mock')}</option>
-            <option value="gemini">{t('settings.gemini.provider_gemini')}</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="mock">{t('settings.gemini.provider_mock')}</option>
+            <option className="dark:bg-gray-800 dark:text-white" value="gemini">{t('settings.gemini.provider_gemini')}</option>
           </select>
         </div>
 

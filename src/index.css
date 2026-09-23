@@ -3,30 +3,102 @@
 @theme {
   --color-bg-app: var(--bg-app);
   --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
   --color-bg-surface-hover: var(--bg-surface-hover);
+  
   --color-text-main: var(--text-main);
   --color-text-muted: var(--text-muted);
   --color-border-main: var(--border-main);
+
+  --color-primary-main: var(--primary-main);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-text: var(--primary-text);
+  --color-primary-bg: var(--primary-bg);
+
+  --color-success-main: var(--success-main);
+  --color-success-text: var(--success-text);
+  --color-success-bg: var(--success-bg);
+
+  --color-warning-main: var(--warning-main);
+  --color-warning-text: var(--warning-text);
+  --color-warning-bg: var(--warning-bg);
+
+  --color-error-main: var(--error-main);
+  --color-error-text: var(--error-text);
+  --color-error-bg: var(--error-bg);
+
+  --color-info-main: var(--info-main);
+  --color-info-text: var(--info-text);
+  --color-info-bg: var(--info-bg);
 }
 
 :root {
-  --primary: #4ade80; /* Pokemon Sleep green tint */
-  
   --bg-app: var(--color-slate-50);
   --bg-surface: var(--color-white);
-  --bg-surface-hover: var(--color-slate-50);
+  --bg-elevated: var(--color-white);
+  --bg-surface-hover: var(--color-slate-100);
+  
   --text-main: var(--color-slate-900);
   --text-muted: var(--color-slate-500);
   --border-main: var(--color-slate-200);
+
+  /* Primary: Indigo / Sleep vibes */
+  --primary-main: var(--color-indigo-600);
+  --primary-hover: var(--color-indigo-700);
+  --primary-text: var(--color-indigo-700);
+  --primary-bg: var(--color-indigo-50);
+
+  /* Success: Green */
+  --success-main: var(--color-emerald-500);
+  --success-text: var(--color-emerald-700);
+  --success-bg: var(--color-emerald-50);
+
+  /* Warning: Amber */
+  --warning-main: var(--color-amber-500);
+  --warning-text: var(--color-amber-700);
+  --warning-bg: var(--color-amber-50);
+
+  /* Error: Red */
+  --error-main: var(--color-rose-500);
+  --error-text: var(--color-rose-700);
+  --error-bg: var(--color-rose-50);
+
+  /* Info: Blue */
+  --info-main: var(--color-blue-500);
+  --info-text: var(--color-blue-700);
+  --info-bg: var(--color-blue-50);
 }
 
 :root[data-theme="dark"] {
   --bg-app: #0b1120;
-  --bg-surface: #172033; /* azul marino ligeramente más claro */
+  --bg-surface: #172033;
+  --bg-elevated: #1e293b;
   --bg-surface-hover: #1e293b;
+  
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --border-main: #334155;
+  
+  --primary-main: var(--color-indigo-500);
+  --primary-hover: var(--color-indigo-400);
+  --primary-text: var(--color-indigo-300);
+  --primary-bg: rgba(99, 102, 241, 0.15);
+
+  --success-main: var(--color-emerald-500);
+  --success-text: var(--color-emerald-400);
+  --success-bg: rgba(16, 185, 129, 0.15);
+
+  --warning-main: var(--color-amber-500);
+  --warning-text: var(--color-amber-400);
+  --warning-bg: rgba(245, 158, 11, 0.15);
+
+  --error-main: var(--color-rose-500);
+  --error-text: var(--color-rose-400);
+  --error-bg: rgba(244, 63, 94, 0.15);
+
+  --info-main: var(--color-blue-500);
+  --info-text: var(--color-blue-400);
+  --info-bg: rgba(59, 130, 246, 0.15);
   
   color-scheme: dark;
 }
@@ -35,4 +107,5 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   background-color: var(--bg-app);
   color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
 }

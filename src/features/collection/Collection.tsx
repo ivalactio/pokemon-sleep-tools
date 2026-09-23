@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import gamedata from '../../data/static/gamedata.json';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { PokemonCard } from '../../components/ui/PokemonCard';
 import { Plus, Sparkles, FlaskConical, Search, Download, Package, Filter, Settings2, FileJson, Camera, ArrowUpDown } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { collectionRepository } from '../../data/repositories/DexieCollectionRepository';
-import { getNatureDisplayName } from '../../services/i18n-game';
 import VisionCapture from './components/VisionCapture';
 import VisionReview from './components/VisionReview';
 import { MockVisionProvider } from '../../services/vision/MockVisionProvider';
@@ -24,21 +24,11 @@ const PROVIDER_LABELS: Record<ProviderKey, string> = {
   gemini: 'Gemini',
 };
 
-const isComplete = (p: OwnedPokemon) => {
-  if (!p.natureId) return false;
-  if (!p.ingredientChoices || !p.ingredientChoices[30]) return false;
-  if (p.level >= 60 && !p.ingredientChoices[60]) return false;
-  if (!p.subskills) return false;
-  if (p.level >= 10 && !p.subskills[10]) return false;
-  if (p.level >= 25 && !p.subskills[25]) return false;
-  if (p.level >= 50 && !p.subskills[50]) return false;
-  if (p.level >= 75 && !p.subskills[75]) return false;
-  if (p.level >= 100 && !p.subskills[100]) return false;
-  return true;
-};
+import { isComplete } from '../../utils/pokemonUtils';
 
 export default function Collection() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const pokemonList = useLiveQuery(() => collectionRepository.getAll());
   const { provider, setProvider, geminiApiKey } = useVisionConfig();
   
@@ -271,16 +261,12 @@ export default function Collection() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredList.map(p => (
-            <Link key={p.id} to={`/pokemon/${p.id}`} className="bg-bg-surface p-4 rounded-xl border border-border-main shadow-sm hover:border-green-300 dark:hover:border-green-500 transition-colors relative block">
-              <button onClick={(e) => handleToggleFavorite(e, p)} className="absolute top-4 right-4 z-10 text-2xl">
-                {p.isFavorite ? '⭐' : '☆'}
-              </button>
-              <h3 className="font-bold text-lg text-text-main pr-8">{p.nickname || p.speciesId}</h3>
-              <p className="text-sm text-text-muted truncate">
-                {t('collection.sort_by_level')} {p.level} • {getNatureDisplayName(t, p.natureId || '')}
-              </p>
-              {!isComplete(p) && <p className="text-xs text-red-500 font-bold mt-2">{t('collection.missing_data')}</p>}
-            </Link>
+            <PokemonCard 
+                key={p.id} 
+                pokemon={p} 
+                onClick={(poke: OwnedPokemon) => navigate(`/pokemon/${poke.id}`)}
+                onToggleFavorite={handleToggleFavorite} 
+              />
           ))}
         </div>
       )}
