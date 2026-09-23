@@ -11,10 +11,15 @@ import type { IslandId } from '../../domain/optimizer/islands';
 import gamedata from '../../data/static/gamedata.json';
 import type { StaticDataSchema } from '../../domain/models';
 import type { OptimizerConfig, TeamResult, OptimizerObjective } from '../../domain/optimizer/core';
-import { Play, Square, AlertCircle, ChevronRight, Calculator } from 'lucide-react';
+import { 
+  Play, Square, AlertCircle, ChevronDown, ChevronUp, 
+  Cpu, RotateCcw, Bookmark, GitCompare, Trophy, 
+  Sparkles, Sliders, Package
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { TeamDetailModal } from './components/TeamDetailModal';
 import { TeamCompareModal } from './components/TeamCompareModal';
+import { PageHeader, Panel, ActionButton, Badge } from '../../components/ui';
 
 function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -61,9 +66,9 @@ export default function OptimizerPage() {
   const [compareList, setCompareList] = useState<TeamResult[]>([]);
   const [showCompare, setShowCompare] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Validate greengrass berries
   const handleReset = () => {
     setIsland('cyan');
     setAreaBonus(0);
@@ -77,6 +82,7 @@ export default function OptimizerPage() {
     setTargetRecipeId('');
     setTopN(10);
   };
+
   const isGreengrass = getIsland(island).id === 'greengrass';
   const greengrassReady = !isGreengrass || favoriteBerries.length === 3;
 
@@ -123,8 +129,8 @@ export default function OptimizerPage() {
 
     const config: OptimizerConfig = {
       simulation: {
-        camp: false, // Por ahora fijo en false, se podría añadir
-        bedtime: '22:00', // Valores por defecto, el usuario los cambia globalmente en Config
+        camp: false,
+        bedtime: '22:00',
         wakeup: '06:00',
         island,
         areaBonus,
@@ -145,7 +151,6 @@ export default function OptimizerPage() {
     abortControllerRef.current = new AbortController();
 
     try {
-      const start = performance.now();
       const res = await optimizer.optimize(
         collection,
         config,
@@ -153,7 +158,6 @@ export default function OptimizerPage() {
         abortControllerRef.current.signal
       );
       setResults(res);
-      console.log(`Optimización completada en ${((performance.now() - start) / 1000).toFixed(2)}s`);
     } catch (err: any) {
       if (err.message !== 'Cancelado por el usuario') {
         setError(err.message || 'Error inesperado durante la optimización.');
@@ -202,42 +206,80 @@ export default function OptimizerPage() {
   const recipesForType = gamedata.recipes.filter(r => r.type === recipeType);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Calculator className="text-indigo-500" /> Optimizador de Equipos
-        </h1>
-      </div>
+    <div className="space-y-8 pb-24 max-w-6xl mx-auto">
+      {/* Header */}
+      <PageHeader 
+        title="Optimizador de Equipos"
+        icon={Cpu}
+        description="Analiza y simula millones de combinaciones de tu colección para hallar el equipo de máxima producción."
+        actions={
+          <div className="flex items-center gap-2">
+            <ActionButton 
+              variant="outline" 
+              onClick={handleReset} 
+              icon={RotateCcw}
+              disabled={isOptimizing}
+              title="Restablecer filtros"
+            >
+              Reiniciar
+            </ActionButton>
+            <ActionButton 
+              variant="outline" 
+              onClick={handleSaveQuery} 
+              icon={Bookmark}
+              disabled={isOptimizing}
+            >
+              Guardar Consulta
+            </ActionButton>
+          </div>
+        }
+      />
 
-      <div className="bg-bg-surface border border-border-main rounded-xl p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-4 border-b border-border-main pb-2">
-          <h2 className="text-lg font-semibold">{t('optimizer.configuration')}</h2>
-          <button onClick={handleReset} className="text-sm px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 font-medium transition-colors">
-            Nueva Configuración
-          </button>
+      {/* Analysis Configuration Dashboard */}
+      <Panel className="space-y-6">
+        <div className="flex items-center justify-between border-b border-border-main pb-4">
+          <div className="flex items-center gap-2">
+            <Sliders size={20} className="text-primary-main" />
+            <h3 className="font-extrabold text-base text-text-main">
+              Configuración del Análisis
+            </h3>
+          </div>
+          <span className="text-xs font-semibold text-text-muted bg-bg-app px-2.5 py-1 rounded-full border border-border-main">
+            {collection.length} Pokémon en tu caja
+          </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Group 1: Island Context */}
+          <div className="space-y-4 bg-bg-app p-4 rounded-xl border border-border-main">
+            <h4 className="text-xs font-black text-text-muted uppercase tracking-wider">
+              1. Entorno e Isla
+            </h4>
+
             <div>
-              <label className="block text-sm font-medium mb-1">{t('optimizer.island')}</label>
+              <label className="block text-xs font-bold text-text-muted uppercase mb-1">
+                {t('optimizer.island')}
+              </label>
               <select 
                 value={island}
                 onChange={e => setIsland(e.target.value as IslandId)}
-                className="w-full p-2 border border-border-main rounded bg-bg-app"
+                className="w-full p-2.5 border border-border-main rounded-lg bg-bg-surface text-text-main font-semibold focus:border-primary-main focus:outline-none"
                 disabled={isOptimizing}
               >
                 {ISLANDS.map(i => (
-                  <option className="dark:bg-gray-800 dark:text-white" key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>
+                  <option className="bg-bg-surface text-text-main" key={i.id} value={i.id}>
+                    {t(`islands.${i.id}`)}
+                  </option>
                 ))}
               </select>
             </div>
 
             {isGreengrass && (
-              <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded">
-                <label className="block text-sm font-medium mb-2 text-amber-900 dark:text-amber-200">
-                  Bayas Favoritas de Verdegal (Elige 3)
+              <div className="p-3 bg-warning-bg/20 border border-warning-main/30 rounded-xl space-y-2">
+                <label className="block text-[11px] font-bold text-warning-main uppercase">
+                  Bayas Verdegal ({favoriteBerries.length}/3)
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {gamedata.berries.map(b => {
                     const isSelected = favoriteBerries.includes(b.name);
                     return (
@@ -245,11 +287,11 @@ export default function OptimizerPage() {
                         key={b.name}
                         onClick={() => toggleFavBerry(b.name)}
                         disabled={isOptimizing || (!isSelected && favoriteBerries.length >= 3)}
-                        className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                        className={`px-2 py-0.5 text-xs font-bold rounded-md border transition-all ${
                           isSelected 
-                            ? 'bg-amber-500 text-white border-amber-600' 
-                            : 'bg-bg-app border-border-main hover:bg-bg-surface-hover'
-                        } disabled:opacity-50`}
+                            ? 'bg-warning-main text-white border-warning-main shadow-xs' 
+                            : 'bg-bg-surface text-text-muted border-border-main hover:text-text-main'
+                        } disabled:opacity-40`}
                       >
                         {translateBerry(t, b.name)}
                       </button>
@@ -260,73 +302,75 @@ export default function OptimizerPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1">{t('optimizer.area_bonus')}</label>
+              <label className="block text-xs font-bold text-text-muted uppercase mb-1">
+                {t('optimizer.area_bonus')} (%)
+              </label>
               <input 
                 type="number" min="0" max="60" step="5"
                 value={areaBonus}
                 onChange={e => setAreaBonus(parseInt(e.target.value) || 0)}
-                className="w-full p-2 border border-border-main rounded bg-bg-app"
+                className="w-full p-2.5 border border-border-main rounded-lg bg-bg-surface text-text-main font-bold focus:border-primary-main focus:outline-none"
                 disabled={isOptimizing}
               />
-            </div>
-
-            <div className="flex items-center gap-2 mt-6">
-              <input 
-                type="checkbox" id="uniqueSpecies"
-                checked={uniqueSpecies}
-                onChange={e => setUniqueSpecies(e.target.checked)}
-                className="w-4 h-4 rounded text-indigo-600"
-                disabled={isOptimizing}
-              />
-              <label htmlFor="uniqueSpecies" className="text-sm font-medium">{t('optimizer.force_unique')}</label>
             </div>
           </div>
 
-          <div className="space-y-4">
+          {/* Group 2: Strategy & Objective */}
+          <div className="space-y-4 bg-bg-app p-4 rounded-xl border border-border-main">
+            <h4 className="text-xs font-black text-text-muted uppercase tracking-wider">
+              2. Objetivo Estratégico
+            </h4>
+
             <div>
-              <label className="block text-sm font-medium mb-1">{t('optimizer.objective')}</label>
+              <label className="block text-xs font-bold text-text-muted uppercase mb-1">
+                {t('optimizer.objective')}
+              </label>
               <select 
                 value={objective}
                 onChange={e => setObjective(e.target.value as OptimizerObjective)}
-                className="w-full p-2 border border-border-main rounded bg-bg-app"
+                className="w-full p-2.5 border border-border-main rounded-lg bg-bg-surface text-text-main font-semibold focus:border-primary-main focus:outline-none"
                 disabled={isOptimizing}
               >
-                <option className="dark:bg-gray-800 dark:text-white" value="berries">{t('optimizer.objective_berries')}</option>
-                <option className="dark:bg-gray-800 dark:text-white" value="ingredients">{t('optimizer.objective_ingredients')}</option>
-                <option className="dark:bg-gray-800 dark:text-white" value="recipe">Cobertura de Recetas ({recipeType === 'curry' ? 'Curris' : recipeType === 'salad' ? 'Ensaladas' : 'Postres'})</option>
+                <option className="bg-bg-surface text-text-main" value="berries">{t('optimizer.objective_berries')}</option>
+                <option className="bg-bg-surface text-text-main" value="ingredients">{t('optimizer.objective_ingredients')}</option>
+                <option className="bg-bg-surface text-text-main" value="recipe">Cobertura de Recetas ({recipeType === 'curry' ? 'Curris' : recipeType === 'salad' ? 'Ensaladas' : 'Postres'})</option>
               </select>
             </div>
 
             {objective === 'recipe' && (
-              <div className="space-y-4">
+              <div className="space-y-3 pt-1 border-t border-border-main">
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('optimizer.dish_type')}</label>
+                  <label className="block text-xs font-bold text-text-muted uppercase mb-1">
+                    {t('optimizer.dish_type')}
+                  </label>
                   <select 
                     value={recipeType}
                     onChange={e => {
                       setRecipeType(e.target.value as 'curry' | 'salad' | 'dessert');
                       setTargetRecipeId('');
                     }}
-                    className="w-full p-2 border border-border-main rounded bg-bg-app"
+                    className="w-full p-2.5 border border-border-main rounded-lg bg-bg-surface text-text-main font-semibold focus:border-primary-main focus:outline-none"
                     disabled={isOptimizing}
                   >
-                    <option className="dark:bg-gray-800 dark:text-white" value="curry">{t('game.recipeType.curry')}</option>
-                    <option className="dark:bg-gray-800 dark:text-white" value="salad">{t('game.recipeType.salad')}</option>
-                    <option className="dark:bg-gray-800 dark:text-white" value="dessert">{t('game.recipeType.dessert')}</option>
+                    <option className="bg-bg-surface text-text-main" value="curry">{t('game.recipeType.curry')}</option>
+                    <option className="bg-bg-surface text-text-main" value="salad">{t('game.recipeType.salad')}</option>
+                    <option className="bg-bg-surface text-text-main" value="dessert">{t('game.recipeType.dessert')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-text-muted">{t('optimizer.prioritize_recipe')}</label>
+                  <label className="block text-xs font-bold text-text-muted uppercase mb-1">
+                    {t('optimizer.prioritize_recipe')}
+                  </label>
                   <select 
                     value={targetRecipeId}
                     onChange={e => setTargetRecipeId(e.target.value)}
-                    className="w-full p-2 border border-border-main rounded bg-bg-app text-sm"
+                    className="w-full p-2 border border-border-main rounded-lg bg-bg-surface text-text-main text-xs focus:border-primary-main focus:outline-none"
                     disabled={isOptimizing}
                   >
-                    <option className="dark:bg-gray-800 dark:text-white" value="">Optimizar para TODA la categoría ({recipesForType.length} recetas)</option>
+                    <option className="bg-bg-surface text-text-main" value="">Categoría completa ({recipesForType.length} recetas)</option>
                     {recipesForType.map(r => (
-                      <option className="dark:bg-gray-800 dark:text-white" key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
+                      <option className="bg-bg-surface text-text-main" key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
                     ))}
                   </select>
                 </div>
@@ -334,198 +378,397 @@ export default function OptimizerPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1">{t('optimizer.min_level_allowed')}</label>
-              <input 
-                type="number" min="1" max="100"
-                value={minLevel}
-                onChange={e => setMinLevel(parseInt(e.target.value) || 1)}
-                className="w-full p-2 border border-border-main rounded bg-bg-app"
-                disabled={isOptimizing}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('optimizer.top_n')}</label>
+              <label className="block text-xs font-bold text-text-muted uppercase mb-1">
+                {t('optimizer.top_n')} (Resultados)
+              </label>
               <input 
                 type="number" min="1" max="20"
                 value={topN}
                 onChange={e => setTopN(parseInt(e.target.value) || 10)}
-                className="w-full p-2 border border-border-main rounded bg-bg-app"
+                className="w-full p-2.5 border border-border-main rounded-lg bg-bg-surface text-text-main font-bold focus:border-primary-main focus:outline-none"
                 disabled={isOptimizing}
               />
             </div>
           </div>
+
+          {/* Group 3: Constraints */}
+          <div className="space-y-4 bg-bg-app p-4 rounded-xl border border-border-main">
+            <h4 className="text-xs font-black text-text-muted uppercase tracking-wider">
+              3. Restricciones
+            </h4>
+
+            <div>
+              <label className="block text-xs font-bold text-text-muted uppercase mb-1">
+                {t('optimizer.min_level_allowed')}
+              </label>
+              <input 
+                type="number" min="1" max="100"
+                value={minLevel}
+                onChange={e => setMinLevel(parseInt(e.target.value) || 1)}
+                className="w-full p-2.5 border border-border-main rounded-lg bg-bg-surface text-text-main font-bold focus:border-primary-main focus:outline-none"
+                disabled={isOptimizing}
+              />
+            </div>
+
+            <div className="bg-bg-surface p-3 rounded-lg border border-border-main flex items-center justify-between">
+              <div>
+                <label htmlFor="uniqueSpecies" className="text-xs font-bold text-text-main block cursor-pointer">
+                  {t('optimizer.force_unique')}
+                </label>
+                <span className="text-[10px] text-text-muted">No repetir la misma especie</span>
+              </div>
+              <input 
+                type="checkbox" id="uniqueSpecies"
+                checked={uniqueSpecies}
+                onChange={e => setUniqueSpecies(e.target.checked)}
+                className="w-5 h-5 rounded border-border-main text-primary-main focus:ring-primary-main bg-bg-app cursor-pointer"
+                disabled={isOptimizing}
+              />
+            </div>
+
+            <div className="bg-bg-surface p-3 rounded-lg border border-border-main">
+              <button 
+                onClick={() => setShowFiltersDrawer(!showFiltersDrawer)}
+                className="w-full flex items-center justify-between text-xs font-bold text-primary-main select-none"
+              >
+                <span>Pokémon Req / Exc ({requiredPokemonIds.length}/{excludedPokemonIds.length})</span>
+                {showFiltersDrawer ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-8 border-t border-border-main pt-4">
-          <details className="group">
-            <summary className="flex items-center cursor-pointer font-medium text-indigo-600 dark:text-indigo-400 select-none">
-              <ChevronRight className="w-5 h-5 transition-transform group-open:rotate-90" />
-              Seleccionar Requeridos / Excluidos ({requiredPokemonIds.length} req, {excludedPokemonIds.length} exc)
-            </summary>
-            <div className="mt-4 max-h-64 overflow-y-auto border border-border-main rounded bg-bg-app p-2 space-y-2">
+        {/* Collapsible Drawer for Required / Excluded */}
+        {showFiltersDrawer && (
+          <div className="bg-bg-app p-4 rounded-xl border border-border-main space-y-3">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xs font-bold text-text-muted uppercase">
+                Seleccionar Requeridos (máx 5) y Excluidos
+              </h5>
+              <span className="text-xs text-text-muted">
+                {requiredPokemonIds.length} requeridos · {excludedPokemonIds.length} excluidos
+              </span>
+            </div>
+
+            <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
               {collection.length === 0 ? (
                 <div className="p-4 text-center text-sm text-text-muted">{t('optimizer.empty_collection')}</div>
               ) : [...collection].sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0)).map(p => {
                 const isReq = requiredPokemonIds.includes(p.id);
                 const isExc = excludedPokemonIds.includes(p.id);
+                const pSpecies = gamedata.species.find(s => s.name === p.speciesId);
+
                 return (
-                  <div key={p.id} className="flex items-center justify-between p-2 hover:bg-bg-surface rounded text-sm">
-                    <span>
-                      <strong>{p.nickname || p.speciesId}</strong> (Nv. {p.level}) - {p.natureId || 'Sin natu'}
-                    </span>
+                  <div key={p.id} className="flex items-center justify-between p-2.5 bg-bg-surface rounded-lg border border-border-main text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-text-main">{p.nickname || pSpecies?.displayName || p.speciesId}</span>
+                      <span className="text-text-muted">Nv. {p.level}</span>
+                      {p.natureId && <Badge variant="default">{p.natureId}</Badge>}
+                    </div>
+
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => toggleRequired(p.id)}
                         disabled={isOptimizing || (!isReq && requiredPokemonIds.length >= 5)}
-                        className={`px-2 py-1 rounded border text-xs ${isReq ? 'bg-green-500 text-white border-green-600' : 'bg-bg-surface border-border-main hover:bg-green-50'}`}
+                        className={`px-2.5 py-1 rounded font-bold border transition-colors ${
+                          isReq 
+                            ? 'bg-success-main text-white border-success-main' 
+                            : 'bg-bg-app border-border-main text-text-muted hover:text-text-main'
+                        }`}
                       >
                         Req
                       </button>
                       <button 
                         onClick={() => toggleExcluded(p.id)}
                         disabled={isOptimizing}
-                        className={`px-2 py-1 rounded border text-xs ${isExc ? 'bg-red-500 text-white border-red-600' : 'bg-bg-surface border-border-main hover:bg-red-50'}`}
+                        className={`px-2.5 py-1 rounded font-bold border transition-colors ${
+                          isExc 
+                            ? 'bg-error-main text-white border-error-main' 
+                            : 'bg-bg-app border-border-main text-text-muted hover:text-text-main'
+                        }`}
                       >
                         Exc
                       </button>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
-          </details>
-        </div>
-
-        <div className="mt-6 flex flex-wrap justify-end gap-3">
-          <button 
-            onClick={handleSaveQuery}
-            disabled={isOptimizing}
-            className="flex items-center gap-2 px-6 py-2 bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-medium rounded hover:bg-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
-          >
-            Guardar Consulta
-          </button>
-          {isOptimizing ? (
-            <button 
-              onClick={handleCancel}
-              className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700 transition-colors"
-            >
-              <Square size={20} /> Cancelar Optimización
-            </button>
-          ) : (
-            <button 
-              onClick={handleStart}
-              disabled={!greengrassReady || (objective === 'recipe' && !targetRecipeId) || collection.length < 5}
-              className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white font-medium rounded hover:bg-indigo-700 disabled:opacity-50 transition-colors"
-            >
-              <Play size={20} /> Iniciar Optimizador
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Progress Section */}
-      {isOptimizing && progress && (
-        <div className="bg-bg-surface border border-indigo-200 dark:border-indigo-900 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center space-y-4">
-          <div className="animate-spin text-indigo-600"><Calculator size={32} /></div>
-          <h3 className="font-semibold text-lg text-indigo-700 dark:text-indigo-400">{t('optimizer.analyzing')}</h3>
-          <div className="w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
-            <div 
-              className="bg-indigo-600 h-4 transition-all duration-300"
-              style={{ width: `${progress.percentage}%` }}
-            ></div>
           </div>
-          <p className="text-sm font-medium">
-            {progress.processedTeams.toLocaleString()} / {progress.totalTeams.toLocaleString()} equipos procesados ({progress.percentage.toFixed(1)}%)
+        )}
+
+        {/* Primary Action Button Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border-main">
+          <div className="text-xs text-text-muted">
+            {collection.length < 5 && (
+              <span className="text-warning-main font-semibold">
+                ⚠️ Necesitas al menos 5 Pokémon en tu colección para optimizar.
+              </span>
+            )}
+            {!greengrassReady && isGreengrass && (
+              <span className="text-warning-main font-semibold">
+                ⚠️ Selecciona 3 bayas favoritas para Verdegal.
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            {isOptimizing ? (
+              <ActionButton 
+                variant="outline" 
+                onClick={handleCancel}
+                icon={Square}
+                className="w-full sm:w-auto text-error-main border-error-main/30 hover:bg-error-bg hover:text-error-main"
+              >
+                Cancelar Optimización
+              </ActionButton>
+            ) : (
+              <ActionButton 
+                variant="primary" 
+                onClick={handleStart}
+                disabled={!greengrassReady || (objective === 'recipe' && !targetRecipeId && recipesForType.length === 0) || collection.length < 5}
+                icon={Play}
+                className="w-full sm:w-auto px-8 py-3 text-base shadow-md"
+              >
+                Iniciar Optimización
+              </ActionButton>
+            )}
+          </div>
+        </div>
+      </Panel>
+
+      {/* Progress State */}
+      {isOptimizing && progress && (
+        <Panel className="border-primary-main/40 shadow-md">
+          <div className="flex flex-col items-center justify-center space-y-4 py-4">
+            <div className="p-3 rounded-full bg-primary-bg text-primary-main animate-pulse">
+              <Cpu size={36} />
+            </div>
+            <div className="text-center">
+              <h3 className="font-extrabold text-xl text-text-main">{t('optimizer.analyzing')}</h3>
+              <p className="text-xs text-text-muted mt-1">Explorando combinaciones de equipo deterministas</p>
+            </div>
+
+            <div className="w-full max-w-lg bg-bg-app rounded-full h-4 overflow-hidden border border-border-main p-0.5">
+              <div 
+                className="bg-primary-main h-full rounded-full transition-all duration-300 shadow-sm"
+                style={{ width: `${progress.percentage}%` }}
+              />
+            </div>
+
+            <p className="text-sm font-bold text-text-main">
+              {progress.processedTeams.toLocaleString()} / {progress.totalTeams.toLocaleString()} equipos procesados ({progress.percentage.toFixed(1)}%)
+            </p>
+          </div>
+        </Panel>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div className="bg-error-bg/20 text-error-text p-4 rounded-xl border border-error-main/30 flex items-start gap-3">
+          <AlertCircle className="shrink-0 mt-0.5" />
+          <p className="font-semibold text-sm">{error}</p>
+        </div>
+      )}
+
+      {/* Empty Initial State */}
+      {!isOptimizing && !results && !error && (
+        <div className="p-12 text-center bg-bg-surface border border-dashed border-border-main rounded-2xl space-y-3">
+          <div className="inline-flex p-4 rounded-2xl bg-bg-app text-primary-main mb-2">
+            <Sparkles size={32} />
+          </div>
+          <h3 className="text-lg font-bold text-text-main">Listo para optimizar</h3>
+          <p className="text-sm text-text-muted max-w-md mx-auto">
+            Configura tus preferencias arriba y pulsa "Iniciar Optimización" para calcular las mejores sinergias de tu caja.
           </p>
         </div>
       )}
 
-      {/* Error / Messages */}
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 p-4 rounded-xl border border-red-200 flex items-start gap-3">
-          <AlertCircle className="shrink-0 mt-0.5" />
-          <p className="font-medium">{error}</p>
-        </div>
-      )}
-
-      {/* Results Section */}
+      {/* Results Protagonist Section */}
       {!isOptimizing && results && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold border-b border-border-main pb-2">Resultados Top {results.length}</h2>
-          
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border-main pb-4">
+            <div>
+              <h2 className="text-2xl font-black text-text-main flex items-center gap-2">
+                <Trophy size={24} className="text-amber-500" />
+                Mejores Equipos Encontrados ({results.length})
+              </h2>
+              <p className="text-xs text-text-muted mt-0.5">
+                Ordenados por puntuación de simulación según el objetivo seleccionado
+              </p>
+            </div>
+
+            {compareList.length > 0 && (
+              <div className="flex items-center gap-3 bg-bg-surface px-4 py-2 rounded-xl border border-border-main shadow-xs">
+                <span className="text-xs font-bold text-text-muted">
+                  Comparador: <span className="text-primary-main font-black">{compareList.length}/2</span>
+                </span>
+                <ActionButton 
+                  variant="primary" 
+                  onClick={() => setShowCompare(true)}
+                  disabled={compareList.length !== 2}
+                  icon={GitCompare}
+                  className="text-xs py-1.5"
+                >
+                  Comparar
+                </ActionButton>
+              </div>
+            )}
+          </div>
+
           {results.length === 0 ? (
-            <div className="p-8 text-center text-text-muted bg-bg-surface rounded-xl border border-border-main">
-              No se encontraron equipos válidos con los filtros aplicados.
+            <div className="p-12 text-center bg-bg-surface rounded-2xl border border-border-main text-text-muted">
+              No se encontraron equipos válidos con los filtros aplicados. Prueba reduciendo el nivel mínimo o retirando exclusiones.
             </div>
           ) : (
-            results.map((res, i) => {
-              // Calcular info secundaria básica
-              const totalBerries = res.evaluation.memberEstimates.reduce((acc, m) => acc + m.estimate.berries.reduce((sum, b) => sum + b.amount, 0), 0);
-              const totalIngredients = res.evaluation.memberEstimates.reduce((acc, m) => acc + m.estimate.ingredients.reduce((sum, ing) => sum + ing.amount, 0), 0);
-              
-              return (
-                <div key={i} className="bg-bg-surface border border-border-main rounded-xl p-5 shadow-sm space-y-4 cursor-pointer hover:border-indigo-400 transition-colors" onClick={() => setSelectedResult(res)}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border-main pb-3 gap-2">
+            <div className="space-y-4">
+              {results.map((res, i) => {
+                const totalBerries = res.evaluation.memberEstimates.reduce(
+                  (acc, m) => acc + m.estimate.berries.reduce((sum, b) => sum + b.amount, 0), 0
+                );
+                const totalIngredients = res.evaluation.memberEstimates.reduce(
+                  (acc, m) => acc + m.estimate.ingredients.reduce((sum, ing) => sum + ing.amount, 0), 0
+                );
+                const isSelectedForCompare = compareList.includes(res);
+
+                return (
+                  <div 
+                    key={i} 
+                    className={`bg-bg-surface border rounded-2xl p-6 shadow-sm transition-all hover:shadow-md cursor-pointer ${
+                      i === 0 
+                        ? 'border-amber-400/80 ring-2 ring-amber-400/10' 
+                        : 'border-border-main hover:border-primary-main/50'
+                    }`}
+                    onClick={() => setSelectedResult(res)}
+                  >
+                    {/* Header Row: Rank, Score, Metrics, Compare Checkbox */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-main pb-4 mb-4">
                       <div className="flex items-center gap-3">
-                        <input type="checkbox" className="w-5 h-5 rounded border-border-main bg-bg-app text-indigo-600 focus:ring-indigo-500 cursor-pointer" checked={compareList.includes(res)} onChange={(e) => {
-                          e.stopPropagation();
-                          if (e.target.checked) {
-                            if (compareList.length < 2) setCompareList([...compareList, res]);
-                          } else {
-                            setCompareList(compareList.filter(c => c !== res));
-                          }
-                        }} />
+                        <input 
+                          type="checkbox" 
+                          checked={isSelectedForCompare}
+                          onClick={e => e.stopPropagation()}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              if (compareList.length < 2) setCompareList([...compareList, res]);
+                            } else {
+                              setCompareList(compareList.filter(c => c !== res));
+                            }
+                          }}
+                          className="w-5 h-5 rounded border-border-main bg-bg-app text-primary-main focus:ring-primary-main cursor-pointer"
+                        />
+                        <div className="flex items-center gap-2">
+                          {i === 0 ? (
+                            <span className="flex items-center gap-1 bg-amber-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-xs">
+                              <Trophy size={12} /> #1 MEJOR
+                            </span>
+                          ) : (
+                            <span className="bg-bg-app text-text-muted border border-border-main text-xs font-black px-2.5 py-1 rounded-full">
+                              #{i + 1}
+                            </span>
+                          )}
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-xl md:text-2xl font-black text-text-main">
+                              {Math.round(res.score.score).toLocaleString()}
+                            </span>
+                            <span className="text-xs font-bold text-text-muted">pts</span>
+                          </div>
+                        </div>
                       </div>
-                  <div>
-                    <h3 className="text-lg font-bold">#{i + 1} - Puntuación: {Math.round(res.score.score).toLocaleString()}</h3>
-                    <div className="flex gap-3 mt-1 text-sm text-text-muted">
-                      <span>Bayas producidas: {Math.round(totalBerries).toLocaleString()}</span>
-                      <span>Ingredientes: {Math.round(totalIngredients).toLocaleString()}</span>
+
+                      {/* Score metrics badges */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="warning">
+                          🍓 {Math.round(totalBerries).toLocaleString()} bayas/d
+                        </Badge>
+                        <Badge variant="success">
+                          🥗 {Math.round(totalIngredients).toLocaleString()} ing/d
+                        </Badge>
+                        {res.score.objective === 'recipe' && res.score.recipeDetails && (
+                          <Badge variant="primary">
+                            🎯 Cobertura: {Math.round(res.score.recipeDetails.coveragePercent)}%
+                          </Badge>
+                        )}
+                        <span className="text-xs font-bold text-primary-main hover:underline ml-2">
+                          Ver detalle →
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Member Pokémon Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                      {res.evaluation.team.members.map((member, idx) => {
+                        const mSpecies = gamedata.species.find(s => s.name === member.speciesId);
+
+                        return (
+                          <Link 
+                            to={`/pokemon/${member.id}`} 
+                            key={`${member.id}-${idx}`}
+                            onClick={e => e.stopPropagation()}
+                            className="bg-bg-app border border-border-main hover:border-primary-main hover:bg-bg-surface p-3 rounded-xl transition-all flex flex-col items-center text-center group"
+                          >
+                            <div className="w-14 h-14 mb-2 flex items-center justify-center">
+                              {mSpecies ? (
+                                <img 
+                                  src={`/pokemon/${mSpecies.pokedexNumber}.png`} 
+                                  alt={mSpecies.displayName}
+                                  className="w-full h-full object-contain filter drop-shadow group-hover:scale-110 transition-transform"
+                                  onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.ico' }}
+                                />
+                              ) : (
+                                <Package size={24} className="text-text-muted" />
+                              )}
+                            </div>
+                            <span className="font-extrabold text-xs text-text-main truncate w-full">
+                              {member.nickname || mSpecies?.displayName || member.speciesId}
+                            </span>
+                            <div className="flex items-center gap-1 mt-1">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-bg-surface border border-border-main text-text-muted">
+                                Nv. {member.level}
+                              </span>
+                              {member.natureId && (
+                                <span className="text-[10px] text-text-muted truncate max-w-[60px]" title={member.natureId}>
+                                  {member.natureId}
+                                </span>
+                              )}
+                            </div>
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
-                  {res.score.objective === 'recipe' && res.score.recipeDetails && (
-                    <div className="text-left sm:text-right">
-                      <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                        Cobertura: {Math.round(res.score.recipeDetails.coveragePercent)}%
-                      </span>
-                      <p className="text-xs text-text-muted mt-1 max-w-xs leading-tight">
-                        * Estimación aproximada de ingredientes cubiertos. No representa el número real de comidas cocinadas por día.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                  {res.evaluation.team.members.map((member, idx) => (
-                    <Link 
-                      to={`/pokemon/${member.id}`} 
-                      key={`${member.id}-${idx}`}
-                      className="block p-3 border border-border-main rounded-lg hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-                    >
-                      <div className="font-semibold text-sm truncate">{member.nickname || member.speciesId}</div>
-                      <div className="text-xs text-text-muted">Nv. {member.level}</div>
-                      <div className="text-xs text-text-muted mt-1 truncate">{member.natureId || 'Sin natu'}</div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )})
+                );
+              })}
+            </div>
           )}
         </div>
       )}
 
+      {/* Floating compare action button */}
       {compareList.length === 2 && (
-          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40">
-            <button onClick={() => setShowCompare(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2">
-              Comparar Equipos
-            </button>
-          </div>
-        )}
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40">
+          <button 
+            onClick={() => setShowCompare(true)} 
+            className="bg-primary-main hover:bg-primary-hover text-white px-8 py-3.5 rounded-full font-black shadow-xl flex items-center gap-2 transition-all transform hover:scale-105"
+          >
+            <GitCompare size={20} /> Comparar Equipos Seleccionados (2)
+          </button>
+        </div>
+      )}
 
-        {showCompare && compareList.length === 2 && <TeamCompareModal teams={compareList as [TeamResult, TeamResult]} onClose={() => setShowCompare(false)} />}
+      {showCompare && compareList.length === 2 && (
+        <TeamCompareModal 
+          teams={compareList as [TeamResult, TeamResult]} 
+          onClose={() => setShowCompare(false)} 
+        />
+      )}
 
-        <TeamDetailModal result={selectedResult} onClose={() => setSelectedResult(null)} />
+      {selectedResult && (
+        <TeamDetailModal 
+          result={selectedResult} 
+          onClose={() => setSelectedResult(null)} 
+        />
+      )}
     </div>
   );
 }

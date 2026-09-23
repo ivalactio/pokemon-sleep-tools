@@ -72,8 +72,8 @@ export const Badge = ({ children, variant = 'default' }: { children: React.React
   );
 };
 
-export const ActionButton = ({ children, onClick, variant = 'default', icon: Icon, className = '', title }: { children?: React.ReactNode, onClick?: (e: any) => void, variant?: 'default' | 'primary' | 'ghost' | 'outline', icon?: React.ElementType, className?: string, title?: string }) => {
-  const base = "font-medium flex items-center justify-center gap-2 transition-colors rounded-lg text-sm";
+export const ActionButton = ({ children, onClick, variant = 'default', icon: Icon, className = '', title, disabled = false }: { children?: React.ReactNode, onClick?: (e: any) => void, variant?: 'default' | 'primary' | 'ghost' | 'outline', icon?: React.ElementType, className?: string, title?: string, disabled?: boolean }) => {
+  const base = "font-medium flex items-center justify-center gap-2 transition-colors rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed";
   const padding = children ? "px-4 py-2" : "p-2";
   const variants = {
     default: "bg-bg-app border border-border-main text-text-main hover:bg-bg-surface-hover",
@@ -83,7 +83,7 @@ export const ActionButton = ({ children, onClick, variant = 'default', icon: Ico
   };
 
   return (
-    <button onClick={onClick} title={title} className={`${base} ${padding} ${variants[variant]} ${className}`}>
+    <button onClick={onClick} title={title} disabled={disabled} className={`${base} ${padding} ${variants[variant]} ${className}`}>
       {Icon && <Icon size={18} />}
       {children}
     </button>

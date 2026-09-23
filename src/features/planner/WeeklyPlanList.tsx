@@ -1,6 +1,8 @@
 import type { WeeklyPlan } from '../../domain/persistence';
 import { db } from '../../data/db';
-import { Copy, Trash, Edit, Calendar } from 'lucide-react';
+import { Copy, Trash, Edit, Calendar, Plus } from 'lucide-react';
+import { PageHeader, Panel, ActionButton, Badge, EmptyState } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   plans: WeeklyPlan[];
@@ -9,7 +11,8 @@ interface Props {
 }
 
 export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
-  
+  const { t } = useTranslation();
+
   const handleDuplicate = async (p: WeeklyPlan) => {
     const newPlan = { ...p, id: crypto.randomUUID(), name: p.name + ' (Copia)', createdAt: Date.now() };
     await db.weeklyPlans.add(newPlan);
@@ -22,40 +25,101 @@ export function WeeklyPlanList({ plans, onCreate, onEdit }: Props) {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Calendar /> Planificador Semanal
-        </h1>
-        <button onClick={onCreate} className="px-4 py-2 bg-primary-main hover:bg-primary-hover text-white rounded font-bold">
-          Nueva Planificación
-        </button>
-      </div>
+    <div className="space-y-6 pb-20 max-w-6xl mx-auto">
+      <PageHeader 
+        title="Planificador Semanal"
+        icon={Calendar}
+        description="Estructura la semana de sueño: asigna equipos por día, planifica comidas y proyecta la fuerza de Snorlax."
+        actions={
+          <ActionButton 
+            variant="primary" 
+            onClick={onCreate}
+            icon={Plus}
+            className="shadow-sm"
+          >
+            Nueva Planificación
+          </ActionButton>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {plans.map(p => (
-          <div key={p.id} className="p-4 bg-bg-surface border border-border-main rounded-xl shadow-sm">
-            <h2 className="text-xl font-bold mb-2">{p.name}</h2>
-            <p className="text-sm text-text-muted mb-4">Inicia: {p.weekStart}</p>
-            <div className="flex gap-2">
-              <button onClick={() => onEdit(p.id)} className="flex-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-sm font-bold flex items-center justify-center gap-1 rounded">
-                <Edit size={16}/> Editar
-              </button>
-              <button onClick={() => handleDuplicate(p)} className="px-3 py-2 border border-border-main hover:bg-bg-surface-hover text-sm flex items-center justify-center rounded">
-                <Copy size={16}/>
-              </button>
-              <button onClick={() => handleDelete(p.id)} className="px-3 py-2 border border-red-200 text-error-main hover:bg-red-50 dark:hover:bg-red-900/20 text-sm flex items-center justify-center rounded">
-                <Trash size={16}/>
-              </button>
-            </div>
-          </div>
-        ))}
-        {plans.length === 0 && (
-          <div className="col-span-full py-12 text-center text-text-muted">
-            No hay planificaciones guardadas. Crea una nueva para empezar.
-          </div>
-        )}
-      </div>
+      {plans.length === 0 ? (
+        <EmptyState 
+          icon={Calendar}
+          title="Sin planes semanales"
+          description="Aún no has creado ninguna planificación. Diseña tu estrategia semanal para optimizar recetas y fuerza."
+          action={
+            <ActionButton variant="primary" onClick={onCreate} icon={Plus}>
+              Crear primer plan
+            </ActionButton>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {plans.map(p => (
+            <Panel key={p.id} className="flex flex-col justify-between hover:border-primary-main/50 transition-all hover:shadow-md">
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-xl font-black text-text-main line-clamp-1" title={p.name}>
+                    {p.name}
+                  </h3>
+                  <Badge variant="primary">
+                    {p.island ? t(`islands.${p.island}`) : 'Isla'}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-semibold text-text-muted bg-bg-app px-3 py-2 rounded-lg border border-border-main">
+                  <Calendar size={14} className="text-primary-main" />
+                  <span>Inicio: {p.weekStart || 'Sin fecha'}</span>
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {p.recipeType && (
+                    <Badge variant={p.recipeType === 'curry' ? 'warning' : p.recipeType === 'salad' ? 'success' : 'info'}>
+                      {t(`game.recipeType.${p.recipeType}`, { defaultValue: p.recipeType })}
+                    </Badge>
+                  )}
+                  {p.objective && (
+                    <Badge variant="default">
+                      {p.objective === 'berries' ? 'Bayas' : p.objective === 'ingredients' ? 'Ingredientes' : 'Recetas'}
+                    </Badge>
+                  )}
+                </div>
+
+                {p.notes && (
+                  <p className="text-xs text-text-muted italic line-clamp-2 bg-bg-app p-2.5 rounded-lg border border-border-main">
+                    "{p.notes}"
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 pt-4 border-t border-border-main">
+                <ActionButton 
+                  variant="primary" 
+                  onClick={() => onEdit(p.id)} 
+                  icon={Edit}
+                  className="flex-1 text-xs py-2"
+                >
+                  Abrir Plan
+                </ActionButton>
+                <ActionButton 
+                  variant="outline" 
+                  onClick={() => handleDuplicate(p)} 
+                  icon={Copy}
+                  title="Duplicar plan"
+                  className="py-2"
+                />
+                <ActionButton 
+                  variant="outline" 
+                  onClick={() => handleDelete(p.id)} 
+                  icon={Trash}
+                  title="Eliminar"
+                  className="py-2 text-error-main border-error-main/20 hover:bg-error-bg hover:text-error-main"
+                />
+              </div>
+            </Panel>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
