@@ -135,7 +135,8 @@ export default function Collection() {
           onSave={handleSaveDraft} 
           onCancel={() => setDraft(null)} 
         />
-      </div>
+      {showFilters && <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70"><CollectionFiltersModal filters={filters} onClose={() => setShowFilters(false)} setFilters={setFilters} /></div>}
+</div>
     );
   }
 
@@ -227,7 +228,7 @@ export default function Collection() {
             onError={(e) => setCaptureError(e)}
           />
 
-          {showFilters && <CollectionFiltersModal filters={filters} setFilters={setFilters} onClose={() => setShowFilters(false)} />}
+          
 
           {captureError && (
             <div className="text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 p-3 rounded-lg border border-red-200 dark:border-red-800 text-sm">
@@ -260,7 +261,8 @@ export default function Collection() {
           ))}
         </div>
       )}
-    </div>
+    {showFilters && <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70"><CollectionFiltersModal filters={filters} onClose={() => setShowFilters(false)} setFilters={setFilters} /></div>}
+</div>
   );
 }
 
