@@ -161,7 +161,7 @@ export default function Collection() {
             <option className="dark:bg-gray-800 dark:text-white" value="level">Nv</option>
             <option className="dark:bg-gray-800 dark:text-white" value="name">{t('app.name')}</option>
           </select>
-          <button onClick={() => setShowFilters(true)} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover font-bold text-sm">{t('collection.filters')}</button>
+          <button onClick={() => { console.log('Clic en Filtros'); setShowFilters(true); }} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover font-bold text-sm">{t('collection.filters')}</button>
           <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover" title="Exportar Backup JSON">
             <Download size={18} className="text-text-muted"/>
           </button>
