@@ -1,6 +1,7 @@
 import type { CalculationEngine } from '../../../domain/services/interfaces';
 import type { OwnedPokemon, ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../../domain/models';
 import { natureEffects } from '../../../data/static/natureEffects';
+import { getSpeciesMainSkillName } from '../../i18n-game';
 
 export class LocalCalculationEngine implements CalculationEngine {
   private gameData: StaticDataSchema;
@@ -37,7 +38,7 @@ export class LocalCalculationEngine implements CalculationEngine {
     let e4eEnergyPerDay = 0;
     for (let i = 0; i < team.length; i++) {
         const species = this.gameData.species.find(s => s.name === team[i].speciesId);
-        if (species?.skill.name === 'Energy for Everyone S') {
+        if (getSpeciesMainSkillName(species) === 'Energy for Everyone S') {
             e4eEnergyPerDay += estimatesPass1[i].skillProcs * 15; 
         }
     }
@@ -188,7 +189,7 @@ export class LocalCalculationEngine implements CalculationEngine {
         
         let skillProcs = totalHelps * finalSkillChance;
         let newSkillEnergy = teamE4EEnergy;
-        if (species.skill.name === 'Charge Energy S') {
+        if (getSpeciesMainSkillName(species) === 'Charge Energy S') {
             newSkillEnergy += skillProcs * 12;
         }
         skillEnergyPerDay = newSkillEnergy;

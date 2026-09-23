@@ -4,7 +4,7 @@ import { AlertCircle, CheckCircle, Save, X, AlertTriangle } from 'lucide-react';
 import type { PokemonDraft, ExtractedField } from '../../../domain/vision/models';
 import type { OwnedPokemon, StaticDataSchema } from '../../../domain/models';
 import _gamedata from '../../../data/static/gamedata.json';
-import { getNatureDisplayName, translateSubskill, translateIngredient } from '../../../services/i18n-game';
+import { getNatureDisplayName, translateSubskill, translateIngredient, getSpeciesMainSkillName } from '../../../services/i18n-game';
 
 const gamedata = _gamedata as unknown as StaticDataSchema;
 
@@ -169,7 +169,7 @@ export default function VisionReview({ draft, onSave, onCancel }: VisionReviewPr
               <input 
                 type="text" 
                 disabled
-                value={formData.speciesId ? (gamedata.species.find(s => s.name === formData.speciesId)?.skill.name || '') : ''} 
+                value={formData.speciesId ? getSpeciesMainSkillName(gamedata.species.find(s => s.name === formData.speciesId)) : ''} 
                 className="w-full p-2 border bg-bg-app text-text-main border-border-main rounded-lg bg-slate-100 dark:bg-slate-800 text-text-muted"
               />
               {renderConfidence(draft.rawExtraction.mainSkill, 'Main Skill')}

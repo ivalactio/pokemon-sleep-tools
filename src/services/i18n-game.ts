@@ -35,6 +35,17 @@ export function translateMainSkill(t: TFunction, id?: string): string {
   return t(`game.mainSkill.${id}`, { defaultValue: id });
 }
 
+export function getSpeciesMainSkillName(species: any): string {
+  if (!species || !species.skill) return '';
+  return species.skill.name || species.skill.baseSkill?.name || '';
+}
+
+export function getSpeciesMainSkillDisplayName(t: TFunction, species: any): string {
+  const skillName = getSpeciesMainSkillName(species);
+  if (!skillName) return t('pokemon_detail.unknown', { defaultValue: 'Desconocida' });
+  return translateMainSkill(t, skillName);
+}
+
 export function translateIngredient(t: TFunction, id: string): string {
   if (!id) return id;
   return t(`game.ingredient.${id}`, { defaultValue: id });

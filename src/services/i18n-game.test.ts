@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import i18next from 'i18next';
 import es from '../i18n/locales/es.json';
 import en from '../i18n/locales/en.json';
-import { translateNature, translateMainSkill, translateSubskill, translateIngredient, getNatureDisplayName, getNatureEffects } from './i18n-game';
+import { translateNature, translateMainSkill, translateSubskill, translateIngredient, getNatureDisplayName, getNatureEffects, getSpeciesMainSkillName, getSpeciesMainSkillDisplayName } from './i18n-game';
 
 describe('Game Data Localization', () => {
   beforeEach(async () => {
@@ -37,6 +37,27 @@ describe('Game Data Localization', () => {
     expect(translateMainSkill(t, 'Ingredient Magnet S')).toBe('Imán Ingredientes S');
     await i18next.changeLanguage('en');
     expect(translateMainSkill(t, 'Ingredient Magnet S')).toBe('Ingredient Magnet S');
+  });
+
+  it('resolves species main skills safely for standard, modified, and special species', async () => {
+    const t = i18next.t.bind(i18next);
+    const pikachu = { skill: { name: 'Charge Strength S' } };
+    const darkrai = { skill: { baseSkill: { name: 'Charge Strength M' }, modifierName: 'Bad Dreams' } };
+    const mew = { skill: { name: 'Versatile' } };
+    const heracross = { skill: { baseSkill: { name: 'Cooking Assist S' } } };
+
+    expect(getSpeciesMainSkillName(pikachu)).toBe('Charge Strength S');
+    expect(getSpeciesMainSkillName(darkrai)).toBe('Charge Strength M');
+    expect(getSpeciesMainSkillName(mew)).toBe('Versatile');
+    expect(getSpeciesMainSkillName(heracross)).toBe('Cooking Assist S');
+    expect(getSpeciesMainSkillName(null)).toBe('');
+    expect(getSpeciesMainSkillName({})).toBe('');
+
+    expect(getSpeciesMainSkillDisplayName(t, pikachu)).toBe('Carga Vigor S');
+    expect(getSpeciesMainSkillDisplayName(t, darkrai)).toBe('Carga Vigor M');
+    expect(getSpeciesMainSkillDisplayName(t, mew)).toBe('Versátil');
+    expect(getSpeciesMainSkillDisplayName(t, heracross)).toBe('Ayuda de Cocina S');
+    expect(getSpeciesMainSkillDisplayName(t, null)).toBe('Desconocida');
   });
 
   it('translates subskills correctly', async () => {

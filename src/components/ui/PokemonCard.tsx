@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { OwnedPokemon } from '../../domain/models';
 import { Badge } from './index';
 import gamedata from '../../data/static/gamedata.json';
-import { translateIngredient, translateMainSkill, translateSpecialty, getNatureDisplayName } from '../../services/i18n-game';
+import { translateIngredient, getSpeciesMainSkillDisplayName, translateSpecialty, getNatureDisplayName } from '../../services/i18n-game';
 import { useTranslation } from 'react-i18next';
 import { Star, AlertCircle, Package } from 'lucide-react';
 import { isComplete } from '../../utils/pokemonUtils';
@@ -95,7 +95,7 @@ export function PokemonCard({ pokemon, onClick, onToggleFavorite }: PokemonCardP
         {/* Skill */}
         <div>
           <p className="text-xs font-bold text-text-muted uppercase mb-1">{t('pokemon_detail.skill')}</p>
-          <p className="text-sm text-text-main truncate">{species.skill ? translateMainSkill(t, species.skill.name) : '-'}</p>
+          <p className="text-sm text-text-main truncate">{species ? getSpeciesMainSkillDisplayName(t, species) : '-'}</p>
         </div>
       </div>
 

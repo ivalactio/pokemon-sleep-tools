@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import gamedata from '../../data/static/gamedata.json';
 import { useTranslation } from 'react-i18next';
-import { translateSubskill, translateMainSkill, translateIngredient, translateBerry, getNatureDisplayName, translateSpecialty } from '../../services/i18n-game';
+import { translateSubskill, getSpeciesMainSkillDisplayName, translateIngredient, translateBerry, getNatureDisplayName, translateSpecialty } from '../../services/i18n-game';
 import { SleepApiEngine } from '../../services/sleepapi/sleepapi-engine';
 import type { ProductionEstimate, SimulationConfig, StaticDataSchema } from '../../domain/models';
 import { ISLANDS } from '../../domain/optimizer/islands';
@@ -260,7 +260,7 @@ export default function PokemonDetail() {
                   {t('pokemon_detail.skill', { defaultValue: 'Habilidad' })}
                 </span>
                 <span className="font-bold text-sm text-text-main">
-                  {translateMainSkill(t, species?.skill?.name || '') || t('pokemon_detail.unknown')}
+                  {getSpeciesMainSkillDisplayName(t, species)}
                 </span>
               </div>
 

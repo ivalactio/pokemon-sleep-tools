@@ -1,6 +1,7 @@
 import type { CalculationEngine } from '../../domain/services/interfaces';
 import type { SimulationConfig, StaticDataSchema } from '../../domain/models';
 import type { Team, TeamEvaluationContext, TeamMetadata } from '../../domain/optimizer/core';
+import { getSpeciesMainSkillName } from '../i18n-game';
 
 export class TeamEvaluator {
   private engine: CalculationEngine;
@@ -45,7 +46,8 @@ export class TeamEvaluator {
       
       const speciesData = this.gameData.species.find(s => s.name === member.speciesId);
       if (speciesData) {
-        skills.add(speciesData.skill.name);
+        const skillName = getSpeciesMainSkillName(speciesData);
+        if (skillName) skills.add(skillName);
         berries.add(speciesData.berry.name);
         specialtyBreakdown[speciesData.specialty]++;
       }

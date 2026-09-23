@@ -2,6 +2,7 @@ import type { OwnedPokemon } from '../../domain/models';
 import type { CollectionFilters } from './types';
 import gamedata from '../../data/static/gamedata.json';
 import { isComplete } from '../../utils/pokemonUtils';
+import { getSpeciesMainSkillName } from '../../services/i18n-game';
 
 /**
  * Filter an OwnedPokemon against CollectionFilters.
@@ -38,7 +39,7 @@ export function matchesFilters(p: OwnedPokemon, filters: CollectionFilters): boo
     return false;
   }
 
-  if (filters.mainSkillId && species.skill?.name !== filters.mainSkillId) {
+  if (filters.mainSkillId && getSpeciesMainSkillName(species) !== filters.mainSkillId) {
     return false;
   }
 
