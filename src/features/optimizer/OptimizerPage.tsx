@@ -366,7 +366,7 @@ export default function OptimizerPage() {
             <div className="mt-4 max-h-64 overflow-y-auto border border-border-main rounded bg-bg-app p-2 space-y-2">
               {collection.length === 0 ? (
                 <div className="p-4 text-center text-sm text-text-muted">{t('optimizer.empty_collection')}</div>
-              ) : collection.map(p => {
+              ) : [...collection].sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0)).map(p => {
                 const isReq = requiredPokemonIds.includes(p.id);
                 const isExc = excludedPokemonIds.includes(p.id);
                 return (

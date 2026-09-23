@@ -13,6 +13,11 @@ import { LocalCalculationEngine } from '../../services/optimizer/calculator/Loca
 import { OptimizerService } from '../../services/optimizer/OptimizerService';
 import type { OwnedPokemon } from '../../domain/models';
 import { Wand2 } from 'lucide-react';
+import { TeamCompareModal } from '../optimizer/components/TeamCompareModal';
+import type { TeamResult } from '../../domain/optimizer/core';
+import { TeamEvaluator } from '../../services/optimizer/TeamEvaluator';
+import { BerryScoringStrategy, IngredientScoringStrategy, RecipeScoringStrategy } from '../../services/optimizer/ScoringStrategies';
+
 
 interface Props {
   plan?: WeeklyPlan;
@@ -54,6 +59,42 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   const [audit, setAudit] = useState<{ing: string, cost: number, prod: number, diff: number}[]>([]);
   const [projectedStrength, setProjectedStrength] = useState(0);
   const [isSuggesting, setIsSuggesting] = useState(false);
+
+  const [compareTeams, setCompareTeams] = useState<[TeamResult, TeamResult] | null>(null);
+
+  const buildTeamResult = async (teamId: string): Promise<TeamResult> => {
+    const saved = savedTeams.find(t => t.id === teamId);
+    if (!saved) throw new Error('Not found');
+    const members = saved.memberIds.map(id => collection.find(p => p.id === id)).filter(Boolean) as OwnedPokemon[];
+    const teamObj = { members };
+    const engine = new LocalCalculationEngine(gamedata as any);
+    const evaluator = new TeamEvaluator(engine, gamedata as any);
+    const ctx = await evaluator.evaluate(teamObj, saved.queryContext.simulation);
+    
+    const obj = saved.queryContext.objectives[0];
+    let strategy;
+    if (obj === 'berries') strategy = new BerryScoringStrategy(gamedata as any);
+    else if (obj === 'ingredients') strategy = new IngredientScoringStrategy(gamedata as any);
+    else strategy = new RecipeScoringStrategy(gamedata as any, saved.queryContext.recipeType || 'curry', saved.queryContext.targetRecipeId);
+    
+    const score = strategy.score(ctx);
+    return { evaluation: ctx, score };
+  };
+
+  const handleCompareClick = async () => {
+    const tids = [mainTeamId, ...alternativeTeamIds].filter(Boolean);
+    if (tids.length === 2) {
+      try {
+        const t1 = await buildTeamResult(tids[0]);
+        const t2 = await buildTeamResult(tids[1]);
+        setCompareTeams([t1, t2]);
+      } catch (e) {
+        console.error("Error al comparar", e);
+        alert("Error al preparar comparación.");
+      }
+    }
+  };
+
 
   useEffect(() => {
     const recalculateAudit = async () => {
@@ -228,7 +269,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   const handleCompare = () => {
     const tids = [mainTeamId, ...alternativeTeamIds].filter(Boolean);
     if (tids.length === 2) {
-      navigate(`/comparador?t1=${tids[0]}&t2=${tids[1]}`);
+      handleCompareClick();
     } else {
       alert('Para comparar directamente, debes tener exactamente 2 equipos definidos (Principal y 1 Alternativo).');
     }
@@ -281,7 +322,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             <div>
               <label className="block text-sm font-medium mb-1">{t('optimizer.island')}</label>
               <select value={island} onChange={e => setIsland(e.target.value as IslandId)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
-                {ISLANDS.map(i => <option key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>)}
+                {ISLANDS.map(i => <option className="dark:bg-gray-800 dark:text-white" key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>)}
               </select>
             </div>
             <div>
@@ -317,18 +358,18 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             <div>
               <label className="block text-sm font-medium mb-1">{t('optimizer.dish_type')}</label>
               <select value={recipeType} onChange={e => setRecipeType(e.target.value as RecipeType)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
-                <option value="curry">{t('game.recipeType.curry', { defaultValue: 'Guisos y curris' })}</option>
-                <option value="salad">{t('game.recipeType.salad', { defaultValue: 'Ensaladas' })}</option>
-                <option value="dessert">{t('game.recipeType.dessert', { defaultValue: 'Postres' })}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="curry">{t('game.recipeType.curry', { defaultValue: 'Guisos y curris' })}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="salad">{t('game.recipeType.salad', { defaultValue: 'Ensaladas' })}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="dessert">{t('game.recipeType.dessert', { defaultValue: 'Postres' })}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">{t('optimizer.prioritize_recipe')}</label>
               <select value={targetRecipeId} onChange={e => setTargetRecipeId(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
-                <option value="">{t('app.none', { defaultValue: 'Ninguna / Variable' })}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="">{t('app.none', { defaultValue: 'Ninguna / Variable' })}</option>
                 {availableRecipes.map(r => (
-                  <option key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
+                  <option className="dark:bg-gray-800 dark:text-white" key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
                 ))}
               </select>
             </div>
@@ -336,9 +377,9 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             <div>
               <label className="block text-sm font-medium mb-1">{t('planner.general_objective')}</label>
               <select value={objective} onChange={e => setObjective(e.target.value as OptimizerObjective)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
-                <option value="berries">{t('app.berries', { defaultValue: 'Bayas' })}</option>
-                <option value="ingredients">{t('app.ingredients', { defaultValue: 'Ingredientes' })}</option>
-                <option value="recipe">{t('app.recipes', { defaultValue: 'Recetas' })}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="berries">{t('app.berries', { defaultValue: 'Bayas' })}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="ingredients">{t('app.ingredients', { defaultValue: 'Ingredientes' })}</option>
+                <option className="dark:bg-gray-800 dark:text-white" value="recipe">{t('app.recipes', { defaultValue: 'Recetas' })}</option>
               </select>
             </div>
 
@@ -371,8 +412,8 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             <div>
               <label className="block text-sm font-medium mb-1">{t('planner.main_team')}</label>
               <select value={mainTeamId} onChange={e => setMainTeamId(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main font-bold text-indigo-700 dark:text-indigo-400">
-                <option value="">{t('planner.select_team')}</option>
-                {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                <option className="dark:bg-gray-800 dark:text-white" value="">{t('planner.select_team')}</option>
+                {savedTeams.map(t => <option className="dark:bg-gray-800 dark:text-white" key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
 
@@ -385,8 +426,8 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                     nw[idx] = e.target.value;
                     setAlternativeTeamIds(nw);
                   }} className="flex-1 px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
-                    <option value="">{t('planner.select_team')}</option>
-                    {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    <option className="dark:bg-gray-800 dark:text-white" value="">{t('planner.select_team')}</option>
+                    {savedTeams.map(t => <option className="dark:bg-gray-800 dark:text-white" key={t.id} value={t.id}>{t.name}</option>)}
                   </select>
                   <button onClick={() => setAlternativeTeamIds(alternativeTeamIds.filter((_, i) => i !== idx))} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded">
                     <X size={20}/>
@@ -409,17 +450,17 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                   <div>
                     <label className="text-xs font-medium text-text-muted">{t('planner.override_team')}</label>
                     <select value={dp.teamId || ''} onChange={e => updateDaily(i, 'teamId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm">
-                      <option value="">{t('planner.use_main')}</option>
-                      {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                      <option className="dark:bg-gray-800 dark:text-white" value="">{t('planner.use_main')}</option>
+                      {savedTeams.map(t => <option className="dark:bg-gray-800 dark:text-white" key={t.id} value={t.id}>{t.name}</option>)}
                     </select>
                   </div>
                   
                   <div>
                     <label className="text-xs font-medium text-text-muted">{t('planner.recipe_day')}</label>
                     <select value={dp.recipeId || ''} onChange={e => updateDaily(i, 'recipeId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm">
-                      <option value="">{t('planner.use_main_recipe')}</option>
+                      <option className="dark:bg-gray-800 dark:text-white" value="">{t('planner.use_main_recipe')}</option>
                       {availableRecipes.map(r => (
-                        <option key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
+                        <option className="dark:bg-gray-800 dark:text-white" key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
                       ))}
                     </select>
                   </div>
@@ -466,6 +507,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
           
         </div>
       </div>
+      {compareTeams && <TeamCompareModal teams={compareTeams} onClose={() => setCompareTeams(null)} />}
     </div>
   );
 }

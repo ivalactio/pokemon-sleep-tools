@@ -15,14 +15,14 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "collection": "Colección",
+    "collection": "Caja Pokémon",
     "recipes": "Recetas",
     "add_pokemon": "Añadir Pokémon",
     "settings": "Configuración",
     "optimizer": "Optimizador"
   },
   "collection": {
-    "title": "Colección",
+    "title": "Caja Pokémon",
     "search": "Buscar por apodo o especie...",
     "empty": "No tienes Pokémon en tu colección.",
     "add_first": "¡Añade tu primer Pokémon!",
@@ -334,7 +334,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "collection_summary": "Resumen de Colección",
+    "collection_summary": "Resumen de Caja Pokémon",
     "total_pokemon": "Total Pokémon",
     "backup": "Copia de Seguridad",
     "export": "Exportar a JSON",

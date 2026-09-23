@@ -16,6 +16,10 @@ export default function SavedTeamsPage() {
   const teams = useLiveQuery(() => db.savedTeams.toArray()) || [];
   const collection = useLiveQuery(() => db.ownedPokemon.toArray()) || [];
   
+    const [search, setSearch] = useState('');
+  const [filterIsland, setFilterIsland] = useState('');
+  const [sortBy, setSortBy] = useState('score');
+
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
   
@@ -61,11 +65,26 @@ export default function SavedTeamsPage() {
 
   const handleCompare = async () => {
     if (selectedForCompare.length === 2) {
-      const t1 = await buildTeamResult(selectedForCompare[0]);
-      const t2 = await buildTeamResult(selectedForCompare[1]);
-      setCompareTeams([t1, t2]);
+      try {
+        const t1 = await buildTeamResult(selectedForCompare[0]);
+        const t2 = await buildTeamResult(selectedForCompare[1]);
+        setCompareTeams([t1, t2]);
+      } catch (e) {
+        console.error("Error comparando", e);
+        alert("Error al comparar equipos");
+      }
     }
   };
+
+  
+  const filteredTeams = teams.filter(t => {
+    if (search && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filterIsland && t.queryContext?.simulation?.island !== filterIsland) return false;
+    return true;
+  }).sort((a, b) => {
+    if (sortBy === 'score') return (b.metrics?.score || 0) - (a.metrics?.score || 0);
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
 
   const handleViewDetail = async (id: string) => {
     const t = await buildTeamResult(id);
@@ -97,8 +116,40 @@ export default function SavedTeamsPage() {
         </div>
       </div>
 
+            <div className="flex flex-col md:flex-row gap-4 p-4 bg-bg-surface border border-border-main rounded-xl">
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre..." 
+          value={search} 
+          onChange={e => setSearch(e.target.value)} 
+          className="flex-1 p-2 rounded border border-border-main bg-bg-main"
+        />
+        <select 
+          value={filterIsland} 
+          onChange={e => setFilterIsland(e.target.value)}
+          className="p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white"
+        >
+          <option className="dark:bg-gray-800 dark:text-white" value="">Todas las islas</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="greengrass">Verdegal</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="cyan">Playa Turquesa</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="taupe">Cueva Pardilla</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="snowdrop">Tundra Galleta</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="lapis">Lago Lazulita</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="gold">Central Oro</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="crimson">Volcán Carmesí</option>
+        </select>
+        <select 
+          value={sortBy} 
+          onChange={e => setSortBy(e.target.value)}
+          className="p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white"
+        >
+          <option className="dark:bg-gray-800 dark:text-white" value="score">Puntuación más alta</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="recent">Más recientes</option>
+        </select>
+      </div>
+
       <div className="space-y-4">
-        {teams.map(t => {
+        {filteredTeams.map(t => {
           const isSelected = selectedForCompare.includes(t.id);
           return (
             <div key={t.id} className={`p-4 border-2 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm ${isSelected ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'border-border-main bg-bg-surface'}`}>
@@ -122,7 +173,7 @@ export default function SavedTeamsPage() {
             </div>
           );
         })}
-        {teams.length === 0 && <p className="text-text-muted text-center py-12">No hay equipos guardados.</p>}
+        {filteredTeams.length === 0 && <p className="text-text-muted text-center py-12">No hay equipos guardados.</p>}
       </div>
 
       {detailTeam && <TeamDetailModal result={detailTeam} onClose={() => setDetailTeam(null)} />}

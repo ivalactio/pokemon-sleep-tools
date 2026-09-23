@@ -40,6 +40,7 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
           </button>
         </div>
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold mb-2">{t('collection.min_level')}</label>
@@ -118,6 +119,7 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
             </div>
           </div>
 
+          </div>
           <div className="space-y-3 pt-4 border-t border-border-main">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={filters.favoritesOnly} onChange={e => setFilters({...filters, favoritesOnly: e.target.checked})} className="w-5 h-5 rounded" />

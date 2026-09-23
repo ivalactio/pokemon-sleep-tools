@@ -7,27 +7,16 @@ import { Utensils, Salad, IceCream, Search, ChefHat } from 'lucide-react';
 
 export default function Recipes() {
   const { t } = useTranslation();
+  const [recipeType, setRecipeType] = useState('');
+  const [ingredient, setIngredient] = useState('');
+  const [sortBy, setSortBy] = useState('strength_desc');
+  
+  const allIngredients = Array.from(new Set(gamedata.recipes.flatMap(r => r.ingredients.map(i => i.ingredient.name)))).sort();
+
   const [filter, setFilter] = useState<'ALL' | 'curry' | 'salad' | 'dessert'>('ALL');
   const [search, setSearch] = useState('');
 
-  const recipes: Recipe[] = (gamedata.recipes as unknown as Recipe[]) || [];
-
-  const filteredRecipes = recipes.filter(r => {
-    if (filter !== 'ALL' && r.type !== filter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      const translatedName = translateRecipe(t, r.name).toLowerCase();
-      const matchName = translatedName.includes(q) || r.name.toLowerCase().includes(q);
-      
-      const matchIng = r.ingredients.some(ing => {
-        const ingName = translateIngredient(t, ing.ingredient.name).toLowerCase();
-        return ingName.includes(q) || ing.ingredient.name.toLowerCase().includes(q);
-      });
-      
-      if (!matchName && !matchIng) return false;
-    }
-    return true;
-  });
+  
 
   const getCategoryIcon = (type: string) => {
     switch (type) {
@@ -46,6 +35,33 @@ export default function Recipes() {
       default: return type;
     }
   };
+
+  
+  
+  const filteredRecipes = (gamedata.recipes as unknown as Recipe[]).filter(r => {
+    // Legacy filter
+    if (filter !== 'ALL' && r.type !== filter) return false;
+    // Legacy search
+    if (search) {
+      const q = search.toLowerCase();
+      const translatedName = translateRecipe(t, r.name).toLowerCase();
+      const matchName = translatedName.includes(q) || r.name.toLowerCase().includes(q);
+      const matchIng = r.ingredients.some(ing => {
+        const ingName = translateIngredient(t, ing.ingredient.name).toLowerCase();
+        return ingName.includes(q) || ing.ingredient.name.toLowerCase().includes(q);
+      });
+      if (!matchName && !matchIng) return false;
+    }
+    // New filters
+    if (recipeType && r.type !== recipeType) return false;
+    if (ingredient && !r.ingredients.some(i => i.ingredient.name === ingredient)) return false;
+    return true;
+  }).sort((a, b) => {
+    if (sortBy === 'pot_asc') return a.ingredients.reduce((s, i) => s + i.amount, 0) - b.ingredients.reduce((s, i) => s + i.amount, 0);
+    if (sortBy === 'pot_desc') return b.ingredients.reduce((s, i) => s + i.amount, 0) - a.ingredients.reduce((s, i) => s + i.amount, 0);
+    return b.value - a.value;
+  });
+
 
   return (
     <div className="max-w-7xl mx-auto pb-10">
@@ -77,6 +93,26 @@ export default function Recipes() {
             className="w-full pl-10 pr-4 py-2 border border-border-main rounded-lg bg-bg-surface text-text-main focus:ring-2 focus:ring-indigo-500"
           />
         </div>
+      </div>
+
+            <div className="flex flex-col md:flex-row gap-4 mb-6 p-4 bg-bg-surface border border-border-main rounded-xl">
+        <select value={recipeType} onChange={e => setRecipeType(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white">
+          <option className="dark:bg-gray-800 dark:text-white" value="">Todos los Tipos</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="curry">Curris</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="salad">Ensaladas</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="dessert">Postres</option>
+        </select>
+        <select value={ingredient} onChange={e => setIngredient(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white">
+          <option className="dark:bg-gray-800 dark:text-white" value="">Cualquier Ingrediente</option>
+          {allIngredients.map(i => (
+            <option className="dark:bg-gray-800 dark:text-white" key={i} value={i}>{translateIngredient(t, i)}</option>
+          ))}
+        </select>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white">
+          <option className="dark:bg-gray-800 dark:text-white" value="strength_desc">Fuerza Base DESC</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="pot_asc">Tamaño Olla ASC</option>
+          <option className="dark:bg-gray-800 dark:text-white" value="pot_desc">Tamaño Olla DESC</option>
+        </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
