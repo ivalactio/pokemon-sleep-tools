@@ -66,10 +66,10 @@ export default function Settings() {
           <select
             value={i18n.language}
             onChange={handleLanguageChange}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main dark:bg-gray-800 dark:text-white"
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main bg-bg-surface text-text-main"
           >
-            <option className="dark:bg-gray-800 dark:text-white" value="es">Español</option>
-            <option className="dark:bg-gray-800 dark:text-white" value="en">English</option>
+            <option className="bg-bg-surface text-text-main" value="es">Español</option>
+            <option className="bg-bg-surface text-text-main" value="en">English</option>
           </select>
         </div>
 
@@ -80,8 +80,8 @@ export default function Settings() {
             onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
             className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface"
           >
-            <option className="dark:bg-gray-800 dark:text-white" value="light">{t('settings.light')}</option>
-            <option className="dark:bg-gray-800 dark:text-white" value="dark">{t('settings.dark')}</option>
+            <option className="bg-bg-surface text-text-main" value="light">{t('settings.light')}</option>
+            <option className="bg-bg-surface text-text-main" value="dark">{t('settings.dark')}</option>
           </select>
         </div>
       </div>
@@ -94,10 +94,10 @@ export default function Settings() {
           <select
             value={provider}
             onChange={handleProviderChange}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main"
           >
-            <option className="dark:bg-gray-800 dark:text-white" value="mock">{t('settings.gemini.provider_mock')}</option>
-            <option className="dark:bg-gray-800 dark:text-white" value="gemini">{t('settings.gemini.provider_gemini')}</option>
+            <option className="bg-bg-surface text-text-main" value="mock">{t('settings.gemini.provider_mock')}</option>
+            <option className="bg-bg-surface text-text-main" value="gemini">{t('settings.gemini.provider_gemini')}</option>
           </select>
         </div>
 
@@ -129,7 +129,7 @@ export default function Settings() {
                   type="button"
                   onClick={testConnection}
                   disabled={testStatus === 'testing'}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium disabled:opacity-50 whitespace-nowrap"
+                  className="px-4 py-2 bg-primary-main hover:bg-primary-hover text-white rounded font-medium disabled:opacity-50 whitespace-nowrap"
                 >
                   {testStatus === 'testing' ? t('settings.gemini.status_testing') : t('settings.gemini.test_connection')}
                 </button>
@@ -138,7 +138,7 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={deleteKey}
-                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
+                    className="p-2 text-error-main hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                     title={t('settings.gemini.delete_key')}
                   >
                     <Trash2 size={20} />
@@ -158,7 +158,7 @@ export default function Settings() {
                   ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-900/50 text-green-800 dark:text-green-300' 
                   : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/50 text-red-800 dark:text-red-300'
               }`}>
-                {testStatus === 'success' ? <CheckCircle size={18} className="text-green-600" /> : <AlertCircle size={18} className="text-red-600" />}
+                {testStatus === 'success' ? <CheckCircle size={18} className="text-green-600" /> : <AlertCircle size={18} className="text-error-main" />}
                 {testMessage}
               </div>
             )}

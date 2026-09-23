@@ -96,22 +96,22 @@ export default function Recipes() {
       </div>
 
             <div className="flex flex-col md:flex-row gap-4 mb-6 p-4 bg-bg-surface border border-border-main rounded-xl">
-        <select value={recipeType} onChange={e => setRecipeType(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white">
-          <option className="dark:bg-gray-800 dark:text-white" value="">Todos los Tipos</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="curry">Curris</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="salad">Ensaladas</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="dessert">Postres</option>
+        <select value={recipeType} onChange={e => setRecipeType(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main">
+          <option className="bg-bg-surface text-text-main" value="">Todos los Tipos</option>
+          <option className="bg-bg-surface text-text-main" value="curry">Curris</option>
+          <option className="bg-bg-surface text-text-main" value="salad">Ensaladas</option>
+          <option className="bg-bg-surface text-text-main" value="dessert">Postres</option>
         </select>
-        <select value={ingredient} onChange={e => setIngredient(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white">
-          <option className="dark:bg-gray-800 dark:text-white" value="">Cualquier Ingrediente</option>
+        <select value={ingredient} onChange={e => setIngredient(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main">
+          <option className="bg-bg-surface text-text-main" value="">Cualquier Ingrediente</option>
           {allIngredients.map(i => (
-            <option className="dark:bg-gray-800 dark:text-white" key={i} value={i}>{translateIngredient(t, i)}</option>
+            <option className="bg-bg-surface text-text-main" key={i} value={i}>{translateIngredient(t, i)}</option>
           ))}
         </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white">
-          <option className="dark:bg-gray-800 dark:text-white" value="strength_desc">Fuerza Base DESC</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="pot_asc">Tamaño Olla ASC</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="pot_desc">Tamaño Olla DESC</option>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main">
+          <option className="bg-bg-surface text-text-main" value="strength_desc">Fuerza Base DESC</option>
+          <option className="bg-bg-surface text-text-main" value="pot_asc">Tamaño Olla ASC</option>
+          <option className="bg-bg-surface text-text-main" value="pot_desc">Tamaño Olla DESC</option>
         </select>
       </div>
 
@@ -121,7 +121,7 @@ export default function Recipes() {
             <div className="p-4 border-b border-border-main bg-slate-50/50 dark:bg-slate-800/30">
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-bold text-lg leading-tight">{translateRecipe(t, recipe.name)}</h3>
-                <span className="flex items-center text-xs font-bold px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-text-main">
+                <span className="flex items-center text-xs font-bold px-2 py-1 rounded-full bg-border-main text-text-main">
                   {recipe.nrOfIngredients} ings
                 </span>
               </div>
@@ -147,15 +147,15 @@ export default function Recipes() {
             <div className="p-4 border-t border-border-main bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center text-sm">
               <div className="flex flex-col">
                 <span className="text-text-muted text-xs">{t('recipes.base_power')}</span>
-                <span className="font-bold text-green-600 dark:text-green-400">{recipe.value.toLocaleString()}</span>
+                <span className="font-bold text-success-main">{recipe.value.toLocaleString()}</span>
               </div>
               <div className="flex flex-col text-right">
                 <span className="text-text-muted text-xs">{t('recipes.max_power')}</span>
-                <span className="font-bold text-indigo-600 dark:text-indigo-400">{recipe.valueMax.toLocaleString()}</span>
+                <span className="font-bold text-primary-main">{recipe.valueMax.toLocaleString()}</span>
               </div>
               <div className="flex flex-col text-right">
                 <span className="text-text-muted text-xs">{t('recipes.bonus')}</span>
-                <span className="font-bold text-amber-600 dark:text-amber-400">+{recipe.bonus}%</span>
+                <span className="font-bold text-warning-main">+{recipe.bonus}%</span>
               </div>
             </div>
           </div>

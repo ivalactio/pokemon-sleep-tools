@@ -41,8 +41,8 @@ export default function SavedQueriesPage() {
               <p className="text-sm text-text-muted">Isla: {q.config.simulation.island} • Objetivo: {q.config.objectives[0]}</p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => handleLoad(q)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold">{t('saved.load')}</button>
-              <button onClick={() => handleDelete(q.id)} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-bold">{t('app.delete')}</button>
+              <button onClick={() => handleLoad(q)} className="px-4 py-2 bg-primary-main hover:bg-primary-hover text-white rounded font-bold">{t('saved.load')}</button>
+              <button onClick={() => handleDelete(q.id)} className="px-4 py-2 bg-error-main hover:bg-error-hover text-white rounded font-bold">{t('app.delete')}</button>
             </div>
           </div>
         ))}

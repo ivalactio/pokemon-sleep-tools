@@ -127,24 +127,24 @@ export default function SavedTeamsPage() {
         <select 
           value={filterIsland} 
           onChange={e => setFilterIsland(e.target.value)}
-          className="p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white"
+          className="p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main"
         >
-          <option className="dark:bg-gray-800 dark:text-white" value="">Todas las islas</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="greengrass">Verdegal</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="cyan">Playa Turquesa</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="taupe">Cueva Pardilla</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="snowdrop">Tundra Galleta</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="lapis">Lago Lazulita</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="gold">Central Oro</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="crimson">Volcán Carmesí</option>
+          <option className="bg-bg-surface text-text-main" value="">Todas las islas</option>
+          <option className="bg-bg-surface text-text-main" value="greengrass">Verdegal</option>
+          <option className="bg-bg-surface text-text-main" value="cyan">Playa Turquesa</option>
+          <option className="bg-bg-surface text-text-main" value="taupe">Cueva Pardilla</option>
+          <option className="bg-bg-surface text-text-main" value="snowdrop">Tundra Galleta</option>
+          <option className="bg-bg-surface text-text-main" value="lapis">Lago Lazulita</option>
+          <option className="bg-bg-surface text-text-main" value="gold">Central Oro</option>
+          <option className="bg-bg-surface text-text-main" value="crimson">Volcán Carmesí</option>
         </select>
         <select 
           value={sortBy} 
           onChange={e => setSortBy(e.target.value)}
-          className="p-2 rounded border border-border-main bg-bg-main dark:bg-gray-800 dark:text-white"
+          className="p-2 rounded border border-border-main bg-bg-main bg-bg-surface text-text-main"
         >
-          <option className="dark:bg-gray-800 dark:text-white" value="score">Puntuación más alta</option>
-          <option className="dark:bg-gray-800 dark:text-white" value="recent">Más recientes</option>
+          <option className="bg-bg-surface text-text-main" value="score">Puntuación más alta</option>
+          <option className="bg-bg-surface text-text-main" value="recent">Más recientes</option>
         </select>
       </div>
 
@@ -167,8 +167,8 @@ export default function SavedTeamsPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => handleViewDetail(t.id)} className="px-4 py-2 bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 rounded font-bold dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800">Detalles</button>
-                <button onClick={() => handleDelete(t.id)} className="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded font-bold dark:hover:bg-red-900/30">Eliminar</button>
+                <button onClick={() => handleViewDetail(t.id)} className="px-4 py-2 bg-indigo-50 text-primary-main border border-indigo-200 hover:bg-indigo-100 rounded font-bold dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800">Detalles</button>
+                <button onClick={() => handleDelete(t.id)} className="px-4 py-2 border border-red-200 text-error-main hover:bg-red-50 rounded font-bold dark:hover:bg-red-900/30">Eliminar</button>
               </div>
             </div>
           );
