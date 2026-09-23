@@ -42,6 +42,7 @@ export interface TeamScore {
 export interface TeamResult {
   evaluation: TeamEvaluationContext;
   score: TeamScore;
+  queryContext?: OptimizerConfig;
 }
 
 export interface Team {

@@ -71,22 +71,58 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
   const [compareTeams, setCompareTeams] = useState<[TeamResult, TeamResult] | null>(null);
 
   const buildTeamResult = async (teamId: string): Promise<TeamResult> => {
-    const saved = savedTeams.find(t => t.id === teamId);
-    if (!saved) throw new Error('Not found');
-    const members = saved.memberIds.map(id => collection.find(p => p.id === id)).filter(Boolean) as OwnedPokemon[];
+    const saved = savedTeams.find(t => t.id === teamId) || (await db.savedTeams.get(teamId));
+    if (!saved) throw new Error(`Equipo con ID "${teamId}" no encontrado.`);
+    
+    const members = (saved.memberIds || [])
+      .map(id => collection.find(p => p.id === id))
+      .filter(Boolean) as OwnedPokemon[];
+      
+    if (members.length === 0) {
+      throw new Error(`El equipo "${saved.name || teamId}" no contiene Pokémon válidos en tu caja actual.`);
+    }
+
     const teamObj = { members };
     const engine = new LocalCalculationEngine(gamedata as any);
     const evaluator = new TeamEvaluator(engine, gamedata as any);
-    const ctx = await evaluator.evaluate(teamObj, saved.queryContext.simulation);
+
+    const simConfig = saved.queryContext?.simulation || {
+      camp: false,
+      bedtime: '22:00',
+      wakeup: '06:00',
+      island: island || 'greengrass',
+      areaBonus: areaBonus || 0,
+      favoriteBerries: island === 'greengrass' ? favoriteBerries : undefined
+    };
+
+    const ctx = await evaluator.evaluate(teamObj, simConfig);
     
-    const obj = saved.queryContext.objectives[0];
+    const obj = saved.queryContext?.objectives?.[0] || objective || 'berries';
+    const currentRecipeType = saved.queryContext?.recipeType || recipeType || 'curry';
+    const currentTargetRecipeId = saved.queryContext?.targetRecipeId || targetRecipeId;
+
     let strategy;
-    if (obj === 'berries') strategy = new BerryScoringStrategy(gamedata as any);
-    else if (obj === 'ingredients') strategy = new IngredientScoringStrategy(gamedata as any);
-    else strategy = new RecipeScoringStrategy(gamedata as any, saved.queryContext.recipeType || 'curry', saved.queryContext.targetRecipeId);
+    if (obj === 'berries') {
+      strategy = new BerryScoringStrategy(gamedata as any);
+    } else if (obj === 'ingredients') {
+      strategy = new IngredientScoringStrategy(gamedata as any);
+    } else {
+      strategy = new RecipeScoringStrategy(gamedata as any, currentRecipeType, currentTargetRecipeId);
+    }
     
     const score = strategy.score(ctx);
-    return { evaluation: ctx, score };
+    return {
+      evaluation: ctx,
+      score,
+      queryContext: {
+        simulation: simConfig,
+        constraints: { minLevel: 1, uniqueSpecies: false, requiredPokemonIds: [], excludedPokemonIds: [] },
+        recipeType: currentRecipeType,
+        targetRecipeId: currentTargetRecipeId,
+        objectives: [obj],
+        maxResults: 10
+      }
+    };
   };
 
   const handleCompareClick = async () => {
@@ -96,9 +132,10 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
         const t1 = await buildTeamResult(tids[0]);
         const t2 = await buildTeamResult(tids[1]);
         setCompareTeams([t1, t2]);
-      } catch (e) {
+      } catch (e: unknown) {
         console.error("Error al comparar", e);
-        alert("Error al preparar comparación.");
+        const msg = e instanceof Error ? e.message : String(e);
+        alert(`Error al preparar comparación: ${msg}`);
       }
     }
   };
@@ -821,6 +858,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
       {compareTeams && (
         <TeamCompareModal 
           teams={compareTeams} 
+          targetRecipeId={targetRecipeId}
           onClose={() => setCompareTeams(null)} 
         />
       )}
