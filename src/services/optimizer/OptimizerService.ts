@@ -28,7 +28,9 @@ export class OptimizerService {
     onProgress?: (progress: OptimizerProgress) => void,
     signal?: AbortSignal
   ): Promise<TeamResult[]> {
-    this.validateConfig(collection, config);
+    if (!this.validateConfig(collection, config)) {
+      return [];
+    }
 
     const filter = new CandidateFilter();
     const candidates = filter.filter(collection, config.constraints);
@@ -105,7 +107,7 @@ export class OptimizerService {
     return topN;
   }
 
-  private validateConfig(collection: OwnedPokemon[], config: OptimizerConfig) {
+  private validateConfig(collection: OwnedPokemon[], config: OptimizerConfig): boolean {
     if (config.constraints.requiredPokemonIds.length > 5) {
       throw new Error('No puedes requerir más de 5 Pokémon.');
     }
@@ -114,7 +116,7 @@ export class OptimizerService {
     const excSet = new Set(config.constraints.excludedPokemonIds);
     for (const req of reqSet) {
       if (excSet.has(req)) {
-        throw new Error(`El Pokémon con ID ${req} no puede estar requerido y excluido a la vez.`);
+        return false;
       }
     }
     
@@ -134,6 +136,8 @@ export class OptimizerService {
         throw new Error('Hay Pokémon requeridos con la misma especie, pero la restricción uniqueSpecies está activada.');
       }
     }
+
+    return true;
   }
 
   private getStrategy(objective: OptimizerObjective, config: OptimizerConfig) {

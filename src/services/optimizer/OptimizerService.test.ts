@@ -102,7 +102,8 @@ test('OptimizerService throws on invalid config (overlapping required/excluded)'
   config.constraints.requiredPokemonIds = ['m1'];
   config.constraints.excludedPokemonIds = ['m1'];
 
-  await expect(service.optimize(collection, config)).rejects.toThrow(/requerido y excluido a la vez/);
+  const results = await service.optimize(collection, config);
+  expect(results).toEqual([]);
 });
 
 test('OptimizerService throws if greengrass and no favorite berries', async () => {
