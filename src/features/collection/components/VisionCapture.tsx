@@ -16,8 +16,10 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
 type ProcessingStatus = 'idle' | 'validating' | 'analyzing' | 'done';
+import { useTranslation } from 'react-i18next';
 
 export default function VisionCapture({ provider, providerLabel = 'Proveedor', onExtracted, onError }: VisionCaptureProps) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<ProcessingStatus>('idle');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -66,8 +68,8 @@ export default function VisionCapture({ provider, providerLabel = 'Proveedor', o
       <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 text-sm flex gap-3 items-start">
         <div className="font-bold shrink-0 mt-0.5">⚠️</div>
         <div>
-          <strong className="block mb-1">Funcionalidad experimental inacabada</strong>
-          Esta funcionalidad todavía está en desarrollo. El análisis automático puede producir resultados incorrectos o inexactos, por lo que <strong>requiere revisión manual</strong> exhaustiva antes de guardar.
+          <strong className="block mb-1"> {t('import.experimental')} </strong>
+          Esta funcionalidad todavía está en desarrollo. El análisis automático puede producir resultados incorrectos o inexactos, por lo que <strong> {t('import.manual_review')} </strong> exhaustiva antes de guardar.
         </div>
       </div>
 
@@ -76,7 +78,7 @@ export default function VisionCapture({ provider, providerLabel = 'Proveedor', o
         <div className="flex flex-col items-center text-slate-600 gap-3">
           <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
           <p className="font-medium">{STATUS_MESSAGES[status]}</p>
-          <p className="text-xs text-slate-400">No cierres esta pantalla mientras se analiza</p>
+          <p className="text-xs text-slate-400"> {t('import.dont_close')} </p>
         </div>
       ) : (
         <div className="flex flex-col items-center space-y-4">
@@ -87,12 +89,12 @@ export default function VisionCapture({ provider, providerLabel = 'Proveedor', o
               className="flex items-center space-x-2 bg-bg-surface border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
             >
               <ImageIcon className="w-5 h-5 text-slate-600" />
-              <span>Subir Imagen</span>
+              <span> {t('import.upload')} </span>
             </button>
             {/* The capture attribute opens the camera on mobile devices */}
             <label className="flex items-center space-x-2 bg-bg-surface border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
               <Camera className="w-5 h-5 text-slate-600" />
-              <span>Cámara</span>
+              <span> {t('import.camera')} </span>
               <input
                 type="file"
                 accept="image/*"

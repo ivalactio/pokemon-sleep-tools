@@ -34,7 +34,7 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-bg-main rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center p-6 border-b border-border-main">
-          <h2 className="text-xl font-bold">Filtros Avanzados</h2>
+          <h2 className="text-xl font-bold">{t('collection.advanced_filters')}</h2>
           <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full">
             <X size={24} className="text-text-muted" />
           </button>
@@ -42,19 +42,19 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold mb-2">Nivel Mínimo</label>
+              <label className="block text-sm font-bold mb-2">{t('collection.min_level')}</label>
               <input type="number" value={filters.minLevel || ''} onChange={e => setFilters({...filters, minLevel: e.target.value ? parseInt(e.target.value) : undefined})} className="w-full bg-bg-surface border border-border-main rounded-lg px-3 py-2" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-2">Nivel Máximo</label>
+              <label className="block text-sm font-bold mb-2">{t('collection.max_level')}</label>
               <input type="number" value={filters.maxLevel || ''} onChange={e => setFilters({...filters, maxLevel: e.target.value ? parseInt(e.target.value) : undefined})} className="w-full bg-bg-surface border border-border-main rounded-lg px-3 py-2" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">Naturaleza</label>
+            <label className="block text-sm font-bold mb-2">{t('collection.nature')}</label>
             <select value={filters.natureId || ''} onChange={e => setFilters({...filters, natureId: e.target.value || undefined})} className="w-full bg-bg-surface border border-border-main rounded-lg px-3 py-2">
-              <option value="">Todas</option>
+              <option value="">{t('app.all')}</option>
               {gamedata.natures.map((n: any) => (
                 <option key={n.id} value={n.id}>{getNatureDisplayName(t, n.id)}</option>
               ))}
@@ -62,7 +62,7 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">Subhabilidades Requeridas</label>
+            <label className="block text-sm font-bold mb-2">{t('collection.required_subskills')}</label>
             <div className="flex flex-wrap gap-2">
               {gamedata.subSkills.map((s: any) => {
                 const active = filters.subSkillIds.includes(s.id);
@@ -76,7 +76,7 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">Ingredientes Requeridos</label>
+            <label className="block text-sm font-bold mb-2">{t('collection.required_ingredients')}</label>
             <div className="flex flex-wrap gap-2">
               {gamedata.ingredients.map((ing: any) => {
                 const active = filters.ingredientIds.includes(ing.name);
@@ -92,11 +92,11 @@ export default function CollectionFiltersModal({ filters, setFilters, onClose }:
           <div className="space-y-3 pt-4 border-t border-border-main">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={filters.favoritesOnly} onChange={e => setFilters({...filters, favoritesOnly: e.target.checked})} className="w-5 h-5 rounded" />
-              <span className="font-bold text-amber-500">Solo Favoritos</span>
+              <span className="font-bold text-amber-500">{t('collection.only_favorites')}</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={filters.incompleteOnly} onChange={e => setFilters({...filters, incompleteOnly: e.target.checked})} className="w-5 h-5 rounded" />
-              <span className="font-bold text-red-500">Solo Datos Incompletos</span>
+              <span className="font-bold text-red-500">{t('collection.only_incomplete')}</span>
             </label>
           </div>
         </div>

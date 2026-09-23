@@ -92,19 +92,19 @@ export default function TeamComparatorPage() {
   };
 
   if (!team1 || !team2) {
-    return <div className="p-6">Por favor selecciona 2 equipos desde Equipos Guardados.</div>;
+    return <div className="p-6">{t('saved.select_two')}</div>;
   }
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Comparador Independiente</h1>
+      <h1 className="text-2xl font-bold">{t('saved.comparator_title')}</h1>
       <p className="text-text-muted">Comparando: <strong>{team1.name}</strong> vs <strong>{team2.name}</strong></p>
 
       <div className="bg-bg-surface border border-border-main rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-4 border-b border-border-main pb-2">Contexto de Evaluación</h2>
+        <h2 className="text-lg font-semibold mb-4 border-b border-border-main pb-2">{t('saved.eval_context')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium mb-1">Isla</label>
+            <label className="block text-sm font-medium mb-1">{t('optimizer.island')}</label>
             <select value={island} onChange={e => setIsland(e.target.value as IslandId)} className="w-full bg-bg-main border border-border-main rounded-lg px-3 py-2">
               {ISLANDS.map(i => (
                 <option key={i.id} value={i.id}>{t(`island.${i.id}`)}</option>
@@ -112,24 +112,24 @@ export default function TeamComparatorPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Bonus de Área (%)</label>
+            <label className="block text-sm font-medium mb-1">{t('optimizer.area_bonus')}</label>
             <input type="number" min="0" max="60" value={areaBonus} onChange={e => setAreaBonus(Number(e.target.value))} className="w-full bg-bg-main border border-border-main rounded-lg px-3 py-2" />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Objetivo</label>
+            <label className="block text-sm font-medium mb-1">{t('optimizer.objective')}</label>
             <select value={objective} onChange={e => setObjective(e.target.value as OptimizerObjective)} className="w-full bg-bg-main border border-border-main rounded-lg px-3 py-2">
-              <option value="berries">Fuerza de Bayas</option>
-              <option value="ingredients">Valor de Ingredientes</option>
-              <option value="recipe">Cobertura de Recetas</option>
+              <option value="berries">{t('optimizer.objective_berries')}</option>
+              <option value="ingredients">{t('optimizer.objective_ingredients')}</option>
+              <option value="recipe">{t('optimizer.objective_recipe')}</option>
             </select>
           </div>
           {objective === 'recipe' && (
             <div>
-              <label className="block text-sm font-medium mb-1">Tipo de Platos</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.dish_type')}</label>
               <select value={recipeType} onChange={e => setRecipeType(e.target.value as any)} className="w-full bg-bg-main border border-border-main rounded-lg px-3 py-2">
-                <option value="curry">Guisos y curris</option>
-                <option value="salad">Ensaladas</option>
-                <option value="dessert">Postres</option>
+                <option value="curry">{t('game.recipeType.curry')}</option>
+                <option value="salad">{t('game.recipeType.salad')}</option>
+                <option value="dessert">{t('game.recipeType.dessert')}</option>
               </select>
             </div>
           )}

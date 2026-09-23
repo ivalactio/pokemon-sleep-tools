@@ -1,6 +1,17 @@
 {
   "app": {
-    "title": "PokéSleep Optimizer"
+    "title": "PokéSleep Optimizer",
+    "name": "Nombre",
+    "all": "Todas",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "duplicate": "Duplicar",
+    "none": "Ninguna",
+    "back": "Volver",
+    "level": "Nv.",
+    "loading": "Cargando o no encontrado..."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -11,12 +22,24 @@
     "optimizer": "Optimizador"
   },
   "collection": {
-    "title": "Mi Colección",
+    "title": "Colección",
     "search": "Buscar por apodo o especie...",
     "empty": "No tienes Pokémon en tu colección.",
     "add_first": "¡Añade tu primer Pokémon!",
     "specialty": "Especialidad",
-    "sort_by_level": "Nv."
+    "sort_by_level": "Nv.",
+    "filters": "Filtros",
+    "analyze_with": "Analizar con:",
+    "error": "Error:",
+    "missing_data": "⚠️ Faltan datos (Naturaleza, Ings o Subhabs)",
+    "advanced_filters": "Filtros Avanzados",
+    "min_level": "Nivel Mínimo",
+    "max_level": "Nivel Máximo",
+    "nature": "Naturaleza",
+    "required_subskills": "Subhabilidades Requeridas",
+    "required_ingredients": "Ingredientes Requeridos",
+    "only_favorites": "Solo Favoritos",
+    "only_incomplete": "Solo Datos Incompletos"
   },
   "pokemon_form": {
     "title_add": "Añadir Pokémon",
@@ -32,12 +55,16 @@
     "select_nature": "Selecciona naturaleza..."
   },
   "recipes": {
-    "title": "Catálogo de Recetas",
+    "title": "Recetas",
     "curry": "Curris",
     "salad": "Ensaladas",
     "dessert": "Postres",
     "all": "Todos",
-    "value": "Valor"
+    "value": "Valor",
+    "base_power": "Poder Base",
+    "max_power": "Poder Max",
+    "bonus": "Bonus",
+    "not_found": "No se encontraron recetas con esos filtros."
   },
   "settings": {
     "title": "Configuración",
@@ -58,7 +85,10 @@
       "status_error": "Error de conexión.",
       "no_key_warning": "Se usará la clave del servidor si existe.",
       "byok_warning": "La clave se almacena solo en memoria durante esta sesión. Desaparecerá al recargar la página."
-    }
+    },
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro"
   },
   "errors": {
     "MISSING_API_KEY": "No hay ninguna API key disponible. Configura una en Configuración o en el servidor.",
@@ -295,6 +325,11 @@
       "HONEY_GATHER_CHOCOLATE_WAFFLES": "Gofres Recogemiel",
       "SCARY_FACE_PANCAKES": "Tortitas Cara Susto",
       "LEAF_TORNADO_SMOOTHIE": "Batido Ciclón de Hojas"
+    },
+    "recipeType": {
+      "curry": "Guisos y curris",
+      "salad": "Ensaladas",
+      "dessert": "Postres"
     }
   },
   "dashboard": {
@@ -317,5 +352,107 @@
     "lapis": "Lago Lazuli",
     "power_plant": "Antigua Planta Eléctrica",
     "amber_canyon": "Cañón Ámbar"
+  },
+  "optimizer": {
+    "configuration": "Configuración",
+    "island": "Isla",
+    "area_bonus": "Bonus de Área (%)",
+    "force_unique": "Forzar 5 especies distintas (Evitar duplicados)",
+    "objective": "Objetivo de Optimización",
+    "objective_berries": "Fuerza Máxima (Producción de Bayas)",
+    "objective_ingredients": "Fuerza Máxima (Producción de Ingredientes base)",
+    "objective_recipe": "Cobertura de Recetas",
+    "dish_type": "Tipo de Platos de la Semana",
+    "prioritize_recipe": "Priorizar Receta Específica (Opcional)",
+    "min_level_allowed": "Nivel Mínimo Permitido",
+    "top_n": "Cantidad de Resultados (Top N)",
+    "empty_collection": "Tu colección está vacía.",
+    "analyzing": "Analizando Equipos...",
+    "all_category": "Optimizar para TODA la categoría"
+  },
+  "team": {
+    "compare": "Comparador de Equipos",
+    "metric": "Métrica",
+    "team_a": "Equipo A",
+    "team_b": "Equipo B",
+    "berries_day": "Bayas / Día",
+    "ings_day": "Ingredientes / Día",
+    "skills_day": "Habilidades / Día",
+    "detail": "Detalle del Equipo",
+    "save": "Guardar Equipo",
+    "members_production": "Miembros y Producción Diaria",
+    "recipe_coverage": "Cobertura de Recetas",
+    "recipe_coverage_desc": "Basado en la producción diaria estimada de ingredientes del equipo completo.",
+    "coverage": "Cobertura",
+    "missing": "Falta:",
+    "ings": "ings"
+  },
+  "saved": {
+    "queries_title": "Consultas Guardadas",
+    "load": "Cargar",
+    "empty_queries": "No hay consultas guardadas.",
+    "teams_title": "Equipos Guardados",
+    "empty_teams": "No hay equipos guardados.",
+    "comparator_title": "Comparador Independiente",
+    "select_two": "Por favor selecciona 2 equipos desde Equipos Guardados.",
+    "comparing": "Comparando:",
+    "eval_context": "Contexto de Evaluación"
+  },
+  "planner": {
+    "title": "Planificador Semanal",
+    "optimize": "Optimizar Equipo",
+    "compare": "Comparar Equipos",
+    "context": "Contexto",
+    "plan_name": "Nombre del Plan",
+    "week_start": "Semana (Fecha inicio)",
+    "general_objective": "Objetivo General",
+    "weekly_notes": "Notas Semanales",
+    "assigned_teams": "Equipos Asignados",
+    "main_team": "Equipo Principal",
+    "select_team": "-- Seleccionar Equipo Guardado --",
+    "alt_teams": "Equipos Alternativos (Opcional)",
+    "daily_plan": "Planificación Diaria",
+    "override_team": "Sobrescribir Equipo",
+    "use_main": "(Usar Principal)",
+    "recipe_day": "Receta del Día",
+    "use_main_recipe": "(Usar Principal / Variable)",
+    "daily_notes": "Notas del día",
+    "new_plan": "Nueva Planificación",
+    "starts": "Inicia:",
+    "empty": "No hay planificaciones guardadas. Crea una nueva para empezar.",
+    "confirm_delete": "¿Eliminar esta planificación?",
+    "compare_error": "Para comparar directamente, debes tener exactamente 2 equipos definidos (Principal y 1 Alternativo).",
+    "copy_suffix": "(Copia)"
+  },
+  "import": {
+    "editing": "Editando Pokémon",
+    "json_title": "Importar JSON",
+    "json_desc": "Pega el código JSON generado por la extensión o script Gemini a continuación:",
+    "json_results": "Resultados de Importación JSON",
+    "select_all": "Seleccionar todos",
+    "upload": "Subir Imagen",
+    "camera": "Cámara",
+    "review": "Revisar Captura",
+    "warnings": "Advertencias",
+    "basic_data": "Datos Básicos",
+    "experimental": "Funcionalidad experimental inacabada",
+    "manual_review": "requiere revisión manual",
+    "dont_close": "No cierres esta pantalla mientras se analiza",
+    "species": "Especie *",
+    "select_species": "Seleccionar especie...",
+    "main_skill_level": "Nivel Main Skill",
+    "main_skill_auto": "Main Skill (Auto)",
+    "ribbon": "Cinta (Ribbon)",
+    "none_0": "Ninguna (0)",
+    "lv1_inv": "Nv 1 (+ Inventario)",
+    "lv2_freq": "Nv 2 (+ Frecuencia)",
+    "lv3_inv": "Nv 3 (+ Inventario)",
+    "lv4_freq": "Nv 4 (+ Frecuencia)",
+    "shiny": "Shiny",
+    "sneaky_snacking": "Sneaky Snacking",
+    "ingredients": "Ingredientes",
+    "select_ingredient": "Seleccionar ingrediente...",
+    "subskills": "Subhabilidades",
+    "select_subskill": "Seleccionar subhabilidad..."
   }
 }

@@ -31,7 +31,7 @@ export default function PokemonDetail() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!pokemon) return <div className="p-8 text-center text-text-muted">Cargando o no encontrado...</div>;
+  if (!pokemon) return <div className="p-8 text-center text-text-muted">{t('app.loading')}</div>;
 
   const handleDelete = async () => {
     if (window.confirm("¿Seguro que quieres eliminar este Pokémon?")) {
@@ -80,8 +80,8 @@ export default function PokemonDetail() {
               }} className="p-1 border border-border-main rounded text-sm bg-bg-app">
                 {gamedata.species.map(s => <option key={s.name} value={s.name}>{s.displayName}</option>)}
               </select>
-              <span className="text-slate-400">•</span>
-              <span className="text-sm font-medium text-text-muted">Nv.</span>
+              <span className="text-text-muted">•</span>
+              <span className="text-sm font-medium text-text-muted">{t('app.level')}</span>
               <input type="number" min="1" max="100" value={pokemon.level} onChange={e => collectionRepository.update({ ...pokemon, level: parseInt(e.target.value) || 1 })} className="w-16 p-1 border border-border-main rounded text-sm bg-bg-app" />
             </div>
           </div>
@@ -268,7 +268,7 @@ export default function PokemonDetail() {
                   <div className="font-medium text-blue-900 dark:text-blue-300 text-xl">{estimate.skillProcs.toFixed(2)} <span className="text-sm">{t('pokemon_detail.procs')}</span></div>
                 </div>
               </div>
-              <div className="mt-3 text-xs text-slate-400 text-right">
+              <div className="mt-3 text-xs text-text-muted text-right">
                 {t('pokemon_detail.calculated_at')} {new Date(estimate.calculatedAt).toLocaleTimeString()}
               </div>
             </div>

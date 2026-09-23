@@ -86,8 +86,8 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
         <div className="flex items-center justify-between p-6 border-b border-border-main bg-bg-surface">
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold flex items-center gap-2">Detalle del Equipo</h2>
-              <button onClick={handleSaveTeam} className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-bold">Guardar Equipo</button>
+              <h2 className="text-2xl font-bold flex items-center gap-2">{t('team.detail')}</h2>
+              <button onClick={handleSaveTeam} className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-bold">{t('team.save')}</button>
             </div>
             <p className="text-sm text-text-muted mt-1">Score: {Math.round(result.score.score).toLocaleString()} ({result.score.objective})</p>
           </div>
@@ -101,7 +101,7 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
           
           {/* SECCIÓN POKÉMON */}
           <section>
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">Miembros y Producción Diaria</h3>
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">{t('team.members_production')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {memberEstimates.map((m, i) => {
                 const pokemonData = gamedata.species.find(s => s.name === m.pokemon.speciesId);
@@ -112,11 +112,11 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
                     </div>
                     <div className="space-y-2 text-text-muted">
                       <div className="flex justify-between">
-                        <span className="font-medium text-amber-600 dark:text-amber-400">Bayas:</span>
+                        <span className="font-medium text-amber-600 dark:text-amber-400">{t('app.berries')}:</span>
                         <span>{Math.round(m.estimate.berries.reduce((s, b) => s + b.amount, 0))}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="font-medium text-indigo-600 dark:text-indigo-400">Ings:</span>
+                        <span className="font-medium text-indigo-600 dark:text-indigo-400">{t('team.ings')}:</span>
                         <span>{Math.round(m.estimate.ingredients.reduce((s, i) => s + i.amount, 0))}</span>
                       </div>
                       <div className="flex justify-between">
@@ -134,8 +134,8 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
 
           {/* SECCIÓN COBERTURA RECETAS */}
           <section>
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Utensils className="text-orange-500" /> Cobertura de Recetas</h3>
-            <p className="text-sm text-text-muted mb-4">Basado en la producción diaria estimada de ingredientes del equipo completo.</p>
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Utensils className="text-orange-500" /> {t('team.recipe_coverage')}</h3>
+            <p className="text-sm text-text-muted mb-4">{t('team.recipe_coverage_desc')}</p>
             
             {topRecipes.length > 0 ? (
               <div className="space-y-3">
@@ -148,7 +148,7 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
                     
                     <div className="flex-1">
                       <div className="flex justify-between text-sm mb-1">
-                        <span>Cobertura</span>
+                        <span>{t('team.coverage')}</span>
                         <span className="font-bold">{recipe.coverage.toFixed(1)}%</span>
                       </div>
                       <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
@@ -166,7 +166,7 @@ export function TeamDetailModal({ result, onClose }: TeamDetailModalProps) {
                         </span>
                       ) : (
                         <div>
-                          <span className="text-red-500 font-medium">Falta:</span>
+                          <span className="text-red-500 font-medium">{t('team.missing')}</span>
                           <ul className="list-disc list-inside text-xs mt-1">
                             {recipe.missing.map(m => (
                               <li key={m.name}>{translateIngredient(t, m.name)} (-{Math.ceil(m.deficit)})</li>

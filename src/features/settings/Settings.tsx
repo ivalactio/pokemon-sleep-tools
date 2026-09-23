@@ -66,7 +66,7 @@ export default function Settings() {
           <select
             value={i18n.language}
             onChange={handleLanguageChange}
-            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface"
+            className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface text-text-main"
           >
             <option value="es">Español</option>
             <option value="en">English</option>
@@ -74,14 +74,14 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="font-bold text-text-main">Tema</label>
+          <label className="font-bold text-text-main">{t('settings.theme')}</label>
           <select
             value={theme}
             onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
             className="p-2 border border-border-main rounded max-w-xs focus:ring-indigo-500 focus:border-indigo-500 bg-bg-surface"
           >
-            <option value="light">Claro</option>
-            <option value="dark">Oscuro</option>
+            <option value="light">{t('settings.light')}</option>
+            <option value="dark">{t('settings.dark')}</option>
           </select>
         </div>
       </div>
@@ -118,7 +118,7 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={() => setShowKey(!showKey)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-text-muted"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-muted"
                     title={showKey ? t('settings.gemini.hide_key') : t('settings.gemini.show_key')}
                   >
                     {showKey ? <EyeOff size={18} /> : <Eye size={18} />}

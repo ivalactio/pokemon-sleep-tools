@@ -114,8 +114,8 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
           <ArrowLeft size={20}/> Volver
         </button>
         <div className="flex gap-2">
-          <button onClick={handleOptimize} className="px-4 py-2 border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50 rounded font-bold">Optimizar Equipo</button>
-          <button onClick={handleCompare} className="px-4 py-2 border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50 rounded font-bold">Comparar Equipos</button>
+          <button onClick={handleOptimize} className="px-4 py-2 border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50 rounded font-bold">{t('planner.optimize')}</button>
+          <button onClick={handleCompare} className="px-4 py-2 border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50 rounded font-bold">{t('planner.compare')}</button>
           <button onClick={handleSave} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold flex items-center gap-2">
             <Save size={18}/> Guardar
           </button>
@@ -127,24 +127,24 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
         {/* Context Configuration */}
         <div className="col-span-1 space-y-4">
           <div className="bg-bg-surface border border-border-main p-4 rounded-xl shadow-sm space-y-4">
-            <h2 className="font-bold text-lg border-b border-border-main pb-2">Contexto</h2>
+            <h2 className="font-bold text-lg border-b border-border-main pb-2">{t('planner.context')}</h2>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Nombre del Plan</label>
+              <label className="block text-sm font-medium mb-1">{t('planner.plan_name')}</label>
               <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Semana (Fecha inicio)</label>
+              <label className="block text-sm font-medium mb-1">{t('planner.week_start')}</label>
               <input type="date" value={weekStart} onChange={e => setWeekStart(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Isla</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.island')}</label>
               <select value={island} onChange={e => setIsland(e.target.value as IslandId)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
                 {ISLANDS.map(i => <option key={i.id} value={i.id}>{t(`islands.${i.id}`)}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Bonus de Área (%)</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.area_bonus')}</label>
               <input type="number" min="0" max="60" value={areaBonus} onChange={e => setAreaBonus(Number(e.target.value))} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main" />
             </div>
             
@@ -174,7 +174,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1">Tipo de Platos</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.dish_type')}</label>
               <select value={recipeType} onChange={e => setRecipeType(e.target.value as RecipeType)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
                 <option value="curry">{t('game.recipeType.curry', { defaultValue: 'Guisos y curris' })}</option>
                 <option value="salad">{t('game.recipeType.salad', { defaultValue: 'Ensaladas' })}</option>
@@ -183,7 +183,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Receta Principal</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.prioritize_recipe')}</label>
               <select value={targetRecipeId} onChange={e => setTargetRecipeId(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
                 <option value="">{t('app.none', { defaultValue: 'Ninguna / Variable' })}</option>
                 {availableRecipes.map(r => (
@@ -193,7 +193,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Objetivo General</label>
+              <label className="block text-sm font-medium mb-1">{t('planner.general_objective')}</label>
               <select value={objective} onChange={e => setObjective(e.target.value as OptimizerObjective)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
                 <option value="berries">{t('app.berries', { defaultValue: 'Bayas' })}</option>
                 <option value="ingredients">{t('app.ingredients', { defaultValue: 'Ingredientes' })}</option>
@@ -202,7 +202,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Notas Semanales</label>
+              <label className="block text-sm font-medium mb-1">{t('planner.weekly_notes')}</label>
               <textarea value={notes} onChange={e => setNotes(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main text-text-main h-24" placeholder="Ej: Priorizar subir ingredientes de Miel." />
             </div>
 
@@ -212,17 +212,17 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
         {/* Daily & Teams */}
         <div className="col-span-1 lg:col-span-2 space-y-6">
           <div className="bg-bg-surface border border-border-main p-4 rounded-xl shadow-sm space-y-4">
-            <h2 className="font-bold text-lg border-b border-border-main pb-2">Equipos Asignados</h2>
+            <h2 className="font-bold text-lg border-b border-border-main pb-2">{t('planner.assigned_teams')}</h2>
             <div>
-              <label className="block text-sm font-medium mb-1">Equipo Principal</label>
+              <label className="block text-sm font-medium mb-1">{t('planner.main_team')}</label>
               <select value={mainTeamId} onChange={e => setMainTeamId(e.target.value)} className="w-full px-3 py-2 border border-border-main rounded bg-bg-main font-bold text-indigo-700 dark:text-indigo-400">
-                <option value="">-- Seleccionar Equipo Guardado --</option>
+                <option value="">{t('planner.select_team')}</option>
                 {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Equipos Alternativos (Opcional)</label>
+              <label className="block text-sm font-medium mb-1">{t('planner.alt_teams')}</label>
               {alternativeTeamIds.map((tid, idx) => (
                 <div key={idx} className="flex items-center gap-2 mb-2">
                   <select value={tid} onChange={e => {
@@ -230,7 +230,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                     nw[idx] = e.target.value;
                     setAlternativeTeamIds(nw);
                   }} className="flex-1 px-3 py-2 border border-border-main rounded bg-bg-main text-text-main">
-                    <option value="">-- Seleccionar Equipo Guardado --</option>
+                    <option value="">{t('planner.select_team')}</option>
                     {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                   </select>
                   <button onClick={() => setAlternativeTeamIds(alternativeTeamIds.filter((_, i) => i !== idx))} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded">
@@ -245,24 +245,24 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
           </div>
 
           <div className="bg-bg-surface border border-border-main p-4 rounded-xl shadow-sm">
-            <h2 className="font-bold text-lg border-b border-border-main pb-4 mb-4">Planificación Diaria</h2>
+            <h2 className="font-bold text-lg border-b border-border-main pb-4 mb-4">{t('planner.daily_plan')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {dailyPlans.map((dp, i) => (
                 <div key={i} className="border border-border-main p-3 rounded-lg bg-bg-main flex flex-col gap-2">
                   <h3 className="font-bold text-md mb-1 text-text-main">{DAYS[i]}</h3>
                   
                   <div>
-                    <label className="text-xs font-medium text-text-muted">Sobrescribir Equipo</label>
+                    <label className="text-xs font-medium text-text-muted">{t('planner.override_team')}</label>
                     <select value={dp.teamId || ''} onChange={e => updateDaily(i, 'teamId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm">
-                      <option value="">(Usar Principal)</option>
+                      <option value="">{t('planner.use_main')}</option>
                       {savedTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                     </select>
                   </div>
                   
                   <div>
-                    <label className="text-xs font-medium text-text-muted">Receta del Día</label>
+                    <label className="text-xs font-medium text-text-muted">{t('planner.recipe_day')}</label>
                     <select value={dp.recipeId || ''} onChange={e => updateDaily(i, 'recipeId', e.target.value)} className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm">
-                      <option value="">(Usar Principal / Variable)</option>
+                      <option value="">{t('planner.use_main_recipe')}</option>
                       {availableRecipes.map(r => (
                         <option key={r.name} value={r.name}>{translateRecipe(t, r.name)}</option>
                       ))}
@@ -270,7 +270,7 @@ export function WeeklyPlanEditor({ plan, onBack }: Props) {
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-text-muted">Notas del día</label>
+                    <label className="text-xs font-medium text-text-muted">{t('planner.daily_notes')}</label>
                     <input type="text" value={dp.notes || ''} onChange={e => updateDaily(i, 'notes', e.target.value)} placeholder="Ej: Usar pito para energía..." className="w-full px-2 py-1 border border-border-main rounded bg-bg-surface text-text-main text-sm" />
                   </div>
                 </div>

@@ -152,11 +152,11 @@ export default function OptimizerPage() {
       </div>
 
       <div className="bg-bg-surface border border-border-main rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-4 border-b border-border-main pb-2">Configuración</h2>
+        <h2 className="text-lg font-semibold mb-4 border-b border-border-main pb-2">{t('optimizer.configuration')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Isla</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.island')}</label>
               <select 
                 value={island}
                 onChange={e => setIsland(e.target.value as IslandId)}
@@ -197,7 +197,7 @@ export default function OptimizerPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1">Bonus de Área (%)</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.area_bonus')}</label>
               <input 
                 type="number" min="0" max="60" step="5"
                 value={areaBonus}
@@ -215,21 +215,21 @@ export default function OptimizerPage() {
                 className="w-4 h-4 rounded text-indigo-600"
                 disabled={isOptimizing}
               />
-              <label htmlFor="uniqueSpecies" className="text-sm font-medium">Forzar 5 especies distintas (Evitar duplicados)</label>
+              <label htmlFor="uniqueSpecies" className="text-sm font-medium">{t('optimizer.force_unique')}</label>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Objetivo de Optimización</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.objective')}</label>
               <select 
                 value={objective}
                 onChange={e => setObjective(e.target.value as OptimizerObjective)}
                 className="w-full p-2 border border-border-main rounded bg-bg-app"
                 disabled={isOptimizing}
               >
-                <option value="berries">Fuerza Máxima (Producción de Bayas)</option>
-                <option value="ingredients">Fuerza Máxima (Producción de Ingredientes base)</option>
+                <option value="berries">{t('optimizer.objective_berries')}</option>
+                <option value="ingredients">{t('optimizer.objective_ingredients')}</option>
                 <option value="recipe">Cobertura de Recetas ({recipeType === 'curry' ? 'Curris' : recipeType === 'salad' ? 'Ensaladas' : 'Postres'})</option>
               </select>
             </div>
@@ -237,7 +237,7 @@ export default function OptimizerPage() {
             {objective === 'recipe' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Tipo de Platos de la Semana</label>
+                  <label className="block text-sm font-medium mb-1">{t('optimizer.dish_type')}</label>
                   <select 
                     value={recipeType}
                     onChange={e => {
@@ -247,14 +247,14 @@ export default function OptimizerPage() {
                     className="w-full p-2 border border-border-main rounded bg-bg-app"
                     disabled={isOptimizing}
                   >
-                    <option value="curry">Guisos y Curris</option>
-                    <option value="salad">Ensaladas</option>
-                    <option value="dessert">Postres</option>
+                    <option value="curry">{t('game.recipeType.curry')}</option>
+                    <option value="salad">{t('game.recipeType.salad')}</option>
+                    <option value="dessert">{t('game.recipeType.dessert')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-text-muted">Priorizar Receta Específica (Opcional)</label>
+                  <label className="block text-sm font-medium mb-1 text-text-muted">{t('optimizer.prioritize_recipe')}</label>
                   <select 
                     value={targetRecipeId}
                     onChange={e => setTargetRecipeId(e.target.value)}
@@ -271,7 +271,7 @@ export default function OptimizerPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1">Nivel Mínimo Permitido</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.min_level_allowed')}</label>
               <input 
                 type="number" min="1" max="100"
                 value={minLevel}
@@ -282,7 +282,7 @@ export default function OptimizerPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Cantidad de Resultados (Top N)</label>
+              <label className="block text-sm font-medium mb-1">{t('optimizer.top_n')}</label>
               <input 
                 type="number" min="1" max="20"
                 value={topN}
@@ -302,7 +302,7 @@ export default function OptimizerPage() {
             </summary>
             <div className="mt-4 max-h-64 overflow-y-auto border border-border-main rounded bg-bg-app p-2 space-y-2">
               {collection.length === 0 ? (
-                <div className="p-4 text-center text-sm text-text-muted">Tu colección está vacía.</div>
+                <div className="p-4 text-center text-sm text-text-muted">{t('optimizer.empty_collection')}</div>
               ) : collection.map(p => {
                 const isReq = requiredPokemonIds.includes(p.id);
                 const isExc = excludedPokemonIds.includes(p.id);
@@ -358,7 +358,7 @@ export default function OptimizerPage() {
       {isOptimizing && progress && (
         <div className="bg-bg-surface border border-indigo-200 dark:border-indigo-900 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center space-y-4">
           <div className="animate-spin text-indigo-600"><Calculator size={32} /></div>
-          <h3 className="font-semibold text-lg text-indigo-700 dark:text-indigo-400">Analizando Equipos...</h3>
+          <h3 className="font-semibold text-lg text-indigo-700 dark:text-indigo-400">{t('optimizer.analyzing')}</h3>
           <div className="w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
             <div 
               className="bg-indigo-600 h-4 transition-all duration-300"
@@ -398,7 +398,7 @@ export default function OptimizerPage() {
                 <div key={i} className="bg-bg-surface border border-border-main rounded-xl p-5 shadow-sm space-y-4 cursor-pointer hover:border-indigo-400 transition-colors" onClick={() => setSelectedResult(res)}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border-main pb-3 gap-2">
                       <div className="flex items-center gap-3">
-                        <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" checked={compareList.includes(res)} onChange={(e) => {
+                        <input type="checkbox" className="w-5 h-5 rounded border-border-main bg-bg-app text-indigo-600 focus:ring-indigo-500 cursor-pointer" checked={compareList.includes(res)} onChange={(e) => {
                           e.stopPropagation();
                           if (e.target.checked) {
                             if (compareList.length < 2) setCompareList([...compareList, res]);

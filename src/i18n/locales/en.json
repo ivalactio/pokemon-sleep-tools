@@ -1,6 +1,17 @@
 {
   "app": {
-    "title": "PokéSleep Optimizer"
+    "title": "PokéSleep Optimizer",
+    "name": "Name",
+    "all": "All",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "none": "None",
+    "back": "Back",
+    "level": "Lv.",
+    "loading": "Loading or not found..."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -11,12 +22,24 @@
     "optimizer": "Optimizer"
   },
   "collection": {
-    "title": "My Collection",
+    "title": "Collection",
     "search": "Search by nickname or species...",
     "empty": "No Pokémon in your collection.",
     "add_first": "Add your first Pokémon!",
     "specialty": "Specialty",
-    "sort_by_level": "Lv."
+    "sort_by_level": "Lv.",
+    "filters": "Filters",
+    "analyze_with": "Analyze with:",
+    "error": "Error:",
+    "missing_data": "⚠️ Missing data (Nature, Ings or Subskills)",
+    "advanced_filters": "Advanced Filters",
+    "min_level": "Min Level",
+    "max_level": "Max Level",
+    "nature": "Nature",
+    "required_subskills": "Required Subskills",
+    "required_ingredients": "Required Ingredients",
+    "only_favorites": "Only Favorites",
+    "only_incomplete": "Only Incomplete Data"
   },
   "pokemon_form": {
     "title_add": "Add Pokémon",
@@ -32,12 +55,16 @@
     "select_nature": "Select nature..."
   },
   "recipes": {
-    "title": "Recipe Catalog",
+    "title": "Recipes",
     "curry": "Curries",
     "salad": "Salads",
     "dessert": "Desserts",
     "all": "All",
-    "value": "Value"
+    "value": "Value",
+    "base_power": "Base Power",
+    "max_power": "Max Power",
+    "bonus": "Bonus",
+    "not_found": "No recipes found with those filters."
   },
   "settings": {
     "title": "Settings",
@@ -58,7 +85,10 @@
       "status_error": "Connection error.",
       "no_key_warning": "Server key will be used if available.",
       "byok_warning": "The key is kept in memory during this session only. It will disappear when you reload the page."
-    }
+    },
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark"
   },
   "errors": {
     "MISSING_API_KEY": "No API key available. Configure one in Settings or on the server.",
@@ -295,6 +325,11 @@
       "HONEY_GATHER_CHOCOLATE_WAFFLES": "\"Honey Gather\" Chocolate Waffles",
       "SCARY_FACE_PANCAKES": "\"Scary Face\" Pancakes",
       "LEAF_TORNADO_SMOOTHIE": "\"Leaf Tornado\" Smoothie"
+    },
+    "recipeType": {
+      "curry": "Curries & Stews",
+      "salad": "Salads",
+      "dessert": "Desserts"
     }
   },
   "dashboard": {
@@ -317,5 +352,107 @@
     "lapis": "Lapis Lakeside",
     "power_plant": "Old Gold Power Plant",
     "amber_canyon": "Amber Canyon"
+  },
+  "optimizer": {
+    "configuration": "Configuration",
+    "island": "Island",
+    "area_bonus": "Area Bonus (%)",
+    "force_unique": "Force 5 different species (Avoid duplicates)",
+    "objective": "Optimization Objective",
+    "objective_berries": "Max Strength (Berry Production)",
+    "objective_ingredients": "Max Strength (Base Ingredient Production)",
+    "objective_recipe": "Recipe Coverage",
+    "dish_type": "Weekly Dish Type",
+    "prioritize_recipe": "Prioritize Specific Recipe (Optional)",
+    "min_level_allowed": "Minimum Allowed Level",
+    "top_n": "Number of Results (Top N)",
+    "empty_collection": "Your collection is empty.",
+    "analyzing": "Analyzing Teams...",
+    "all_category": "Optimize for WHOLE category"
+  },
+  "team": {
+    "compare": "Team Comparator",
+    "metric": "Metric",
+    "team_a": "Team A",
+    "team_b": "Team B",
+    "berries_day": "Berries / Day",
+    "ings_day": "Ingredients / Day",
+    "skills_day": "Skills / Day",
+    "detail": "Team Detail",
+    "save": "Save Team",
+    "members_production": "Members and Daily Production",
+    "recipe_coverage": "Recipe Coverage",
+    "recipe_coverage_desc": "Based on the estimated daily ingredient production of the full team.",
+    "coverage": "Coverage",
+    "missing": "Missing:",
+    "ings": "ings"
+  },
+  "saved": {
+    "queries_title": "Saved Queries",
+    "load": "Load",
+    "empty_queries": "No saved queries.",
+    "teams_title": "Saved Teams",
+    "empty_teams": "No saved teams.",
+    "comparator_title": "Standalone Comparator",
+    "select_two": "Please select 2 teams from Saved Teams.",
+    "comparing": "Comparing:",
+    "eval_context": "Evaluation Context"
+  },
+  "planner": {
+    "title": "Weekly Planner",
+    "optimize": "Optimize Team",
+    "compare": "Compare Teams",
+    "context": "Context",
+    "plan_name": "Plan Name",
+    "week_start": "Week (Start date)",
+    "general_objective": "General Objective",
+    "weekly_notes": "Weekly Notes",
+    "assigned_teams": "Assigned Teams",
+    "main_team": "Main Team",
+    "select_team": "-- Select Saved Team --",
+    "alt_teams": "Alternative Teams (Optional)",
+    "daily_plan": "Daily Plan",
+    "override_team": "Override Team",
+    "use_main": "(Use Main)",
+    "recipe_day": "Recipe of the Day",
+    "use_main_recipe": "(Use Main / Variable)",
+    "daily_notes": "Daily notes",
+    "new_plan": "New Plan",
+    "starts": "Starts:",
+    "empty": "No saved plans. Create a new one to start.",
+    "confirm_delete": "Delete this plan?",
+    "compare_error": "To compare directly, you must have exactly 2 defined teams (Main and 1 Alternative).",
+    "copy_suffix": "(Copy)"
+  },
+  "import": {
+    "editing": "Editing Pokémon",
+    "json_title": "Import JSON",
+    "json_desc": "Paste the JSON code generated by the extension or Gemini script below:",
+    "json_results": "JSON Import Results",
+    "select_all": "Select all",
+    "upload": "Upload Image",
+    "camera": "Camera",
+    "review": "Review Capture",
+    "warnings": "Warnings",
+    "basic_data": "Basic Data",
+    "experimental": "Unfinished experimental feature",
+    "manual_review": "requires manual review",
+    "dont_close": "Do not close this screen while analyzing",
+    "species": "Species *",
+    "select_species": "Select species...",
+    "main_skill_level": "Main Skill Level",
+    "main_skill_auto": "Main Skill (Auto)",
+    "ribbon": "Ribbon",
+    "none_0": "None (0)",
+    "lv1_inv": "Lv 1 (+ Inventory)",
+    "lv2_freq": "Lv 2 (+ Frequency)",
+    "lv3_inv": "Lv 3 (+ Inventory)",
+    "lv4_freq": "Lv 4 (+ Frequency)",
+    "shiny": "Shiny",
+    "sneaky_snacking": "Sneaky Snacking",
+    "ingredients": "Ingredients",
+    "select_ingredient": "Select ingredient...",
+    "subskills": "Subskills",
+    "select_subskill": "Select subskill..."
   }
 }

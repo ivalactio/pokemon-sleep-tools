@@ -49,11 +49,11 @@ export default function Recipes() {
 
   return (
     <div className="max-w-7xl mx-auto pb-10">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><ChefHat className="text-indigo-500" /> Recetas</h2>
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><ChefHat className="text-indigo-500" /> {t('recipes.title')}</h2>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex bg-bg-surface p-1 rounded-lg border border-border-main overflow-x-auto">
-          <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'ALL' ? 'bg-indigo-500 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>Todas</button>
+          <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'ALL' ? 'bg-indigo-500 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>{t('app.all')}</button>
           <button onClick={() => setFilter('curry')} className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap ${filter === 'curry' ? 'bg-orange-500 text-white shadow-sm' : 'text-text-muted hover:text-text-main'}`}>
             <Utensils size={16} /> Guisos y curris
           </button>
@@ -110,15 +110,15 @@ export default function Recipes() {
 
             <div className="p-4 border-t border-border-main bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center text-sm">
               <div className="flex flex-col">
-                <span className="text-text-muted text-xs">Poder Base</span>
+                <span className="text-text-muted text-xs">{t('recipes.base_power')}</span>
                 <span className="font-bold text-green-600 dark:text-green-400">{recipe.value.toLocaleString()}</span>
               </div>
               <div className="flex flex-col text-right">
-                <span className="text-text-muted text-xs">Poder Max</span>
+                <span className="text-text-muted text-xs">{t('recipes.max_power')}</span>
                 <span className="font-bold text-indigo-600 dark:text-indigo-400">{recipe.valueMax.toLocaleString()}</span>
               </div>
               <div className="flex flex-col text-right">
-                <span className="text-text-muted text-xs">Bonus</span>
+                <span className="text-text-muted text-xs">{t('recipes.bonus')}</span>
                 <span className="font-bold text-amber-600 dark:text-amber-400">+{recipe.bonus}%</span>
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function Recipes() {
       
       {filteredRecipes.length === 0 && (
         <div className="text-center py-12 text-text-muted">
-          <p>No se encontraron recetas con esos filtros.</p>
+          <p>{t('recipes.not_found')}</p>
         </div>
       )}
     </div>

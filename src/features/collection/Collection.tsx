@@ -149,10 +149,10 @@ export default function Collection() {
           </div>
           <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="bg-bg-surface border border-border-main rounded-lg px-3 py-2 text-sm">
             <option value="level">Nv</option>
-            <option value="name">Nombre</option>
+            <option value="name">{t('app.name')}</option>
           </select>
-          <button onClick={() => setShowFilters(true)} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-slate-100 font-bold text-sm">Filtros</button>
-          <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-surface hover:bg-slate-100" title="Exportar Backup JSON">
+          <button onClick={() => setShowFilters(true)} className="px-3 py-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover font-bold text-sm">{t('collection.filters')}</button>
+          <button onClick={handleExport} className="p-2 border border-border-main rounded-lg bg-bg-surface hover:bg-bg-surface-hover" title="Exportar Backup JSON">
             <Download size={18} className="text-text-muted"/>
           </button>
           <button 
@@ -180,7 +180,7 @@ export default function Collection() {
         <div className="mb-6 bg-bg-surface border border-border-main rounded-xl p-5 shadow-sm space-y-4">
           {/* Selector de proveedor */}
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-text-muted">Analizar con:</span>
+            <span className="text-sm font-medium text-text-muted">{t('collection.analyze_with')}</span>
             {(Object.keys(PROVIDER_LABELS) as ProviderKey[]).map((key) => (
               <button
                 key={key}
@@ -221,7 +221,7 @@ export default function Collection() {
 
           {captureError && (
             <div className="text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 p-3 rounded-lg border border-red-200 dark:border-red-800 text-sm">
-              <strong>Error:</strong> {captureError}
+              <strong>{t('collection.error')}</strong> {captureError}
             </div>
           )}
         </div>
@@ -245,7 +245,7 @@ export default function Collection() {
               <p className="text-sm text-text-muted truncate">
                 {t('collection.sort_by_level')} {p.level} • {getNatureDisplayName(t, p.natureId || '')}
               </p>
-              {!isComplete(p) && <p className="text-xs text-red-500 font-bold mt-2">⚠️ Faltan datos (Naturaleza, Ings o Subhabs)</p>}
+              {!isComplete(p) && <p className="text-xs text-red-500 font-bold mt-2">{t('collection.missing_data')}</p>}
             </Link>
           ))}
         </div>
