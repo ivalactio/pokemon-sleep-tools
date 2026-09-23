@@ -6,6 +6,7 @@ import PokemonForm from './features/collection/PokemonForm';
 import PokemonDetail from './features/collection/PokemonDetail';
 import Recipes from './features/recipes/Recipes';
 import Settings from './features/settings/Settings';
+import TestsPage from './features/tests/TestsPage';
 import OptimizerPage from './features/optimizer/OptimizerPage';
 import SavedQueriesPage from './features/saved/SavedQueriesPage';
 import SavedTeamsPage from './features/saved/SavedTeamsPage';
@@ -35,6 +36,7 @@ function App() {
             <Route path="comparador" element={<TeamComparatorPage />} />
             <Route path="planificador" element={<WeeklyPlannerPage />} />
             <Route path="configuracion" element={<Settings />} />
+            <Route path="tests" element={<TestsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

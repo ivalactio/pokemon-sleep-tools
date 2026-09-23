@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Book, LayoutDashboard, List, Settings as SettingsIcon, Zap } from 'lucide-react';
+import { Book, LayoutDashboard, List, Settings as SettingsIcon, Zap, TestTube } from 'lucide-react';
 
 export default function Layout() {
   const { t } = useTranslation();
@@ -68,12 +68,18 @@ export default function Layout() {
               Planificador semanal
             </Link>
           </li>
-          <li>
-            <Link to="/configuracion" className={linkClass('/configuracion')}>
-              <SettingsIcon size={20} />
-              {t('nav.settings')}
-            </Link>
-          </li>
+            <li>
+              <Link to="/configuracion" className={linkClass('/configuracion')}>
+                <SettingsIcon size={20} />
+                {t('nav.settings')}
+              </Link>
+            </li>
+            <li>
+              <Link to="/tests" className={linkClass('/tests')}>
+                <TestTube size={20} />
+                Tests
+              </Link>
+            </li>
         </ul>
       </nav>
       <main className="flex-1 p-6 overflow-auto">
